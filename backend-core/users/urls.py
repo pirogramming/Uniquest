@@ -4,11 +4,14 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView, # 로그인 (Access + Refresh 토큰 발급)
     TokenRefreshView,    # 토큰 갱신
 )
+from . import views
 
 app_name = 'users'
 
 urlpatterns = [
-    path('signup/', RegisterView.as_view(), name='signup'),
+    path('signup/',views.signup_page,name="signup"),
+    path('signup-data/', RegisterView.as_view(), name='signup-data'),
+    path('verify-email/', views.verify_email, name='verify-email'),
     
     # 로그인 (이거 하나면 끝!)
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
