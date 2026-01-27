@@ -118,3 +118,25 @@ button {
 .verify-group input {
     flex: 1;
 }
+
+.footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* 링크 사이 간격 */
+    padding:0 6px;
+}
+
+.footer a {
+    color: #777;
+    text-decoration: none;
+    font-size: 13.5px;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.footer a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}

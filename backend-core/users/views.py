@@ -8,6 +8,12 @@ import json
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+
+#유저모델 불러오기
+User = get_user_model()
 
 #메일 인증 test용
 from django.core.cache import cache
@@ -75,18 +81,33 @@ class ProfileView(views.APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
 
-# 3. 대학생 인증 메일 발송 View (Univcert 연동 예시)
-class UnivCertView(views.APIView):
-    permission_classes = [IsAuthenticated]
+def login_page(request):
+    return render(request,'users/login.html')
+
+class MyLoginView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
+        # 1. 프론트에서 보낸 email과 password 받기
         email = request.data.get('email')
-        univ_name = request.data.get('univ_name')
-        
-        # 실제로는 여기서 Univcert API 호출
-        # response = requests.post('https://univcert.com/api/v1/certify', ...)
-        
-        # (테스트용 가짜 로직)
-        if email and univ_name:
-            return Response({"message": "인증 메일이 전송되었습니다."}, status=status.HTTP_200_OK)
-        return Response({"error": "이메일과 학교명을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+        password = request.data.get('password')
+        print(email,password)
+
+        try:
+            # 2. 이메일로 유저 객체 찾기 (이메일이 유니크하다고 가정)
+            user_obj = User.objects.get(univ_email=email)
+            print(user_obj.username)
+            
+            # 3. 비밀번호 검증 (authenticate 대신 직접 체크)
+            if user_obj.check_password(password):
+                # 4. 검증 성공 시 JWT 발급
+                refresh = RefreshToken.for_user(user_obj)
+                return Response({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'detail': '비밀번호가 틀렸습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
+                
+        except User.DoesNotExist:
+            return Response({'detail': '존재하지 않는 이메일입니다.'}, status=status.HTTP_404_NOT_FOUND)
