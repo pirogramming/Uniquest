@@ -62,24 +62,6 @@ def verify_email(request):
 
     return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
 
-# def check_number(request):
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             # print("받은 데이터:", data) # 터미널 확인용
-            
-#             # 이메일 값이 잘 들어왔는지 확인
-#             number = int(data.get('number'))
-#             email = data.get('email')
-#             if number:
-#                 if verify_code(email, number):
-#                     print('번호 인증 완료')
-#                 else:
-#                     return JsonResponse({'message': '인증번호가 틀렸습니다.'}, status=400)
-#             else:
-#                 return JsonResponse({'message': '인증번호 값이 없습니다.'}, status=400)
-                
-
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
