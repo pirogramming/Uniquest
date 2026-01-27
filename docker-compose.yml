@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # [Gateway] Nginx
+  # [1] 게이트웨이: 외부 요청을 백엔드 서버들로 배분
   nginx:
     image: nginx:alpine
     ports:
@@ -12,48 +12,55 @@ services:
       - backend-core
       - backend-chat
 
-  # [Main Server] Django
+  # [2] 메인 서버 (Django): 유저, 미션, 정산 등 핵심 비즈니스 로직
   backend-core:
     build: ./backend-core
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend-core:/app
-    ports:
-      - "8000:8000"
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=uniquest
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
     depends_on:
       - postgres
       - redis
 
-  # [Chat Server] FastAPI
+  # [3] 채팅 서버 (FastAPI): 실시간 웹소켓 통신 및 MongoDB 저장
   backend-chat:
     build: ./backend-chat
     command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
     volumes:
       - ./backend-chat:/app
-    ports:
-      - "8001:8001"
     environment:
       - REDIS_HOST=redis
+      - MONGO_URL=mongodb://mongo:27017
     depends_on:
+      - mongo
       - redis
 
-  # [DB] PostgreSQL
+  # [4] 관계형 DB (PostgreSQL): 유저, 미션 데이터 저장
   postgres:
     image: postgres:13
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=uniquest
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # [Message Broker] Redis
+  # [5] NoSQL DB (MongoDB): 채팅 메시지 로그 대량 저장
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+  # [6] 메시지 브로커 (Redis): 서버 간 통신 및 캐싱
   redis:
     image: redis:alpine
     ports:
@@ -61,3 +68,4 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:
