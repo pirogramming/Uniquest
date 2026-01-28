@@ -25,9 +25,6 @@ env = environ.Env(
 # 2. .env 파일을 읽어들임
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# 3. 값 할당
-DEBUG = env('DEBUG')
-
 # 메일 설정에 활용
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
