@@ -1,0 +1,142 @@
+/* 기본 레이아웃 설정 */
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    background-color: #f4f7f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* 회원가입 컨테이너 */
+.signup-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* 입력 그룹 스타일 */
+.input-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* 이메일 및 인증 섹션 */
+.email-section {
+    display: flex;
+    gap: 8px;
+}
+
+.email-section input {
+    flex: 1;
+}
+
+/* 버튼 공통 스타일 */
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+/* 서브 버튼 (발송, 확인) */
+.btn-sub {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 15px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.btn-sub:hover {
+    background-color: #5a6268;
+}
+
+/* 메인 제출 버튼 */
+.btn-main {
+    width: 100%;
+    background-color: #4A90E2;
+    color: white;
+    padding: 14px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.btn-main:hover {
+    background-color: #357ABD;
+    transform: translateY(-1px);
+}
+
+/* 인증번호 박스 */
+#check_number_box {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px dashed #ced4da;
+}
+
+.verify-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.verify-group input {
+    flex: 1;
+}
+
+.footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* 링크 사이 간격 */
+    padding:0 6px;
+}
+
+.footer a {
+    color: #777;
+    text-decoration: none;
+    font-size: 13.5px;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.footer a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}

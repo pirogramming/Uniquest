@@ -1,24 +1,29 @@
 from django.urls import path
-from .views import RegisterView, ProfileView, UnivCertView
+from .views import RegisterView, ProfileView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView, # 로그인 (Access + Refresh 토큰 발급)
     TokenRefreshView,    # 토큰 갱신
 )
+from . import views
+from .views import MyLoginView
+
+app_name = 'users'
 
 urlpatterns = [
-    # 회원가입
-    path('signup/', RegisterView.as_view(), name='signup'),
+    #회원가입
+    path('signup/',views.signup_page,name="signup"),
+    path('signup-data/', RegisterView.as_view(), name='signup-data'),
+    path('verify-email/', views.verify_email, name='verify-email'),
     
-    # 로그인 (SimpleJWT 기본 제공 뷰 사용)
-    # 아이디/비번을 POST로 보내면 access, refresh 토큰을 반환합니다.
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    
-    # 토큰 갱신 (Access 토큰 만료 시 Refresh 토큰으로 재발급)
+    # 로그인
+    path('login/',views.login_page,name="login"),
+    path('login_logic/', MyLoginView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #로그아웃
+    path('logout/',views.logout,name='logout'),
     
     # 내 정보 조회
     path('profile/', ProfileView.as_view(), name='profile'),
-    
-    # 대학생 인증
-    path('verify-univ/', UnivCertView.as_view(), name='verify_univ'),
+    # path('verify-univ/', UnivCertView.as_view(), name='verify_univ'),
 ]

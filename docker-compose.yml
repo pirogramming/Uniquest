@@ -15,7 +15,9 @@ services:
   # [2] 메인 서버 (Django): 유저, 미션, 정산 등 핵심 비즈니스 로직
   backend-core:
     build: ./backend-core
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate && 
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./backend-core:/app
     environment:
