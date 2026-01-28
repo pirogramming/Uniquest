@@ -1,0 +1,44 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Uniquest</title>
+    <link rel="stylesheet" href="{%static 'css/login.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="signup-wrapper">
+        <div class="signup-container">
+            <div class="header">
+                <h2>로그인</h2>
+                <p>Uniquest에 오신 것을 환영합니다</p>
+            </div>
+            
+            <form method="submit">
+                {%csrf_token%}
+                <div class="input-section">
+                    <div class="email-section">
+                        <label for="email">이메일</label>
+                        <input type="email" name="email" id="email" placeholder="school@ac.kr" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">비밀번호</label>
+                        <input type="password" name="password" id="password" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-main" onclick="handleSignup()">로그인</button>
+            </form>
+            
+            <div class="footer">
+                <a href="#" id="search_key">비밀번호 찾기</a>
+                <a href="{%url 'users:signup'%}" id="signup">회원가입하기</a>
+            </div>
+        </div>
+    </div>
+    <script src="{%static 'js/login.js'%}"></script>
+</body>
+</html>
