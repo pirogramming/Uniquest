@@ -277,6 +277,11 @@ def send_verification_email(raw_email):
         smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
         smtp.send_message(msg)
 
+# def send_verification_email(raw_email):
+#     auth_code = rd.randint(100000, 999999)
+#     cache.set(f"auth_{raw_email}", str(auth_code), timeout=300)
+#     print(cache.get(f"auth_{raw_email}"))
+
     
 def verify_code(raw_email, user_input):
     saved_code = cache.get(f"auth_{raw_email}")

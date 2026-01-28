@@ -33,7 +33,12 @@ async function handleSignup(){
         })
 
         if (response.ok) {
-            alert("로그인 성공!");
+            const data = await response.json();
+            // 💡 핵심: 브라우저 금고(LocalStorage)에 토큰 보관
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            console.log(data)
+            alert("로그인 성공 야호!");
         } else {
             const errorData = await response.json();
             console.error("에러 발생:", errorData);

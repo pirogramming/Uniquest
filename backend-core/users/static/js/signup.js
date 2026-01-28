@@ -1,7 +1,3 @@
-let is_email_varified = false;
-let verified_email = ""
-let university_name = ""
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -18,10 +14,7 @@ function getCookie(name) {
 }
 
 async function handleSignup(){
-    if (!is_email_varified){ // 학생메일 인증 누락시
-        alert('학생메일 인증은 필수입니다!')
-        return
-    } else if(document.getElementById('password').value !== document.getElementById('password_check').value){
+    if(document.getElementById('password').value !== document.getElementById('password_check').value){
         document.getElementById('password_check').value = "";
         document.getElementById('password_check').focus();
         alert('비밀번호 불일치')
@@ -34,9 +27,8 @@ async function handleSignup(){
         username:document.getElementById('username').value,
         nickname:document.getElementById('nickname').value,
         password:document.getElementById('password').value,
+        univ_email:document.getElementById('email').value,
         password_check:document.getElementById('password_check').value,
-        univ_email:verified_email,
-        university:university_name
     }
 
     const response = await fetch('/users/signup-data/', {
@@ -50,6 +42,9 @@ async function handleSignup(){
 
     if (response.ok) {
         alert("회원가입 성공!");
+        const data = await response.json();
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
         window.location.href = "/login-page/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
@@ -78,10 +73,10 @@ async function send_number(){
             action:'send_email'
         })
     });
+
     if (response.ok){
         const data = await response.json();
         document.getElementById('check_number_box').style.display = 'block'
-        university_name = data.university
         alert(data.message + data.university);
     } else{
         const data = await response.json();
@@ -117,9 +112,7 @@ async function check_number(){
     if (response.ok){
         const data = await response.json();
         if (data.is_varified){
-            alert('인증 성공!')
-            is_email_varified = true
-            verified_email = data.email
+            alert('메일 인증 성공!')
         }
     } else{
         const data = await response.json();

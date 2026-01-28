@@ -6,7 +6,7 @@ User = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'nickname', 'university', 'univ_email']
+        fields = ['username', 'password', 'nickname', 'university', 'univ_email','is_student_verified']
         extra_kwargs = {
             'password': {'write_only': True} # 비번은 응답에 포함 안 함
         }
@@ -18,7 +18,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             nickname=validated_data['nickname'],
             university=validated_data.get('university', ''),
-            univ_email=validated_data.get('univ_email', '')
+            univ_email=validated_data.get('univ_email', ''),
+            is_student_verified=validated_data.get('is_student_verified', '')
         )
         return user
 
