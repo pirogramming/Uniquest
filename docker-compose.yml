@@ -26,6 +26,8 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
+      - EMAIL_HOST_USER=your_email@gmail.com # 임시
+      - EMAIL_HOST_PASSWORD=your_password # 임시
     depends_on:
       - postgres
       - redis
