@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def sy_map(request):
+    return render(request, "missions/sy_map.html")
