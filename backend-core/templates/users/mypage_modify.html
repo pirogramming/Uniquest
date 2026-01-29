@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>유니퀘스트 - 마이페이지</title>
+</head>
+<body>
+    <form method="PATCH">
+        <label for="user-nickname"></label>
+        <input type="text" id="user-nickname" value="">
+        <label for="user-name"></label>
+        <input type="text" id="user-name">
+        <h1>안녕하세요, <span id="user-email"></span>님!</h1>
+        <h1>안녕하세요, <span id="user-univ"></span>님!</h1>
+    </form>
+
+    <button>저장하기</button>
+
+    <script src="{% static 'users/js/mypage_modify.js' %}"></script>
+</body>
+</html>

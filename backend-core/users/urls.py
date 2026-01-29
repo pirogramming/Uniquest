@@ -24,5 +24,11 @@ urlpatterns = [
     path('logout/',views.logout,name='logout'),
     
     path('profile/', ProfileView.as_view(), name='profile'),
-    # path('verify-univ/', UnivCertView.as_view(), name='verify_univ'),
+
+    # 마이페이지 메인
+    path('mypage/', views.mypage_view, name='mypage_screen'),
+    path('api/profile/', views.get_my_info, name='get_my_info_api'),
+    # 마이페이지 수정
+    path('mypage_modify/', views.mypage_modify_view, name='mypage_modify_screen'),
+    path('api/profile_modify/', views.get_my_info_patch, name='get_my_info_api_patch'),
 ]

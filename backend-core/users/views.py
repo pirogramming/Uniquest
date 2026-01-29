@@ -156,3 +156,45 @@ class MyLoginView(APIView):
         
 def logout(request):
     return render(request,'users/logout.html')
+
+
+
+
+# users/views.py (함수형 뷰 예시)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
+def get_my_info(request):
+    user = request.user
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "nickname": user.nickname,
+        "university": user.university,
+        "univ_email": user.univ_email,
+        "is_student_verified": user.is_student_verified,
+        "manner_score": round(user.manner_score, 1)
+    })
+
+def mypage_view(request):
+    return render(request, 'users/mypage.html')
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
+def get_my_info_patch(request):
+    user = request.user
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "nickname": user.nickname,
+        "university": user.university,
+        "univ_email": user.univ_email,
+        "is_student_verified": user.is_student_verified,
+        "manner_score": round(user.manner_score, 1)
+    })
+
+def mypage_modify_view(request):
+    return render(request, 'users/mypage_modify.html')
