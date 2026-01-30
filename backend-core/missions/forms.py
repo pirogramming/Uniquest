@@ -31,6 +31,7 @@ class MissionCreateForm(forms.ModelForm):
     images = forms.ImageField(
         required=False,
         widget=MultiFileInput(attrs={"multiple": True}),
+        label="미션 이미지들",
     )
 
     # 위치 hidden 필드(지도 선택 후 자동으로 채워짐)
@@ -62,9 +63,8 @@ class MissionCreateForm(forms.ModelForm):
         # datetime-local(분까지만) vs now(초/마이크로초) 때문에
         # 방금 고른 시간이 과거 판정 나는 문제를 방지
         now = timezone.now()
-        comparision_now = now.replace(second=0, microsecond=0)  
 
-        if deadline <= comparision_now:
+        if deadline < (now - timezone.timedelta(minutes=1)):
             raise ValidationError("마감기한은 현재 이후여야 합니다.ddddd(입력: {deadline.strftime('%Y-%m-%d %H:%M')})")
 
         return deadline

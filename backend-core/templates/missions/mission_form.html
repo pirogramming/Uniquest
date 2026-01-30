@@ -162,11 +162,9 @@
   </form>
 
 <script>
-  // =========================
-  // 0) Draft 저장/복원 (위치 선택 갔다 와도 값 유지)
-  // =========================
   const DRAFT_KEY = "mission_draft_v1";
 
+  // 0) Draft 저장/복원
   function saveDraft() {
     const data = {
       title: document.querySelector("input[name='title']")?.value || "",
@@ -175,7 +173,6 @@
       category: document.querySelector("select[name='category']")?.value || "",
       deadline: document.querySelector("input[name='deadline']")?.value || "",
       tags_input: document.getElementById("tags_input")?.value || "",
-      // location은 지도에서 새로 오니 굳이 저장 안 해도 됨(원하면 추가 가능)
     };
     sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
   }
@@ -185,53 +182,35 @@
     if (!raw) return;
     try {
       const data = JSON.parse(raw);
+      // 필드 값 복구
+      const fields = ['title', 'descriptions', 'reward', 'category', 'deadline'];
+      fields.forEach(name => {
+        const el = document.querySelector(`[name='${name}']`);
+        if (el && !el.value && data[name]) el.value = data[name];
+      });
 
-      const titleEl = document.querySelector("input[name='title']");
-      const descEl = document.querySelector("textarea[name='descriptions']");
-      const rewardEl = document.querySelector("input[name='reward']");
-      const categoryEl = document.querySelector("select[name='category']");
-      const deadlineEl = document.querySelector("input[name='deadline']");
       const tagsHidden = document.getElementById("tags_input");
-
-      if (titleEl && !titleEl.value) titleEl.value = data.title || "";
-      if (descEl && !descEl.value) descEl.value = data.descriptions || "";
-      if (rewardEl && !rewardEl.value) rewardEl.value = data.reward || "";
-      if (categoryEl && !categoryEl.value) categoryEl.value = data.category || "";
-      if (deadlineEl && !deadlineEl.value) deadlineEl.value = data.deadline || "";
-      if (tagsHidden && !tagsHidden.value) tagsHidden.value = data.tags_input || "";
-
-      // 커스텀 태그 칩 UI 갱신
-      if (typeof customTags !== "undefined" && tagsHidden?.value) {
-        customTags.length = 0;
-        tagsHidden.value.split(",").map(s => s.trim()).filter(Boolean).forEach(t => customTags.push(t));
-        if (typeof renderChips === "function") renderChips();
+      if (tagsHidden && data.tags_input) {
+        tagsHidden.value = data.tags_input;
+        customTags = data.tags_input.split(",").filter(Boolean);
+        renderChips();
       }
-
-      // 마감기한 프리뷰 갱신
       initDeadlinePreview();
-    } catch (e) {}
+    } catch (e) { console.error("Draft restore error", e); }
   }
 
-  window.addEventListener("DOMContentLoaded", restoreDraft);
-
-  // =========================
-  // 1) 위치 선택 페이지로 이동 (return 파라미터 + draft 저장)
-  // =========================
+  // 1) 위치 선택 이동
   function goPickLocation() {
     saveDraft();
     const returnUrl = window.location.pathname + window.location.search;
     window.location.href = "{% url 'missions:location_picker' %}?return=" + encodeURIComponent(returnUrl);
   }
 
-  // =========================
-  // 2) 태그 엔터 입력 + 자동완성(간단 버전)
-  // =========================
+  // 2) 태그 관리
   const tagInput = document.getElementById("tag_input");
   const tagChips = document.getElementById("tag_chips");
-  const tagSuggestBox = document.getElementById("tag_suggest_box");
   const tagsHidden = document.getElementById("tags_input");
-
-  let customTags = []; // ["우산","급해요"]
+  let customTags = []; 
   const MAX_TAGS = 5;
 
   function renderChips() {
@@ -240,33 +219,19 @@
       const span = document.createElement("span");
       span.className = "pill";
       span.textContent = "#" + t + "  ×";
-      span.onclick = () => {
-        customTags.splice(idx, 1);
-        syncHidden();
-        renderChips();
-      };
+      span.onclick = () => { customTags.splice(idx, 1); syncHidden(); renderChips(); };
       tagChips.appendChild(span);
     });
   }
 
-  function syncHidden() {
-    tagsHidden.value = customTags.join(",");
-  }
+  function syncHidden() { tagsHidden.value = customTags.join(","); }
 
   function addCustomTag(raw) {
     const t = raw.trim().replace(/^#/, "");
-    if (!t) return;
-
-    if (customTags.includes(t)) return;
-
-    if (customTags.length >= MAX_TAGS) {
-      alert("해시태그는 최대 5개까지 추가할 수 있어요.");
-      return;
-    }
-
+    if (!t || customTags.includes(t)) return;
+    if (customTags.length >= MAX_TAGS) { alert("최대 5개까지 가능합니다."); return; }
     customTags.push(t);
-    syncHidden();
-    renderChips();
+    syncHidden(); renderChips();
   }
 
   tagInput.addEventListener("keydown", (e) => {
@@ -274,148 +239,77 @@
       e.preventDefault();
       addCustomTag(tagInput.value);
       tagInput.value = "";
-      tagSuggestBox.innerHTML = "";
       saveDraft();
     }
   });
 
-  // 입력 중 자동완성(백엔드 API 호출)
-  let suggestTimer = null;
-  tagInput.addEventListener("input", () => {
-    const q = tagInput.value.trim().replace(/^#/, "");
-    const categoryEl = document.querySelector("select[name='category']");
-    const category = categoryEl ? categoryEl.value : "";
-
-    if (suggestTimer) clearTimeout(suggestTimer);
-    suggestTimer = setTimeout(async () => {
-      if (!q) {
-        tagSuggestBox.innerHTML = "";
-        return;
-      }
-      const url = "{% url 'missions:tag_suggest' %}" + `?q=${encodeURIComponent(q)}&category=${encodeURIComponent(category)}`;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      tagSuggestBox.innerHTML = (data.results || []).map(r =>
-        `<span class="pill" data-name="${r.name}">${r.display}</span>`
-      ).join("");
-
-      tagSuggestBox.querySelectorAll(".pill").forEach(el => {
-        el.onclick = () => {
-          addCustomTag(el.dataset.name);
-          tagInput.value = "";
-          tagSuggestBox.innerHTML = "";
-          saveDraft();
-        };
-      });
-    }, 150);
-  });
-
-  // =========================
-  // 3) 위치 초기값이 GET으로 들어온 경우 hidden -> display 반영
-  // =========================
-  (function initLocationDisplay(){
-    const name = document.getElementById("location_name").value;
-    if (name) document.getElementById("location_name_display").value = name;
-  })();
-
-  // =========================
-  // 4) 마감기한 버튼 UX
-  // =========================
+  // 3) 마감기한 UX (핵심 수정 부분)
   const deadlineInput = document.querySelector("input[name='deadline']");
   const duePreview = document.getElementById("due_preview");
   const duePickerWrap = document.getElementById("due_picker_wrap");
   const duePicker = document.getElementById("due_picker");
 
-  const btnToday = document.getElementById("btn_due_today");
-  const btn3d = document.getElementById("btn_due_3d");
-  const btn7d = document.getElementById("btn_due_7d");
-  const btnPick = document.getElementById("btn_due_pick");
-
   function pad2(n){ return String(n).padStart(2,"0"); }
 
+  // Django DateTimeField가 좋아하는 ISO 형식으로 변환
   function toDatetimeLocalValue(d){
     return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
   }
 
-  function toKoreanPreview(d, showAs24=false){
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    let h = d.getHours();
-    let m = d.getMinutes();
-
-    if (showAs24 && h === 23 && m === 59){
-      return `마감기한: ${month}월 ${day}일 24:00`;
-    }
-    return `마감기한: ${month}월 ${day}일 ${pad2(h)}:${pad2(m)}`;
-  }
-
-  function setActive(btn){
-    [btnToday, btn3d, btn7d, btnPick].forEach(b => b.style.opacity = "0.7");
-    btn.style.opacity = "1";
-  }
-
-  function setDueToday(){
-    const now = new Date();
-    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 0, 0);
-    deadlineInput.value = toDatetimeLocalValue(end);
-    duePreview.textContent = toKoreanPreview(end, true);
-    duePickerWrap.style.display = "none";
-    setActive(btnToday);
+  function updateDeadline(dateObj, is24 = false) {
+    const val = toDatetimeLocalValue(dateObj);
+    deadlineInput.value = val;
+    duePreview.textContent = `마감기한: ${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 ` + 
+                             (is24 && dateObj.getHours() === 23 ? "24:00" : `${pad2(dateObj.getHours())}:${pad2(dateObj.getMinutes())}`);
     saveDraft();
   }
 
-  function setDueHoursLater(hours){
-    const now = new Date();
-    const d = new Date(now.getTime() + hours * 60 * 60 * 1000);
-    deadlineInput.value = toDatetimeLocalValue(d);
-    duePreview.textContent = toKoreanPreview(d, false);
+  document.getElementById("btn_due_today").onclick = () => {
+    const d = new Date();
+    d.setHours(23, 59, 0, 0);
+    updateDeadline(d, true);
     duePickerWrap.style.display = "none";
-    setActive(hours === 72 ? btn3d : btn7d);
-    saveDraft();
-  }
+  };
 
-  function enablePicker(){
+  document.getElementById("btn_due_3d").onclick = () => {
+    const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    updateDeadline(d);
+    duePickerWrap.style.display = "none";
+  };
+
+  document.getElementById("btn_due_7d").onclick = () => {
+    const d = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    updateDeadline(d);
+    duePickerWrap.style.display = "none";
+  };
+
+  document.getElementById("btn_due_pick").onclick = () => {
     duePickerWrap.style.display = "block";
-    setActive(btnPick);
+    duePicker.focus();
+  };
 
-    const now = new Date();
-    const base = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    base.setHours(23, 59, 0, 0);
+  duePicker.onchange = () => {
+    if(!duePicker.value) return;
+    updateDeadline(new Date(duePicker.value));
+  };
 
-    duePicker.value = deadlineInput.value || toDatetimeLocalValue(base);
-    duePreview.textContent = "마감기한: 직접 선택 중…";
-  }
-
-  btnToday.addEventListener("click", setDueToday);
-  btn3d.addEventListener("click", () => setDueHoursLater(72));
-  btn7d.addEventListener("click", () => setDueHoursLater(7*24));
-  btnPick.addEventListener("click", enablePicker);
-
-  duePicker.addEventListener("change", () => {
-    if (!duePicker.value) return;
-    deadlineInput.value = duePicker.value;
-    const d = new Date(duePicker.value);
-    duePreview.textContent = toKoreanPreview(d, false);
-    saveDraft();
-  });
-
-  // 밖에서 restoreDraft()가 호출할 수 있게 함수로 남겨둠
   function initDeadlinePreview(){
-    if (deadlineInput && deadlineInput.value){
+    if (deadlineInput?.value){
       const d = new Date(deadlineInput.value);
-      duePreview.textContent = toKoreanPreview(d, false);
-      // 버튼 활성화는 굳이 복원 안 해도 됨(원하면 추가 가능)
+      duePreview.textContent = `마감기한: ${d.getMonth()+1}월 ${d.getDate()}일 ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
     }
   }
 
-  // 페이지 로드 시 프리뷰 갱신(서버 initial 혹은 draft 복원)
-  initDeadlinePreview();
-
-  // 폼 제출 직전 draft 저장
-  document.getElementById("submit_btn").addEventListener("click", () => {
-    saveDraft();
+  // 초기화 실행
+  window.addEventListener("DOMContentLoaded", () => {
+    restoreDraft();
+    if (document.getElementById("location_name").value) {
+        document.getElementById("location_name_display").value = document.getElementById("location_name").value;
+    }
   });
+
+  // 제출 시 draft 삭제 (성공했을 때만 지우기 위해 유지)
+  document.getElementById("submit_btn").onclick = saveDraft;
 </script>
 </body>
 </html>

@@ -21,6 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - TZ=Asia/Seoul
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -39,6 +40,7 @@ services:
     ports:
       - "8001:8001"
     environment:
+      - TZ=Asia/Seoul
       - REDIS_HOST=redis
     depends_on:
       - redis

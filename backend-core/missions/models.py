@@ -86,7 +86,7 @@ class Mission(models.Model):
 
         if self.deadline:
             now = timezone.now()
-            if self.deadline < (now - timezone.timedelta(minutes=1)):
+            if self.deadline < (now - timezone.timedelta(minutes=5)):
                 raise ValidationError({"deadline": "마감기한은 현재 이후여야 합니다."})
 
         # 위치를 받는 정책: "위치추가를 눌렀으면 name+lat+lng 세트로 와야" 정도로 강제

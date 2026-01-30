@@ -99,10 +99,12 @@ def mission_create(request: HttpRequest) -> HttpResponse:
             except Exception:
                 logger.exception("미션 생성 중 오류 발생")
                 form.add_error(None, "미션 생성 중 오류가 발생했습니다. 다시 시도해주세요.")
-
+        else: 
+            print("폼 에러:", form.errors)
+            return render(request, "missions/mission_form.html", {"form": form, "is_update": False,})
         # ✅ POST인데 폼이 invalid거나 예외면, 여기서 다시 렌더해야 버튼 눌렀을 때 반응이 있음
         return render(request, "missions/mission_form.html", {"form": form, "is_update": False,})
-
+    
     # GET
     initial: dict[str, Any] = {}
 
