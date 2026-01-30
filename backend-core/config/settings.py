@@ -80,7 +80,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,6 +147,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [ BASE_DIR / "static" ]
+
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -163,4 +167,12 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY, # Django 비밀키 사용 (FastAPI랑 이거 공유함!)
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+#로그인 후 발급받은 토큰 해독
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 💡 이 설정이 있으면 장고가 API 호출 시마다 자동으로 토큰을 해독합니다.
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }

@@ -54,5 +54,9 @@ async function renderProfile() {
     }
 }
 
+async function logout(){
+    
+}
+
 // 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);

@@ -3,19 +3,47 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>유니퀘스트 - 마이페이지</title>
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유니퀘스트 - 프로필 수정</title>
+    <link rel="stylesheet" href="{%static 'users/css/mypage_modify.css'%}">
+    </head>
 <body>
-    <form method="PATCH">
-        <label for="user-nickname"></label>
-        <input type="text" id="user-nickname" value="">
-        <label for="user-name"></label>
-        <input type="text" id="user-name">
-        <h1>안녕하세요, <span id="user-email"></span>님!</h1>
-        <h1>안녕하세요, <span id="user-univ"></span>님!</h1>
-    </form>
+    <div class="profile-container">
+        <h2>← 프로필 수정</h2>
+        
+        <div class="profile-image-section">
+            <div class="image-circle">연</div>
+            <button type="button" class="img-change-btn">프로필 사진 변경</button>
+        </div>
 
-    <button>저장하기</button>
+        <form id="profile-form">
+            <div class="input-group">
+                <label for="user-nickname">닉네임</label>
+                <input type="text" id="user-nickname" placeholder="닉네임을 입력하세요">
+            </div>
+
+            <div class="input-group">
+                <label for="user-name">이름</label>
+                <input type="text" id="user-name" placeholder="이름을 입력하세요">
+            </div>
+
+            <div class="input-group readonly-group">
+                <p id="user-email"></p>
+                <p class="helper-text">이메일은 변경할 수 없습니다</p>
+            </div>
+
+            <div class="input-group readonly-group">
+                <p id="user-univ"></p>
+                <p class="helper-text">학교 정보는 변경할 수 없습니다</p>
+            </div>
+
+            <div class="info-banner">
+                ⓘ 학교 이메일과 학교 정보는 인증 완료 후 변경할 수 없습니다.
+            </div>
+        </form>
+
+        <button type="button" class="save-btn" onclick="patchProfile()">저장하기</button>
+    </div>
 
     <script src="{% static 'users/js/mypage_modify.js' %}"></script>
 </body>

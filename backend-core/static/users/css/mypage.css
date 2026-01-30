@@ -1,0 +1,168 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    font-family: 'Pretendard', sans-serif;
+    color: #333;
+    display:flex; justify-content: center;
+}
+
+.mypage-container {
+    padding-bottom: 80px; /* 하단 네비게이션 바 공간 */
+    width:450px;
+}
+
+/* 상단 프로필 카드 */
+.profile-card {
+    background: linear-gradient(180deg, #7fb5ff 0%, #a3c9ff 100%);
+    padding: 20px 24px 30px;
+    color: white;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.user-info-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.profile-circle {
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    color: #7fb5ff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.text-info h2 { margin: 0; font-size: 20px; }
+.text-info p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+/* 신뢰 온도 바 */
+.score-section {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.score-bar-bg {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.score-bar-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+}
+
+.score-desc {
+    font-size: 11px;
+    margin-top: 8px;
+    opacity: 0.8;
+}
+
+/* 메뉴 아이템 */
+.menu-section { padding: 20px; }
+
+.menu-item {
+    background: white;
+    padding: 18px 20px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+}
+
+.menu-left { font-weight: 600; }
+.menu-arrow { color: #ccc; }
+
+/* 미션 리스트 그룹 */
+.mission-list-group h3 {
+    font-size: 16px;
+    margin: 25px 0 12px 5px;
+}
+
+.empty-box {
+    background: #fff;
+    padding: 40px;
+    text-align: center;
+    border-radius: 15px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* 로그아웃 버튼 */
+.logout-btn {
+    width: 100%;
+    padding: 15px;
+    border: 1.5px solid #ff4d4f;
+    background: transparent;
+    color: #ff4d4f;
+    border-radius: 15px;
+    font-weight: 700;
+    margin-top: 30px;
+}
+
+.withdraw-text {
+    text-align: center;
+    color: #aaa;
+    font-size: 12px;
+    margin-top: 15px;
+}
+
+/* 하단 네비게이션 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 450px; /* 모바일 폭 제한 */
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+}
+
+.nav-item { text-align: center; font-size: 11px; color: #aaa; }
+.nav-item.active { color: #7fb5ff; }
+
+.nav-plus {
+    width: 45px;
+    height: 45px;
+    background: #7fb5ff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    margin-top: -5px;
+    box-shadow: 0 4px 10px rgba(127, 181, 255, 0.4);
+}

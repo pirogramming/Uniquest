@@ -3,12 +3,76 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>유니퀘스트 - 마이페이지</title>
+    <link rel="stylesheet" href="{% static 'users/css/mypage.css' %}">
 </head>
 <body>
-    <h1>안녕하세요, <span id="user-nickname"></span>님!</h1>
-    <h1>안녕하세요, <span id="user-univ"></span>님!</h1>
-    <h1>안녕하세요, <span id="user-score"></span>님!</h1>
+    <div class="mypage-container">
+        <header class="profile-card">
+            <div class="header-top">
+                <span>마이페이지</span>
+                <img src="{% static 'users/img/settings.svg' %}" alt="설정" class="settings-icon">
+            </div>
+            
+            <div class="user-info-section">
+                <div class="profile-circle">연</div>
+                <div class="text-info">
+                    <h2 id="user-nickname"></h2>
+                    <p id="user-univ"></p>
+                </div>
+            </div>
+
+            <div class="score-section">
+                <div class="score-header">
+                    <span>🌡️ 신뢰 온도</span>
+                    <span id="user-score">36.9°C</span>
+                </div>
+                <div class="score-bar-bg">
+                    <div class="score-bar-fill" style="width: 36.9%;"></div>
+                </div>
+                <p class="score-desc">신뢰 온도는 미션 완료와 평가에 따라 변동됩니다</p>
+            </div>
+        </header>
+
+        <main class="menu-section">
+            <div class="menu-item" onclick="location.href='/users/mypage/modify/'">
+                <div class="menu-left">📝 프로필 수정</div>
+                <div class="menu-arrow">→</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-left">🛡️ 차단 관리</div>
+                <div class="menu-arrow">→</div>
+            </div>
+
+            <section class="mission-list-group">
+                <h3>내가 등록한 미션</h3>
+                <div id="my-registered-missions" class="empty-box">
+                    등록한 미션이 없습니다
+                </div>
+            </section>
+
+            <section class="mission-list-group">
+                <h3>내가 수행한 미션</h3>
+                <div id="my-performed-missions" class="empty-box">
+                    수행한 미션이 없습니다
+                </div>
+            </section>
+
+            <button class="logout-btn" onclick="handleLogout()">
+                <a href="">📤 로그아웃</a>
+            </button>
+            <p class="withdraw-text">회원탈퇴</p>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item">🏠<br>홈</div>
+            <div class="nav-item">📋<br>미션</div>
+            <div class="nav-plus">+</div>
+            <div class="nav-item">💬<br>채팅</div>
+            <div class="nav-item active">👤<br>마이</div>
+        </nav>
+    </div>
 
     <script src="{% static 'users/js/mypage.js' %}"></script>
 </body>

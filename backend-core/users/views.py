@@ -182,19 +182,41 @@ def get_my_info(request):
 def mypage_view(request):
     return render(request, 'users/mypage.html')
 
-@api_view(['PATCH'])
-@permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
+# users/views.py
+
+@api_view(['GET','PATCH']) # 👈 PATCH 추가!
+@permission_classes([IsAuthenticated])
 def get_my_info_patch(request):
     user = request.user
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "nickname": user.nickname,
-        "university": user.university,
-        "univ_email": user.univ_email,
-        "is_student_verified": user.is_student_verified,
-        "manner_score": round(user.manner_score, 1)
-    })
+    
+    if request.method == 'GET':
+        # 기존 조회 로직
+        return Response({
+            "username": user.username,
+            "nickname": user.nickname,
+            "univ_email": user.univ_email,
+            "university": user.university,
+        })
+
+    elif request.method == 'PATCH':
+        # 1. 프론트에서 보낸 데이터(updatedData) 받기
+        nickname = request.data.get('nickname')
+        username = request.data.get('username')
+
+        # 2. 데이터 업데이트 (값이 있을 때만)
+        if nickname:
+            user.nickname = nickname
+        if username:
+            user.username = username
+        
+        # 3. DB 저장
+        user.save()
+        
+        return Response({
+            "message": "수정 완료",
+            "nickname": user.nickname,
+            "username": user.username
+        }, status=status.HTTP_200_OK)
 
 def mypage_modify_view(request):
     return render(request, 'users/mypage_modify.html')

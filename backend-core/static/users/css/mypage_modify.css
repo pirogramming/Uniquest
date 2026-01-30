@@ -1,0 +1,139 @@
+/* 기본 레이아웃 및 폰트 설정 */
+body {
+    background-color: #f2f4f6; /* 모바일 앱 배경색 느낌 */
+    font-family: 'Pretendard', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.profile-container {
+    background-color: white;
+    width: 100%;
+    max-width: 450px; /* 고사양 모바일 뷰 최적화 */
+    padding: 30px 24px;
+    box-sizing: border-box;
+}
+
+/* 상단 헤더 */
+h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 40px;
+    cursor: pointer;
+}
+
+/* 프로필 이미지 섹션 */
+.profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.image-circle {
+    width: 110px;
+    height: 110px;
+    background-color: #7fb5ff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.img-change-btn {
+    background: none;
+    border: none;
+    color: #4a90e2;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* 입력 그룹 공통 */
+.input-group {
+    margin-bottom: 24px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #4e5968;
+    margin-bottom: 10px;
+}
+
+/* 수정 가능한 input 스타일 */
+.input-group input {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #7fb5ff;
+}
+
+/* 수정 불가 영역 (p 태그 박스화) */
+.readonly-group p:first-child {
+    width: 100%;
+    height: 54px;
+    line-height: 54px; /* 높이와 맞춰서 텍스트 수직 중앙 정렬 */
+    padding: 0 16px;
+    background-color: #f2f4f6; /* 읽기 전용 배경색 */
+    border-radius: 12px;
+    color: #8b95a1;
+    font-size: 16px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.helper-text {
+    font-size: 13px;
+    color: #8b95a1;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* 안내 배너 */
+.info-banner {
+    background-color: #f0f7ff;
+    color: #1b64da;
+    padding: 18px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 32px;
+}
+
+/* 저장 버튼 */
+.save-btn {
+    width: 100%;
+    height: 56px;
+    background-color: #7fb5ff;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 40px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.save-btn:active {
+    opacity: 0.8;
+}
