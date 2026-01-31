@@ -63,7 +63,26 @@ INSTALLED_APPS = [
     # [Local Apps] 
     'users',     
     'missions',  
+    'drf_spectacular',
 ]
+
+# settings.py
+REST_FRAMEWORK = {
+    # 1. Swagger용 스키마 설정 (에러 해결의 핵심)
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    # 2. JWT 인증 설정 (로그인 연동)
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# SPECTACULAR_SETTINGS가 혹시 잘못되었을 수도 있으니 일단 기본값만 둡니다.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Uniquest API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -167,12 +186,4 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY, # Django 비밀키 사용 (FastAPI랑 이거 공유함!)
     'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-#로그인 후 발급받은 토큰 해독
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 💡 이 설정이 있으면 장고가 API 호출 시마다 자동으로 토큰을 해독합니다.
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
 }
