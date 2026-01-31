@@ -4,5 +4,8 @@ psycopg2-binary
 redis
 django-cors-headers
 djangorestframework-simplejwt>=5.3.0
-requests  
 Pillow==10.4.0
+requests
+django-environ
+django-redis
+python-dotenv

@@ -12,10 +12,26 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATICFILES_DIRS = [ BASE_DIR / "static" ]
+
+# 1. 환경 변수를 읽어올 객체 생성
+env = environ.Env(
+    DEBUG=(bool, False) # 기본값 설정
+)
+
+# 2. .env 파일을 읽어들임
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# 메일 설정에 활용
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 
 # Quick-start development settings - unsuitable for production
@@ -64,6 +80,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -131,6 +148,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [ BASE_DIR / "static" ]
+
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -147,6 +168,14 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY, # Django 비밀키 사용 (FastAPI랑 이거 공유함!)
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+#로그인 후 발급받은 토큰 해독
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 💡 이 설정이 있으면 장고가 API 호출 시마다 자동으로 토큰을 해독합니다.
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 # settings.py

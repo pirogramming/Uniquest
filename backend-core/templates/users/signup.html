@@ -1,0 +1,58 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link rel="stylesheet" href="{%static 'users/css/signup.css'%}">
+</head>
+<body>
+    <div class="signup-container">
+        <h2>회원가입</h2>
+
+        <div class="input-group">
+            <label for="username">이름</label>
+            <input type="text" name="username" id="username" placeholder="아이디를 입력하세요" required>
+        </div>
+
+        <div class="input-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" name="nickname" id="nickname" placeholder="사용하실 닉네임을 입력하세요" required>
+        </div>
+
+        <div class="input-group">
+            <label for="password">비밀번호</label>
+            <input type="password" name="password" id="password" placeholder="비밀번호" required>
+        </div>
+
+        <div class="input-group">
+            <label for="password_check">비밀번호 확인</label>
+            <input type="password" name="password_check" id="password_check" placeholder="비밀번호 재입력" required>
+        </div>
+
+        <div class="input-group">
+            <label for="email">이메일</label>
+            <div class="email-section">
+                <input type="email" name="email" id="email" placeholder="school@ac.kr" required>
+                <button type="button" class="btn-sub" onclick="send_number()">인증번호 발송</button>
+            </div>
+
+            <div id="check_number_box" style="display:none;">
+                <label for="number" style="display: block; margin-bottom: 5px;">인증번호 입력</label>
+                <div class="verify-group">
+                    <input type="number" name="number" id="number" placeholder="6자리 숫자" required>
+                    <button type="button" class="btn-sub" onclick="check_number()">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn-main" onclick="handleSignup()">회원가입 완료</button>
+        <div class="footer">
+            <p>이미 계정이 있습니까?</p>
+            <a href="{%url 'users:login'%}" id="signup">로그인하기</a>
+        </div>
+    </div>
+    <script src="{%static 'users/js/signup.js'%}"></script>
+</body>
+</html>
