@@ -1,0 +1,45 @@
+{%load static %}
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ mission.title }}</title>
+<style>
+  body { font-family: system-ui; padding: 16px; }
+  .muted { color:#666; font-size: 13px; }
+  img { max-width: 100%; border-radius: 12px; margin: 8px 0; }
+</style>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0185d557a906f6d9e2bbd3f67a53bf4e&libraries=services"></script>
+  <script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
+
+</head>
+<body>
+  <p><a href="{% url 'missions:mission_list' %}">← 목록</a></p>
+  <h2>{{ mission.title }}</h2>
+  <a href="{% url 'missions:mission_update' mission.id %}">수정하기</a>
+  <div class="muted">{{ mission.category }} / {{ mission.status }}</div>
+
+  <p>{{ mission.descriptions|linebreaksbr }}</p>
+
+  <p><b>보상:</b> {{ mission.reward }}</p>
+  <p><b>마감:</b> {{ mission.deadline }}</p>
+
+  {% if mission.location_name %}
+    <p><b>거래 희망 장소:</b> {{ mission.location_name }}</p>
+    <div id="map" data-lat="{{mission.location_lat}}" data-lng="{{mission.location_lng}}"
+    style="width:500px;height:400px;"></div>
+    <p class="muted">{{ mission.location_address }}</p>
+  {% endif %}
+
+  <p>
+    {% for t in mission.tags.all %}
+      <span class="muted">#{{ t.name }}</span>
+    {% endfor %}
+  </p>
+
+  {% for img in mission.images.all %}
+    <img src="{{ img.image.url }}" alt="mission image">
+  {% endfor %}
+
+
+</body>
+</html>
