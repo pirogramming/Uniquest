@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>차단 관리 - Uniquest</title>
+    <link rel="stylesheet" href="{% static 'users/css/blocked_users.css' %}">
+</head>
+<body class="bg-gray-body">
+    <div class="container">
+        <header class="header">
+            <button onclick="history.back()" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </button>
+            <h1 class="header-title">차단 관리</h1>
+        </header>
+
+        <main class="content">
+            <section class="info-banner">
+                <div class="info-icon">!</div>
+                <div class="info-text">
+                    <h3>차단 기능 안내</h3>
+                    <p>차단된 사용자는 회원님의 미션 목록에 노출되지 않으며, 채팅을 보낼 수 없습니다.</p>
+                </div>
+            </section>
+
+            <section class="list-section">
+                <div class="list-header">
+                    <span class="shield-icon">🛡️</span>
+                    <h2>차단된 사용자 (<span id="block-count">0</span>)</h2>
+                </div>
+
+                <div id="blocked-user-list" class="user-card-stack">
+                    <div class="user-card">
+                        <div class="user-info">
+                            <div class="avatar"></div>
+                            <div class="user-text">
+                                <p class="nickname">불량유저123</p>
+                                <p class="date">차단일: 2026-01-20</p>
+                            </div>
+                        </div>
+                        <button class="unblock-btn">차단 해제</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="limit-notice">
+                <h3>차단 시 제한사항</h3>
+                <ul>
+                    <li>차단된 사용자의 미션이 목록에 표시되지 않습니다</li>
+                    <li>차단된 사용자는 회원님의 미션에 신청할 수 없습니다</li>
+                    <li>기존 채팅방은 유지되지만 새 메시지를 받을 수 없습니다</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    <script src="{% static 'users/js/blocked_users.js' %}"></script>
+</body>
+</html>

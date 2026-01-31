@@ -30,8 +30,15 @@ class User(AbstractUser):
     # 인증 및 신뢰도
     is_student_verified = models.BooleanField(default=False, verbose_name="학생 인증 여부")
     univ_email = models.EmailField(blank=True, null=True, verbose_name="학교 이메일")
-    reliability_score = models.FloatField(default=36.5, verbose_name="신뢰도 점수")
-    manner_score = models.FloatField(default=36.5)
+    
+    # 매너 온도 (기본 36.5도)
+    manner_score = models.FloatField(default=36.5, verbose_name="매너 온도")
+    blocked_people = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
+        related_name='blocked_by_users'
+    )
 
     def __str__(self):
         return self.nickname if self.nickname else self.username

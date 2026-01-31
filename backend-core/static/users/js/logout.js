@@ -1,5 +1,4 @@
 function logout() {
-    // 저장할 때 썼던 키 이름을 그대로 입력해야 합니다.
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
 

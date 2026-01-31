@@ -23,4 +23,14 @@ urlpatterns = [
 
     # 5. 내 정보 조회
     path('profile/', ProfileView.as_view(), name='profile'),
+
+    # 마이페이지 메인
+    path('mypage/', views.mypage_view, name='mypage_screen'),
+    path('api/profile/', views.get_my_info, name='get_my_info_api'),
+    # 마이페이지 수정
+    path('mypage_modify/', views.mypage_modify_view, name='mypage_modify_screen'),
+    path('api/profile_modify/', views.get_my_info_patch, name='get_my_info_api_patch'),
+    #차단 유저 관리
+    path('blocked_users/',views.get_blocked_users,name="blocked_users"),
+    path('api/blocked_users/',views.get_blocked_users_info,name="blocked_user_info"),
 ]

@@ -36,11 +36,17 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
-    path('api/users/', include('users.urls')),
-    path('api/missions/', include('missions.urls')),
+    path('missions/', include('missions.urls')),
+    path('users/',include('users.urls')),
 
 
     # 3. Swagger 문서 접속 주소 (여기가 핵심!)
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-]
+] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+from django.conf import settings
+from django.conf.urls.static import static
+
+
+
+

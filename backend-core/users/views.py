@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import json
 from django.http import JsonResponse
 import requests # Univcert 호출용
@@ -11,8 +11,12 @@ from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+<<<<<<< HEAD
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+=======
+from rest_framework.decorators import api_view, permission_classes
+>>>>>>> 11d62f56e20f03b68c0a0120d92d7f15ab117748
 
 #유저모델 불러오기
 User = get_user_model()
@@ -163,3 +167,93 @@ class MyLoginView(APIView):
         
 def logout(request):
     return render(request,'users/logout.html')
+
+# 마이 페이지
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
+def get_my_info(request):
+    user = request.user
+    missions = list(user.missions.all().values('id','title','reward'))
+    blocked_Queryset = user.blocked_people.all()
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "nickname": user.nickname,
+        "university": user.university,
+        "univ_email": user.univ_email,
+        "is_student_verified": user.is_student_verified,
+        "manner_score": round(user.manner_score, 1),
+        "missions" : missions,
+        "blocked_people" : list(blocked_Queryset.values('id','nickname'))
+    })
+
+def mypage_view(request):
+    return render(request, 'users/mypage.html')
+
+# 프로필 수정 페이지
+
+@api_view(['GET','PATCH'])
+@permission_classes([IsAuthenticated])
+def get_my_info_patch(request):
+    user = request.user
+    
+    if request.method == 'GET':
+        # 기존 조회 로직
+        return Response({
+            "username": user.username,
+            "nickname": user.nickname,
+            "univ_email": user.univ_email,
+            "university": user.university,
+        })
+
+    elif request.method == 'PATCH':
+        # 1. 프론트에서 보낸 데이터(updatedData) 받기
+        nickname = request.data.get('nickname')
+        username = request.data.get('username')
+
+        # 2. 데이터 업데이트 (값이 있을 때만)
+        if nickname:
+            user.nickname = nickname
+        if username:
+            user.username = username
+        
+        # 3. DB 저장
+        user.save()
+        
+        return Response({
+            "message": "수정 완료",
+            "nickname": user.nickname,
+            "username": user.username
+        }, status=status.HTTP_200_OK)
+
+def mypage_modify_view(request):
+    return render(request, 'users/mypage_modify.html')
+
+#차단 유저들
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def get_blocked_users_info(request):
+    user = request.user
+    if request.method == "GET":
+        blocked_list = list(user.blocked_people.all().values('id','nickname'))
+        return Response({
+            "id":user.id,
+            "nickname":user.nickname,
+            "blocked_users":blocked_list
+        })
+    elif request.method == "POST":
+        try:
+            target_user_id = request.data.get('target_id')
+            target_user = User.objects.get(id=target_user_id)
+            user.blocked_people.remove(target_user)
+            return Response({"message": "해제 완료"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+            
+
+
+
+def get_blocked_users(request):
+    return render(request,'users/blocked_users.html')
