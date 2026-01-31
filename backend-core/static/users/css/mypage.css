@@ -130,6 +130,10 @@ body {
     margin-top: 30px;
 }
 
+.logout-btn p{
+    margin:0;
+}
+
 .withdraw-text {
     text-align: center;
     color: #aaa;

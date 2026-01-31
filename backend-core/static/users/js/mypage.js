@@ -23,6 +23,7 @@ async function getUserData() {
             return userData;
         } else {
             console.error("토큰이 만료되었거나 유효하지 않습니다.");
+            alert('노 토큰')
             window.location.href = '/users/login/';
             return null;
         }
@@ -32,21 +33,31 @@ async function getUserData() {
     }
 }
 
-/**
- * 화면의 특정 ID를 가진 요소에 유저 데이터를 꽂아주는 함수
- */
 async function renderProfile() {
     const user = await getUserData();
     
     if (user) {
-        // HTML에 해당 ID를 가진 태그가 있을 때만 꽂아줌
+        const my_missions = user.missions
+        const blockers = user.blocked_people
+
         const nicknameElement = document.getElementById('user-nickname');
         const univElement = document.getElementById('user-univ');
         const mannerScore = document.getElementById('user-score');
+        const register_missions = document.getElementById('my-registered-missions');
+        const performed_missions = document.getElementById('my-performed-missions');
+
 
         if (nicknameElement) nicknameElement.innerText = user.nickname;
         if (univElement) univElement.innerText = user.university;
         if (mannerScore) mannerScore.innerText = user.manner_score;
+        blockers.forEach(({id,nickname}) => {
+            console.log(`${id} : ${nickname}`)
+            if (register_missions) register_missions.innerHTML += `${id} : ${nickname}`;
+        });
+        // if (register_missions) register_missions.innerHTML = ;
+        // if (performed_missions) performed_missions.innerHTML = ;
+        console.log('나의 미션들',my_missions)
+        console.log('블락 인원들',blockers)
 
     } else {
         // 토큰이 없거나 문제가 있다면 로그인 페이지로 보낼 수도 있습니다.
@@ -54,8 +65,11 @@ async function renderProfile() {
     }
 }
 
-async function logout(){
-    
+function logout() { // 로그아웃 로직
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    alert("로그아웃 되었습니다.");
+    window.location.href = "/users/login/"; // 로그인 페이지로 이동
 }
 
 // 페이지가 로드되면 자동으로 실행

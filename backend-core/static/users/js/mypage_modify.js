@@ -98,5 +98,12 @@ async function patchProfile() {
     }
 };
 
+function logout(){
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    alert('로그아웃 되었습니다');
+    window.location.href = "/users/login/";
+}
+
 // 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);
