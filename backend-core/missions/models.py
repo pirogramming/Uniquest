@@ -82,18 +82,6 @@ class Mission(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deadline = models.DateTimeField(null=True, blank=True)
 
-<<<<<<< HEAD
-    def __str__(self):
-        return self.title
-
-
-class Review(models.Model):
-    mission = models.ForeignKey(Mission, on_delete=models.CASCADE)
-    writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='written_reviews')
-    target = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reviews')
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-=======
     def clean(self):
         super().clean()
 
@@ -132,4 +120,3 @@ class MissionImage(models.Model):
 
     def __str__(self) -> str:
         return f"MissionImage(mission_id={self.mission_id})"
->>>>>>> 11d62f56e20f03b68c0a0120d92d7f15ab117748
