@@ -81,7 +81,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,6 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'missions.context_processors.kakao_key',
             ],
         },
     },
@@ -181,3 +181,7 @@ REST_FRAMEWORK = {
 # settings.py
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+env= environ.Env()
+env.read_env(os.path.join(BASE_DIR, '.env'))
+KAKAO_KEY = env('KAKAO_MAP_API_KEY')
