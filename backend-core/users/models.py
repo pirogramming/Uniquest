@@ -31,6 +31,7 @@ class User(AbstractUser):
     is_student_verified = models.BooleanField(default=False, verbose_name="학생 인증 여부")
     univ_email = models.EmailField(blank=True, null=True, verbose_name="학교 이메일")
     reliability_score = models.FloatField(default=36.5, verbose_name="신뢰도 점수")
+    manner_score = models.FloatField(default=36.5)
 
     def __str__(self):
         return self.nickname if self.nickname else self.username

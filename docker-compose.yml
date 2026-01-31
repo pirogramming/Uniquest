@@ -31,6 +31,8 @@ services:
     depends_on:
       - postgres
       - redis
+    ports:
+      - "8000:8000"
 
   # [3] 채팅 서버 (FastAPI): 실시간 웹소켓 통신 및 MongoDB 저장
   backend-chat:
@@ -44,6 +46,9 @@ services:
     depends_on:
       - mongo
       - redis
+    ports:
+      - "8001:8001"
+
 
   # [4] 관계형 DB (PostgreSQL): 유저, 미션 데이터 저장
   postgres:

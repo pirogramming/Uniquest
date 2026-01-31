@@ -1,18 +1,35 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User  # 찬웅님이 만든 유저 모델
+from django.contrib.admin.sites import NotRegistered  # 👈 여기가 핵심!
+from .models import User, University
+
+# 1. 대학교 모델 등록
+@admin.register(University)
+class UniversityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'domain')
+
+# 2. 유저 모델 재등록을 위한 안전장치
+try:
+    admin.site.unregister(User)
+except NotRegistered:  # 👈 이제 에러 안 날 겁니다
+    pass
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    # 관리자 목록 화면에서 보여줄 필드 (닉네임, 학교, 인증여부 추가)
-    list_display = ('username', 'email', 'nickname', 'university', 'is_student_verified', 'is_staff')
+    list_display = ('username', 'nickname', 'university', 'is_student_verified', 'is_staff')
     
-    # 상세 수정 페이지에 찬웅님이 만든 커스텀 필드들을 추가
-    fieldsets = UserAdmin.fieldsets + (
-        ('Uniquest 정보', {'fields': ('nickname', 'university', 'is_student_verified', 'univ_email', 'manner_score')}),
-    )
-    
-    # 관리자 페이지에서 유저를 새로 생성할 때 필요한 필드
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('추가 정보', {'fields': ('nickname', 'university', 'univ_email')}),
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('개인 정보', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Uniquest 추가 정보', {
+            'fields': (
+                'nickname', 
+                'university',
+                'is_student_verified', 
+                'univ_email', 
+                'reliability_score'
+            )
+        }),
+        ('권한', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('중요 날짜', {'fields': ('last_login', 'date_joined')}),
     )

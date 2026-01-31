@@ -1,29 +1,26 @@
 from django.urls import path
-from .views import RegisterView, ProfileView
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView, # 로그인 (Access + Refresh 토큰 발급)
-    TokenRefreshView,    # 토큰 갱신
-)
 from . import views
-from .views import MyLoginView
+from .views import RegisterView, ProfileView, MyLoginView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 app_name = 'users'
 
 urlpatterns = [
-    #회원가입
-    path('signup/',views.signup_page,name="signup"),
-    path('signup-data/', RegisterView.as_view(), name='signup-data'),
+    # 1. 회원가입 (HTML 페이지 연결 삭제 -> API 연결)
+    # 기존: path('signup/', views.signup_page), path('signup-data/', RegisterView...)
+    path('signup/', RegisterView.as_view(), name='signup'),
+    
+    # 2. 이메일 인증
     path('verify-email/', views.verify_email, name='verify-email'),
     
-    # 로그인
-    path('login/',views.login_page,name="login"),
-    path('login_logic/', MyLoginView.as_view(), name='token_obtain_pair'),
+    # 3. 로그인 (핵심! ⭐)
+    # 기존: path('login/', views.login_page) -> 에러 원인!
+    # 수정: 바로 API 뷰(MyLoginView)로 연결합니다.
+    path('login/', MyLoginView.as_view(), name='login'),
+    
+    # 4. 토큰 갱신 (선택 사항)
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    #로그아웃
-    path('logout/',views.logout,name='logout'),
-    
-    # 내 정보 조회
+    # 5. 내 정보 조회
     path('profile/', ProfileView.as_view(), name='profile'),
-    # path('verify-univ/', UnivCertView.as_view(), name='verify_univ'),
 ]

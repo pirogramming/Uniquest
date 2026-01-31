@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     # [3rd Party]
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
 
     # [Local Apps] 
     'users',     
@@ -164,3 +165,8 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY, # Django 비밀키 사용 (FastAPI랑 이거 공유함!)
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+# 개발 중에만 True로 설정
+CORS_ALLOW_ALL_ORIGINS = True

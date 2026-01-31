@@ -8,3 +8,4 @@ requests
 django-environ
 django-redis
 python-dotenv
+drf-yasg

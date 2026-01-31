@@ -11,23 +11,31 @@ async def get_chat_history(room_id: str):
 
 @router.websocket("/chat/{room_id}/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: int):
-    await chat_manager.connect(websocket, room_id)
+    # 수정: user_id를 함께 전달
+    await chat_manager.connect(websocket, room_id, user_id)
     
-    # [입장 알림]
+    # 입장 알림
     await chat_manager.publish_message({
-        "type": "SYSTEM", "sender_id": 0, "content": f"유저 {user_id} 입장",
+        "type": "SYSTEM", 
+        "sender_id": 0, 
+        "content": f"유저 {user_id} 입장",
         "time": datetime.now().strftime("%H:%M")
     }, room_id)
 
     try:
         while True:
             data = await websocket.receive_text()
-            msg_obj = ChatMessage(room_id=room_id, sender_id=user_id, content=data)
             
+            msg_obj = ChatMessage(room_id=room_id, sender_id=user_id, content=data)
             await chat_manager.save_message(msg_obj)
+            
             await chat_manager.publish_message({
-                "type": "TALK", "sender_id": user_id, "content": data,
+                "type": "TALK", 
+                "sender_id": user_id, 
+                "content": data,
                 "time": msg_obj.created_at.strftime("%H:%M")
             }, room_id)
+
     except WebSocketDisconnect:
-        await chat_manager.disconnect(websocket, room_id)
+        # 연결 끊길 때 user_id 전달
+        await chat_manager.disconnect(room_id, user_id)
