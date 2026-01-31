@@ -1,0 +1,151 @@
+{# missions/templates/missions/location_picker.html #}
+{% load static %}
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>위치 선택</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    #map { width: 100vw; height: calc(100vh - 120px); }
+    .panel {
+      height: 120px;
+      padding: 12px 16px;
+      box-sizing: border-box;
+      border-top: 1px solid #eee;
+      background: #fff;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-weight: 800;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+    }
+    .btn:active { transform: translateY(1px); }
+    .hint { color:#666; font-size: 13px; margin-top: 6px; }
+    /* 중앙 고정 마커 */
+    .center-marker {
+      position: absolute;
+      left: 50%;
+      top: calc((100vh - 120px) / 2);
+      transform: translate(-50%, -100%);
+      width: 22px;
+      height: 22px;
+      background: #111;
+      border-radius: 50% 50% 50% 0;
+      transform: translate(-50%, -100%) rotate(-45deg);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      z-index: 10;
+    }
+    .center-marker::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      top: 6px;
+      left: 6px;
+    }
+    .topbar {
+      padding: 10px 16px;
+      font-weight: 800;
+      border-bottom: 1px solid #eee;
+      background:#fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">거래 희망 장소 선택</div>
+
+  <div style="position: relative;">
+    <div id="map"></div>
+    <div class="center-marker"></div>
+  </div>
+
+  <div class="panel">
+    <button class="btn" onclick="confirmLocation()">선택 완료</button>
+    <div class="hint" id="hint">지도를 움직여 중앙 마커를 원하는 위치에 맞춘 뒤 선택 완료를 눌러주세요.</div>
+  </div>
+
+  {# 카카오 지도 SDK (services 포함) #}
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0185d557a906f6d9e2bbd3f67a53bf4e&libraries=services"></script>
+
+  <script>
+    let map;
+    let geocoder;
+
+    function initMap() {
+      const container = document.getElementById('map');
+      const options = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본(서울시청)
+        level: 3
+      };
+      map = new kakao.maps.Map(container, options);
+      geocoder = new kakao.maps.services.Geocoder();
+
+      // 가능하면 현위치로 이동
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const loc = new kakao.maps.LatLng(lat, lng);
+            map.setCenter(loc);
+          },
+          () => { /* 실패 시 기본 center 유지 */ },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      }
+    }
+
+    function getCenterLatLng() {
+      const center = map.getCenter();
+      return { lat: center.getLat(), lng: center.getLng() };
+    }
+
+    function reverseGeocode(lat, lng) {
+      return new Promise((resolve) => {
+        geocoder.coord2Address(lng, lat, (result, status) => {
+          if (status === kakao.maps.services.Status.OK && result && result.length > 0) {
+            const road = result[0].road_address ? result[0].road_address.address_name : "";
+            const jibun = result[0].address ? result[0].address.address_name : "";
+            resolve(road || jibun || "");
+          } else {
+            resolve("");
+          }
+        });
+      });
+    }
+
+    async function confirmLocation() {
+      const { lat, lng } = getCenterLatLng();
+
+      // 장소명 입력
+      const name = prompt("선택한 곳의 장소명을 입력해주세요 (예: 학생회관 1층 앞)");
+      if (!name) return;
+
+      const addr = await reverseGeocode(lat, lng);
+
+      const params = new URLSearchParams({
+        loc_name: name,
+        lat: String(lat),
+        lng: String(lng),
+        addr: addr
+      });
+
+      // return 파라미터 있으면 거기로, 없으면 기본 new로
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnUrl = urlParams.get("return") || "/missions/new/";
+      const joiner = returnUrl.includes("?") ? "&" : "?";
+
+      window.location.href = returnUrl + joiner + params.toString();
+    }
+
+    initMap();
+  </script>
+</body>
+</html>
