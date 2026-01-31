@@ -11,12 +11,9 @@ from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-<<<<<<< HEAD
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-=======
 from rest_framework.decorators import api_view, permission_classes
->>>>>>> 11d62f56e20f03b68c0a0120d92d7f15ab117748
 
 #유저모델 불러오기
 User = get_user_model()
