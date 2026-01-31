@@ -1,26 +1,14 @@
-"""
-URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings  # 하단에 있던 것을 위로 이동
+from django.conf.urls.static import static  # 하단에 있던 것을 위로 이동
+
+# Swagger 관련 임포트
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 
-# === Swagger 설정 (API 명세서 정보) ===
+# === Swagger 설정 ===
 schema_view = get_schema_view(
    openapi.Info(
       title="Uniquest API 문서",
@@ -36,17 +24,15 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
-    path('missions/', include('missions.urls')),
-    path('users/',include('users.urls')),
+    path('api/missions/', include('missions.urls')), # 관례상 api/ 를 붙여주는 것이 좋습니다.
+    path('api/users/', include('users.urls')),
 
-
-    # 3. Swagger 문서 접속 주소 (여기가 핵심!)
+    # Swagger 문서 접속 주소
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-from django.conf import settings
-from django.conf.urls.static import static
+]
 
-
-
-
+# 미디어/정적 파일 설정 (이 부분이 리스트 바깥으로 깔끔하게 빠져야 합니다)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
