@@ -41,26 +41,23 @@ class ConnectionManager:
         try:
             async for message in pubsub.listen():
                 if message['type'] == 'message':
-                    data = json.loads(message['data'])
-                    
-                    # 🚀 [핵심 추가] 이벤트 타입에 따른 분기 처리
-                    msg_type = data.get("type")
+                    payload = json.loads(message['data'])
+                    msg_type = payload.get("type")
+                    data = payload.get("data", {})
 
                     if msg_type == "KICK":
-                        # 강퇴 로직: 특정 유저 소켓 끊기
-                        target_id = data.get("target_id")
+                        # Django가 쏜 target_id를 받아서 소켓 강제 종료
+                        target_id = int(data.get("target_id"))
                         await self._kick_user(room_id, target_id)
                     
-                    elif msg_type in ["CONFIRM", "COMPLETE"]:
-                         # 시스템 메시지: 모두에게 알림 (프론트가 UI 변경)
-                        await self._local_broadcast(data, room_id)
-                        
-                    else:
-                        # 일반 채팅 (TALK, SYSTEM 등)
-                        await self._local_broadcast(data, room_id)
-
-        except asyncio.CancelledError:
-            await pubsub.unsubscribe(f"chat_{room_id}")
+                    elif msg_type == "COMPLETE":
+                        # 미션 완료 시 시스템 메시지 브로드캐스트
+                        await self._local_broadcast({
+                            "type": "SYSTEM",
+                            "content": "미션이 완료되었습니다."
+                        }, room_id)
+        except Exception as e:
+            print(f"FastAPI Redis 리스너 에러: {e}")
 
     # 특정 유저 강퇴 메서드
     async def _kick_user(self, room_id, target_id):

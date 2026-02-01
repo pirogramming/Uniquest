@@ -14,6 +14,9 @@ from django.contrib.auth import authenticate
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
+from common.utils import publish_chat_event
+from missions.models import Mission
+from django.db import models
 
 #유저모델 불러오기
 User = get_user_model()
@@ -229,25 +232,35 @@ def mypage_modify_view(request):
 
 #차단 유저들
 
-@api_view(['GET','POST'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_blocked_users_info(request):
     user = request.user
-    if request.method == "GET":
-        blocked_list = list(user.blocked_people.all().values('id','nickname'))
-        return Response({
-            "id":user.id,
-            "nickname":user.nickname,
-            "blocked_users":blocked_list
-        })
-    elif request.method == "POST":
-        try:
-            target_user_id = request.data.get('target_id')
-            target_user = User.objects.get(id=target_user_id)
-            user.blocked_people.remove(target_user)
-            return Response({"message": "해제 완료"}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+    target_user_id = request.data.get('target_id')
+    
+    try:
+        target_user = User.objects.get(id=target_user_id)
+        # 1. DB에서 차단 관계 설정
+        user.blocked_people.add(target_user) 
+        
+        # 2. [핵심] 두 유저가 연관된 '진행 중인' 미션방들을 모두 찾음
+        related_missions = Mission.objects.filter(
+            models.Q(author=user, helper=target_user) | 
+            models.Q(author=target_user, helper=user)
+        ).filter(status__in=['WAITING', 'MATCHED']) # 대기나 매칭 중인 방만
+
+        # 3. 찾은 모든 방에 대해 각각 강퇴 이벤트 발행
+        for mission in related_missions:
+            publish_chat_event(
+                room_id=str(mission.id), # 실제 미션 ID를 동적으로 넣음
+                event_type="KICK", 
+                data={"target_id": target_user_id}
+            )
+            
+        return Response({"message": "차단 및 실시간 강퇴 완료"}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
             
 
 

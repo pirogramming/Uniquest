@@ -13,6 +13,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category
 
+from common.utils import publish_chat_event
+
 logger = logging.getLogger(__name__)
 
 
@@ -222,3 +224,40 @@ def tag_suggest(request: HttpRequest) -> JsonResponse:
     } for t in qs]
 
     return JsonResponse({"results": data})
+
+@login_required
+@transaction.atomic
+def mission_accept(request: HttpRequest, mission_id: int) -> HttpResponse:
+    """
+    미션 수락 (매칭 성사)
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+    
+    mission = get_object_or_404(Mission, id=mission_id)
+    
+    # 이미 매칭된 미션인지 확인
+    if mission.status != "WAITING":
+        return JsonResponse({"error": "이미 매칭된 미션입니다."}, status=400)
+    
+    # 자기 자신의 미션은 수락할 수 없음
+    if mission.author == request.user:
+        return JsonResponse({"error": "자신의 미션은 수락할 수 없습니다."}, status=400)
+    
+    # 매칭 성공 로직
+    mission.status = "MATCHED"
+    mission.helper = request.user
+    mission.save()
+
+    # 🚀 핵심: 매칭 즉시 채팅방에 시스템 메시지 전송
+    publish_chat_event(
+        room_id=str(mission.id),
+        event_type="SYSTEM",
+        data={"content": "매칭이 성사되었습니다! 대화를 시작해보세요."}
+    )
+    
+    return JsonResponse({
+        "success": True,
+        "message": "미션 수락이 완료되었습니다.",
+        "mission_id": mission.id
+    })

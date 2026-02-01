@@ -1,6 +1,3 @@
-from django.contrib import admin
-from .models import Mission, Review
-
 # Register your models here.
 # missions/admin.py
 from django.contrib import admin
@@ -21,7 +18,7 @@ class MissionImageInline(admin.TabularInline):
 
 @admin.register(Mission)
 class MissionAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "author", "category", "status", "deadline", "location_name", "created_at")
+    list_display = ("id", "title", "author", "helper", "category", "status", "deadline", "location_name", "created_at")
     list_filter = ("category", "status")
-    search_fields = ("title", "descriptions", "author__username", "location_name")
+    search_fields = ("title", "descriptions", "author__username", "helper__username", "location_name")
     inlines = [MissionImageInline]

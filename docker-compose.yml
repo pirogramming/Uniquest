@@ -24,13 +24,14 @@ services:
       - ./backend-core/media:/app/media
     environment:
       - TZ=Asia/Seoul
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      # settings.py의 os.environ.get 키값과 정확히 일치시킴
+      - POSTGRES_DB=uniquest
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
-      - EMAIL_HOST_USER=your_email@gmail.com # 임시
-      - EMAIL_HOST_PASSWORD=your_password # 임시
+      - EMAIL_HOST_USER=your_email@gmail.com
+      - EMAIL_HOST_PASSWORD=your_password
     depends_on:
       - postgres
       - redis
@@ -53,11 +54,11 @@ services:
     ports:
       - "8001:8001"
 
-
   # [4] 관계형 DB (PostgreSQL): 유저, 미션 데이터 저장
   postgres:
     image: postgres:13
     environment:
+      # backend-core의 설정값과 동일하게 맞춤
       - POSTGRES_DB=uniquest
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
