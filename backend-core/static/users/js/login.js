@@ -38,6 +38,7 @@ async function handleSignup(){
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             console.log(data)
+            window.location.href = "/users/homepage/"
             alert("로그인 성공 야호!");
         } else {
             const errorData = await response.json();

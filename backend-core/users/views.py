@@ -12,12 +12,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
+from django.core.cache import cache
 
 #유저모델 불러오기
 User = get_user_model()
-
-#메일 인증 test용
-from django.core.cache import cache
 
 # 1. 회원가입 View
 def signup_page(request):
@@ -116,14 +114,6 @@ class RegisterView(generics.CreateAPIView):
             "refresh": str(refresh),
             "message": f"{university} 소속으로 가입 및 로그인이 완료되었습니다!"
         }, status=status.HTTP_201_CREATED)
-
-# 2. 내 프로필 조회 View
-class ProfileView(views.APIView):
-    permission_classes = [IsAuthenticated] # 로그인한 사람만
-
-    def get(self, request):
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data)
 
 #로그인 페이지
 def login_page(request):
@@ -243,7 +233,25 @@ def get_blocked_users_info(request):
             return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
             
 
-
-
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
+
+#홈 페이지
+
+def get_home_page(request):
+    return render(request,'users/homepage.html')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_homepage_info(request):
+    user = request.user
+    blocked_list = list(user.blocked_people.all().values('id','nickname'))
+    return Response({
+        "id":user.id,
+        "nickname":user.nickname,
+        "university":user.university,
+        "is_student_verified":user.is_student_verified,
+        "univ_email":user.univ_email,
+        "manner_score":user.manner_score,
+        "blocked_people":blocked_list
+    })

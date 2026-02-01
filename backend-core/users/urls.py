@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, ProfileView
+from .views import RegisterView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView, # 로그인 (Access + Refresh 토큰 발급)
     TokenRefreshView,    # 토큰 갱신
@@ -22,16 +22,20 @@ urlpatterns = [
 
     #로그아웃
     path('logout/',views.logout,name='logout'),
-    
-    path('profile/', ProfileView.as_view(), name='profile'),
 
     # 마이페이지 메인
     path('mypage/', views.mypage_view, name='mypage_screen'),
     path('api/profile/', views.get_my_info, name='get_my_info_api'),
+
     # 마이페이지 수정
     path('mypage_modify/', views.mypage_modify_view, name='mypage_modify_screen'),
     path('api/profile_modify/', views.get_my_info_patch, name='get_my_info_api_patch'),
+
     #차단 유저 관리
     path('blocked_users/',views.get_blocked_users,name="blocked_users"),
     path('api/blocked_users/',views.get_blocked_users_info,name="blocked_user_info"),
+
+    #홈 페이지
+    path('homepage/',views.get_home_page,name="homepage"),
+    path('api/homepage',views.get_homepage_info,name="homepage_info"),
 ]
