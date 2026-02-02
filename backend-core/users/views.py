@@ -182,7 +182,7 @@ def get_my_info(request):
         "id": user.id,
         "username": user.username,
         "nickname": user.nickname,
-        "university": user.university,
+        "university": user.university.name if user.university else None,
         "univ_email": user.univ_email,
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
@@ -206,7 +206,7 @@ def get_my_info_patch(request):
             "username": user.username,
             "nickname": user.nickname,
             "univ_email": user.univ_email,
-            "university": user.university,
+            "university": user.university.name if user.university else None,
         })
 
     elif request.method == 'PATCH':
