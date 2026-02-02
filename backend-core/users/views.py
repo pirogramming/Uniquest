@@ -131,8 +131,10 @@ class ProfileView(views.APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
 
-#로그인 페이지
-# users/views.py
+# 로그인: GET → 로그인 페이지(HTML), POST → /api/users/login/submit/ (API)
+def login_page(request):
+    return render(request, 'users/login.html')
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MyLoginView(APIView):
