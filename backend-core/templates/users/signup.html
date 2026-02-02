@@ -35,7 +35,8 @@
             <label for="email">이메일</label>
             <div class="email-section">
                 <input type="email" name="email" id="email" placeholder="school@ac.kr" required>
-                <button type="button" class="btn-sub" onclick="send_number()" action="verify-email">인증번호 발송</button>
+                <button type="button" class="btn-sub" id="send-btn" onclick="send_number()" action="verify-email">인증번호 발송</button>
+                <div class="btn-sub" id="complete" style="display:none;">완료</div>
             </div>
 
             <div id="check_number_box" style="display:none;">
@@ -43,6 +44,18 @@
                 <div class="verify-group">
                     <input type="number" name="number" id="number" placeholder="6자리 숫자" required>
                     <button type="button" class="btn-sub" onclick="check_number()">확인</button>
+                    <div id="timer-display" style="font-weight: bold; margin-top: 10px; color: blue;">
+                        남은 시간: 05:00
+                    </div>
+                </div>
+            </div>
+            <div id="check_number_box_certified">
+                <div class="certified-badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                    </svg>
+                    <span>이메일 인증 완료!</span>
                 </div>
             </div>
         </div>

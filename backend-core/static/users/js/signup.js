@@ -45,7 +45,7 @@ async function handleSignup(){
         const data = await response.json();
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        window.location.href = "/login-page/"; // 가입 후 로그인 페이지로 이동
+        window.location.href = "/api/users/homepage/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);
@@ -76,7 +76,8 @@ async function send_number(){
 
     if (response.ok){
         const data = await response.json();
-        document.getElementById('check_number_box').style.display = 'block'
+        document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
+        startTimer(300);
         alert(data.message + data.university);
     } else{
         const data = await response.json();
@@ -111,11 +112,42 @@ async function check_number(){
     });
     if (response.ok){
         const data = await response.json();
+        const check_box = document.getElementById('check_number_box')
+        const check_box_certified = document.getElementById('check_number_box_certified')
+        const complete = document.getElementById('complete')
+        const send = document.getElementById('send-btn')
         if (data.is_varified){
+            check_box.style.display = 'none'
+            check_box_certified.style.display = 'block'
+            send.style.display = 'none'
+            complete.style.display = 'block'
             alert('메일 인증 성공!')
         }
+
     } else{
         const data = await response.json();
         alert("확인 실패: " + (data.message || "오류가 발생했습니다."));
     }
+}
+
+let timerInterval;
+function startTimer(seconds) {
+    // 혹시 이미 실행 중인 타이머가 있다면 초기화
+    clearInterval(timerInterval);
+    
+    const display = document.getElementById('timer-display');
+    let timeLeft = seconds;
+
+    timerInterval = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+
+        display.innerText = `남은 시간: ${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        if (--timeLeft < 0) {
+            clearInterval(timerInterval);
+            display.innerText = "인증 시간이 만료되었습니다. 다시 시도해주세요.";
+            display.style.color = "red";
+        }
+    }, 1000);
 }
