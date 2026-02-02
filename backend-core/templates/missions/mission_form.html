@@ -21,7 +21,7 @@
   </style>
 
   {# 지도 관련 스크립트(혹시 폼 페이지에서도 쓰면 유지) #}
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0185d557a906f6d9e2bbd3f67a53bf4e&autoload=false&libraries=services"></script>
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&autoload=false&libraries=services"></script>
   <script src="{% static 'missions/js/sy_map.js' %}" defer></script>
 </head>
 <body>
