@@ -33,6 +33,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
+KAKAO_KEY = env('KAKAO_MAP_API_KEY')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -188,6 +190,4 @@ REST_FRAMEWORK = {
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-env= environ.Env()
-env.read_env(os.path.join(BASE_DIR, '.env'))
-KAKAO_KEY = env('KAKAO_MAP_API_KEY')
+
