@@ -43,7 +43,7 @@ SECRET_KEY = 'django-insecure-h0@$u*thum6_lais86qqijq)lvwl8q8c7c&2yrnx66+opx0j3k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     # [3rd Party]
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
 
     # [Local Apps] 
     'users',     
@@ -68,6 +69,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS 미들웨어는 CommonMiddleware 전에 와야 합니다
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,9 +105,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME', 'postgres'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
+        'NAME': os.environ.get('POSTGRES_DB', 'uniquest'),
+        'USER': os.environ.get('POSTGRES_USER', 'user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
         'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),
         'PORT': '5432',
     }
@@ -170,6 +172,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+# 개발 중에만 True로 설정
+CORS_ALLOW_ALL_ORIGINS = True
 #로그인 후 발급받은 토큰 해독
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

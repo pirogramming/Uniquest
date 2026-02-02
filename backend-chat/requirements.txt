@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-redis
-websockets
 motor
-pydantic
+pydantic>=2.0
+pydantic-settings
+redis>=4.2.0

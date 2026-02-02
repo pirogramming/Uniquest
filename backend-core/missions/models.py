@@ -63,8 +63,14 @@ class Mission(models.Model):
     category = models.CharField(max_length=20, choices=Category.choices)
     status = models.CharField(max_length=20, choices=MissionStatus.choices, default=MissionStatus.WAITING)
 
-    # timezone-aware deadline
-    deadline = models.DateTimeField(default=timezone.now)
+    # 미션을 수행하는 헬퍼 (매칭 시 설정됨)
+    helper = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="accepted_missions"
+    )
 
     # ===== location =====
     # 사용자가 입력한 "거래 희망 장소명"
@@ -80,6 +86,7 @@ class Mission(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deadline = models.DateTimeField(null=True, blank=True)
 
     def clean(self):
         super().clean()
