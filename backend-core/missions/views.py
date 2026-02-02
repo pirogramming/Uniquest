@@ -179,7 +179,7 @@ def mission_update(request: HttpRequest, mission_id: int) -> HttpResponse:
 
     return render(request, "missions/mission_form.html", {"form": form, "is_update": True, "mission": mission})
 
-
+@login_required
 def mission_detail(request: HttpRequest, mission_id: int) -> HttpResponse:
     mission = get_object_or_404(
         Mission.objects.prefetch_related("tags", "images").select_related("author"),
@@ -187,7 +187,7 @@ def mission_detail(request: HttpRequest, mission_id: int) -> HttpResponse:
     )
     return render(request, "missions/mission_detail.html", {"mission": mission})
 
-
+@login_required
 def mission_list(request: HttpRequest) -> HttpResponse:
     qs = Mission.objects.select_related("author").prefetch_related("tags", "images").order_by("-created_at")
 
