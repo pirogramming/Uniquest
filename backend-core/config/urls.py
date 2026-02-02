@@ -22,10 +22,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
-    path('missions/', include('missions.urls')),
-    path('users/',include('users.urls')),
+    path('api/missions/', include('missions.urls')),
+    path('api/users/',include('users.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-

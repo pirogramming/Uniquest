@@ -11,11 +11,18 @@ from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
-from django.core.cache import cache
+from common.utils import publish_chat_event
+from missions.models import Mission
+from django.db import models
 
 #유저모델 불러오기
 User = get_user_model()
+
+#메일 인증 test용
+from django.core.cache import cache
 
 # 1. 회원가입 View
 def signup_page(request):
@@ -73,7 +80,7 @@ def verify_email(request):
 #유저 생성 로직
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserRegisterSerializer
+    serializer_class = UserRegisterSerializer # serializer.py class불러오기
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -91,8 +98,8 @@ class RegisterView(generics.CreateAPIView):
 
         # 3. Serializer 검증 및 유저 생성
         # 여기서 백엔드가 직접 찾은 university 값을 주입합니다.
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(data=request.data) # 회원가입용 serializer를 만들기만 함
+        serializer.is_valid(raise_exception=True) #username, password, nickname등 형식/필수값 검사
         
         # save() 시점에 university 필드를 강제로 채워줍니다.
         # (유저 모델에 university 필드가 있다고 가정합니다)
@@ -115,25 +122,38 @@ class RegisterView(generics.CreateAPIView):
             "message": f"{university} 소속으로 가입 및 로그인이 완료되었습니다!"
         }, status=status.HTTP_201_CREATED)
 
-#로그인 페이지
-def login_page(request):
-    return render(request,'users/login.html')
+# 2. 내 프로필 조회 View
+class ProfileView(views.APIView):
+    permission_classes = [IsAuthenticated] # 로그인한 사람만 접근 가능
 
+    def get(self, request):
+        # request.user: 현재 토큰으로 로그인한 유저 객체
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+#로그인 페이지
+# users/views.py
+
+@method_decorator(csrf_exempt, name='dispatch')
 class MyLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # 1. 프론트에서 보낸 email과 password 받기
-        email = request.data.get('email')
+        # 1. 요청에서 데이터 가져오기
+        username = request.data.get('username') # 아이디 (root용)
+        email = request.data.get('email')       # 이메일 (학생용)
         password = request.data.get('password')
 
         try:
-            # 2. 이메일로 유저 객체 찾기 (이메일이 유니크하다고 가정)
-            user_obj = User.objects.get(univ_email=email)
+            # 2. 유저 찾기 (아이디가 있으면 아이디로, 없으면 이메일로 검색)
+            if username:
+                user_obj = User.objects.get(username=username)
+            else:
+                user_obj = User.objects.get(univ_email=email)
             
-            # 3. 비밀번호 검증 (authenticate 대신 직접 체크)
+            # 3. 비밀번호 검증
             if user_obj.check_password(password):
-                # 4. 검증 성공 시 JWT 발급
+                # 4. 토큰 발급
                 refresh = RefreshToken.for_user(user_obj)
                 return Response({
                     'access': str(refresh.access_token),
@@ -143,7 +163,7 @@ class MyLoginView(APIView):
                 return Response({'detail': '비밀번호가 틀렸습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
                 
         except User.DoesNotExist:
-            return Response({'detail': '존재하지 않는 이메일입니다.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': '사용자를 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
         
 def logout(request):
     return render(request,'users/logout.html')
@@ -212,46 +232,38 @@ def mypage_modify_view(request):
 
 #차단 유저들
 
-@api_view(['GET','POST'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_blocked_users_info(request):
     user = request.user
-    if request.method == "GET":
-        blocked_list = list(user.blocked_people.all().values('id','nickname'))
-        return Response({
-            "id":user.id,
-            "nickname":user.nickname,
-            "blocked_users":blocked_list
-        })
-    elif request.method == "POST":
-        try:
-            target_user_id = request.data.get('target_id')
-            target_user = User.objects.get(id=target_user_id)
-            user.blocked_people.remove(target_user)
-            return Response({"message": "해제 완료"}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+    target_user_id = request.data.get('target_id')
+    
+    try:
+        target_user = User.objects.get(id=target_user_id)
+        # 1. DB에서 차단 관계 설정
+        user.blocked_people.add(target_user) 
+        
+        # 2. [핵심] 두 유저가 연관된 '진행 중인' 미션방들을 모두 찾음
+        related_missions = Mission.objects.filter(
+            models.Q(author=user, helper=target_user) | 
+            models.Q(author=target_user, helper=user)
+        ).filter(status__in=['WAITING', 'MATCHED']) # 대기나 매칭 중인 방만
+
+        # 3. 찾은 모든 방에 대해 각각 강퇴 이벤트 발행
+        for mission in related_missions:
+            publish_chat_event(
+                room_id=str(mission.id), # 실제 미션 ID를 동적으로 넣음
+                event_type="KICK", 
+                data={"target_id": target_user_id}
+            )
             
+        return Response({"message": "차단 및 실시간 강퇴 완료"}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+            
+
+
 
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
-
-#홈 페이지
-
-def get_home_page(request):
-    return render(request,'users/homepage.html')
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_homepage_info(request):
-    user = request.user
-    blocked_list = list(user.blocked_people.all().values('id','nickname'))
-    return Response({
-        "id":user.id,
-        "nickname":user.nickname,
-        "university":user.university,
-        "is_student_verified":user.is_student_verified,
-        "univ_email":user.univ_email,
-        "manner_score":user.manner_score,
-        "blocked_people":blocked_list
-    })
