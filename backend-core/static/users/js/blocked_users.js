@@ -25,7 +25,7 @@ async function getuserData() {
 
     try {
         // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/users/api/blocked_users/', { // 팀장님의 API 주소
+        const response = await fetch('/api/users/blocked_users/', { // 팀장님의 API 주소
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!

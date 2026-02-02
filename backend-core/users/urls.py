@@ -32,4 +32,8 @@ urlpatterns = [
     #차단 유저 관리
     path('blocked_users/',views.get_blocked_users,name="blocked_users"),
     path('api/blocked_users/',views.get_blocked_users_info,name="blocked_user_info"),
+
+    #홈페이지
+    path('homepage/',views.get_home_page,name="homepage"),
+    path('api/homepage/',views.get_homepage_info,name="homepage_info"),
 ]

@@ -23,10 +23,12 @@
             </div>
             
             <div class="quick-menu">
-                <div class="menu-item">
-                    <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                    <span>미션 찾기</span>
-                </div>
+                <a href={%url 'missions:mission_list'%}>
+                    <div class="menu-item">
+                        <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span>미션 찾기</span>
+                    </div>
+                </a>
                 <a href={%url 'missions:mission_create'%}>
                     <div class="menu-item">
                         <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
@@ -63,34 +65,35 @@
                 <h2>진행 중인 미션</h2>
                 <a href="#" class="view-all">전체보기</a>
             </div>
-
-            <div class="mission-card">
-                <div class="card-header">
-                    <h3 class="title">점심 배달 대신 받아주실 분</h3>
-                    <span class="tag-status">진행중</span>
-                </div>
-                <p class="description">12시 30분경 학생회관 앞에서 배달 받아주세요. 제가 수업 중이라 직접 못 받습니다.</p>
-                <div class="card-footer">
-                    <div class="info">
-                        <span class="tag-category category-delivery">배달</span>
-                        <span class="location">학생회관 앞</span>
+            <div id="mission_cards">
+                <div class="mission-card">
+                    <div class="card-header">
+                        <h3 class="title">점심 배달 대신 받아주실 분</h3>
+                        <span class="tag-status">진행중</span>
                     </div>
-                    <span class="price">5,000원</span>
-                </div>
-            </div>
-
-            <div class="mission-card">
-                <div class="card-header">
-                    <h3 class="title">과제 도움 구합니다</h3>
-                    <span class="tag-status">진행중</span>
-                </div>
-                <p class="description">파이썬 기초 과제 도와주실 분 구해요. 1시간 정도 소요될 것 같습니다.</p>
-                <div class="card-footer">
-                    <div class="info">
-                        <span class="tag-category category-task">과제도움</span>
-                        <span class="location">중앙도서관</span>
+                    <p class="description">12시 30분경 학생회관 앞에서 배달 받아주세요. 제가 수업 중이라 직접 못 받습니다.</p>
+                    <div class="card-footer">
+                        <div class="info">
+                            <span class="tag-category category-delivery">배달</span>
+                            <span class="location">학생회관 앞</span>
+                        </div>
+                        <span class="price">5,000원</span>
                     </div>
-                    <span class="price">15,000원</span>
+                </div>
+
+                <div class="mission-card">
+                    <div class="card-header">
+                        <h3 class="title">과제 도움 구합니다</h3>
+                        <span class="tag-status">진행중</span>
+                    </div>
+                    <p class="description">파이썬 기초 과제 도와주실 분 구해요. 1시간 정도 소요될 것 같습니다.</p>
+                    <div class="card-footer">
+                        <div class="info">
+                            <span class="tag-category category-task">과제도움</span>
+                            <span class="location">중앙도서관</span>
+                        </div>
+                        <span class="price">15,000원</span>
+                    </div>
                 </div>
             </div>
         </section>
