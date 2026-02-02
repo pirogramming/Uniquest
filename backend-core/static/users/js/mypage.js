@@ -9,7 +9,7 @@ async function getUserData() {
 
     try {
         // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/users/api/profile/', { // 팀장님의 API 주소
+        const response = await fetch('/api/users/api/profile/', { // 팀장님의 API 주소
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
@@ -24,7 +24,7 @@ async function getUserData() {
         } else {
             console.error("토큰이 만료되었거나 유효하지 않습니다.");
             alert('노 토큰')
-            window.location.href = '/users/login/';
+            // window.location.href = '/api/users/login/';
             return null;
         }
     } catch (error) {

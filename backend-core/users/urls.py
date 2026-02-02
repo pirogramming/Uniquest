@@ -7,16 +7,15 @@ app_name = 'users'
 
 urlpatterns = [
     # 1. 회원가입 (HTML 페이지 연결 삭제 -> API 연결)
-    # 기존: path('signup/', views.signup_page), path('signup-data/', RegisterView...)
-    path('signup/', RegisterView.as_view(), name='signup'),
+    path('signup/', views.signup_page),
+    path('signup/submit/', RegisterView.as_view(), name='signup'),
     
     # 2. 이메일 인증
     path('verify-email/', views.verify_email, name='verify-email'),
     
-    # 3. 로그인 (핵심! ⭐)
-    # 기존: path('login/', views.login_page) -> 에러 원인!
-    # 수정: 바로 API 뷰(MyLoginView)로 연결합니다.
-    path('login/', MyLoginView.as_view(), name='login'),
+    # 3. 로그인: GET → 로그인 페이지, POST → login/submit/ (API)
+    path('login/', views.login_page, name='login'),
+    path('login/submit/', MyLoginView.as_view(), name='login_submit'),
     
     # 4. 토큰 갱신 (선택 사항)
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

@@ -10,4 +10,5 @@ requests
 django-environ
 django-redis
 python-dotenv
+drf-spectacular
 drf-yasg

@@ -13,39 +13,42 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function handleSignup(){
+async function handleLogin() {
     const csrftoken = getCookie('csrftoken');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
 
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
+    if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+    }
 
     try {
-        const response = await fetch('/users/login_logic/',{
-            method:"POST",
-            headers:{
+        const response = await fetch('/api/users/login/submit/', {
+            method: 'POST',
+            headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken':csrftoken
+                'X-CSRFToken': csrftoken
             },
-            body:JSON.stringify({
-                email:email,
-                password:password
+            body: JSON.stringify({
+                email: email,
+                password: password
             })
-        })
+        });
+
+        const data = await response.json();
 
         if (response.ok) {
-            const data = await response.json();
-            // 💡 핵심: 브라우저 금고(LocalStorage)에 토큰 보관
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
-            console.log(data)
-            alert("로그인 성공 야호!");
+            alert('로그인 성공!');
+            window.location.href = '/api/users/mypage/';
         } else {
-            const errorData = await response.json();
-            console.error("에러 발생:", errorData);
-            alert("가입 실패: " + JSON.stringify(errorData));
+            const msg = data.detail || data.error || JSON.stringify(data);
+            alert('로그인 실패: ' + msg);
         }
-    } catch(error){
-        console.error('네트워크 에러',error)
-        alert('서버 통신 불가')
+    } catch (error) {
+        console.error('네트워크 에러', error);
+        alert('서버 통신 불가');
     }
 }

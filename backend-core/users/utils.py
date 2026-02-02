@@ -262,25 +262,25 @@ def extract_univ(raw_email):
 
     return email_dic.get(domain)
 
-def send_verification_email(raw_email):
-    auth_code = rd.randint(100000, 999999)
-
-    cache.set(f"auth_{raw_email}", str(auth_code), timeout=300)
-
-    msg = EmailMessage()
-    msg.set_content(f"안녕하세요! Uniquest 인증번호는 [{auth_code}] 입니다.")
-    msg['Subject'] = "[Uniquest] 대학생 소속 인증 번호"
-    msg['From'] = settings.EMAIL_HOST_USER
-    msg['To'] = raw_email
-
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        smtp.send_message(msg)
-
 # def send_verification_email(raw_email):
 #     auth_code = rd.randint(100000, 999999)
-#     cache.set(f"auth_{raw_email}", str(auth_code), timeout=300)
-#     print(cache.get(f"auth_{raw_email}"))
+
+#     cache.set(f"auth_{raw_email}", str(auth_code), timeout=300) #인증번호 캐시에 저장
+
+#     msg = EmailMessage()
+#     msg.set_content(f"안녕하세요! Uniquest 인증번호는 [{auth_code}] 입니다.")
+#     msg['Subject'] = "[Uniquest] 대학생 소속 인증 번호"
+#     msg['From'] = settings.EMAIL_HOST_USER
+#     msg['To'] = raw_email
+
+#     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+#         smtp.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+#         smtp.send_message(msg)
+
+def send_verification_email(raw_email):
+    auth_code = rd.randint(100000, 999999)
+    cache.set(f"auth_{raw_email}", str(auth_code), timeout=300)
+    print(cache.get(f"auth_{raw_email}"))
 
     
 def verify_code(raw_email, user_input):

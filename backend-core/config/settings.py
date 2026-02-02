@@ -66,7 +66,26 @@ INSTALLED_APPS = [
     # [Local Apps] 
     'users',     
     'missions',  
+    'drf_spectacular',
 ]
+
+# settings.py
+REST_FRAMEWORK = {
+    # 1. Swagger용 스키마 설정 (에러 해결의 핵심)
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    # 2. JWT 인증 설정 (로그인 연동)
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# SPECTACULAR_SETTINGS가 혹시 잘못되었을 수도 있으니 일단 기본값만 둡니다.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Uniquest API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

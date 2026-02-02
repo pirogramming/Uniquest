@@ -80,7 +80,7 @@ def verify_email(request):
 #유저 생성 로직
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserRegisterSerializer
+    serializer_class = UserRegisterSerializer # serializer.py class불러오기
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -98,8 +98,8 @@ class RegisterView(generics.CreateAPIView):
 
         # 3. Serializer 검증 및 유저 생성
         # 여기서 백엔드가 직접 찾은 university 값을 주입합니다.
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(data=request.data) # 회원가입용 serializer를 만들기만 함
+        serializer.is_valid(raise_exception=True) #username, password, nickname등 형식/필수값 검사
         
         # save() 시점에 university 필드를 강제로 채워줍니다.
         # (유저 모델에 university 필드가 있다고 가정합니다)
@@ -131,8 +131,10 @@ class ProfileView(views.APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
 
-#로그인 페이지
-# users/views.py
+# 로그인: GET → 로그인 페이지(HTML), POST → /api/users/login/submit/ (API)
+def login_page(request):
+    return render(request, 'users/login.html')
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MyLoginView(APIView):
@@ -180,7 +182,7 @@ def get_my_info(request):
         "id": user.id,
         "username": user.username,
         "nickname": user.nickname,
-        "university": user.university,
+        "university": user.university.name if user.university else None,
         "univ_email": user.univ_email,
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
@@ -204,7 +206,7 @@ def get_my_info_patch(request):
             "username": user.username,
             "nickname": user.nickname,
             "univ_email": user.univ_email,
-            "university": user.university,
+            "university": user.university.name if user.university else None,
         })
 
     elif request.method == 'PATCH':
