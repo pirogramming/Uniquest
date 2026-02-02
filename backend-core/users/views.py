@@ -269,3 +269,25 @@ def get_blocked_users_info(request):
 
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
+
+#홈 페이지
+
+def get_home_page(request):
+    return render(request,'users/homepage.html')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_homepage_info(request):
+    user = request.user
+    blocked_list = list(user.blocked_people.all().values('id','nickname'))
+    mission_lst = list(user.missions.all().values('title','descriptions','reward','category','status','location_name'))
+    return Response({
+        "id":user.id,
+        "nickname":user.nickname,
+        "university":user.university.name,
+        "is_student_verified":user.is_student_verified,
+        "univ_email":user.univ_email,
+        "manner_score":user.manner_score,
+        "blocked_people":blocked_list,
+        "missions":mission_lst
+    })

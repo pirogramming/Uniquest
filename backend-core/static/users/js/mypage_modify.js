@@ -9,7 +9,7 @@ async function getUserData() {
 
     try {
         // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/users/api/profile_modify/', { // 팀장님의 API 주소
+        const response = await fetch('/api/users/api/profile_modify/', { // 팀장님의 API 주소
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
@@ -22,6 +22,7 @@ async function getUserData() {
             console.log("유저 정보 로드 성공:", userData);
             return userData;
         } else {
+            alert('토큰이 만료되었거나 유효하지 않습니다.')
             console.error("토큰이 만료되었거나 유효하지 않습니다.");
             window.location.href = '/users/login/';
             return null;
@@ -76,7 +77,7 @@ async function patchProfile() {
 
     try {
         // 2. 백엔드 PATCH API 호출
-        const response = await fetch('/users/api/profile_modify/', {
+        const response = await fetch('/api/users/api/profile_modify/', {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -87,7 +88,7 @@ async function patchProfile() {
 
         if (response.ok) {
             alert("프로필이 성공적으로 변경되었습니다! ✨");
-            window.location.href = '/users/mypage/'; // 저장 후 마이페이지로 이동
+            window.location.href = '/api/users/mypage/'; // 저장 후 마이페이지로 이동
         } else {
             const errorData = await response.json();
             alert("수정 실패: " + (errorData.detail || "오류가 발생했습니다."));
