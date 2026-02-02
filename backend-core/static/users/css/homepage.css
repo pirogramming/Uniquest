@@ -1,0 +1,222 @@
+:root {
+    --primary-blue: #70a1ff;
+    --bg-light-blue: #f0f7ff;
+    --text-dark: #333;
+    --text-gray: #777;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Pretendard', sans-serif;
+}
+
+a{
+    color:white;
+    text-decoration: none;
+}
+
+body {
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 450px;
+    background-color: #fcfcfc;
+    min-height: 100vh;
+    padding-bottom: 80px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* Header */
+.header {
+    background-color: var(--primary-blue);
+    padding: 30px 20px 80px 20px;
+    border-radius: 0 0 40px 40px;
+    color: var(--white);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+}
+
+.user-greeting h1 { font-size: 24px; font-weight: 300; }
+.user-greeting p { font-size: 20px; font-weight: 600; }
+
+.notification {
+    position: relative;
+    font-size: 24px;
+}
+
+.badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background: #ff4757;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+}
+
+/* Quick Menu */
+.quick-menu {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px 10px;
+    border-radius: 20px;
+}
+
+.menu-item {
+    text-align: center;
+    font-size: 12px;
+}
+
+.icon-box {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+/* Status Card */
+.mission-status-card {
+    background: var(--white);
+    margin: -50px 20px 25px 20px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.mission-status-card h3 {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.status-grid {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.count { font-size: 22px; font-weight: bold; color: #aaa; }
+.highlight-blue { color: var(--primary-blue); }
+.highlight-yellow { color: #fbc531; }
+.label { font-size: 12px; color: var(--text-gray); margin-top: 5px; }
+
+/* Mission List */
+.mission-list-section { padding: 0 20px; }
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-title h2 { font-size: 18px; }
+.view-all { font-size: 13px; color: var(--primary-blue); text-decoration: none; }
+
+.mission-card {
+    background: var(--white);
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.title { font-size: 16px; font-weight: bold; }
+.tag-status {
+    background: #eef5ff;
+    color: var(--primary-blue);
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.description {
+    font-size: 13px;
+    color: var(--text-gray);
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tag-category {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-right: 5px;
+}
+
+.category-delivery { background: #fff5eb; color: #ff9f43; }
+.category-task { background: #eef2ff; color: #5352ed; }
+
+.location { font-size: 11px; color: #aaa; }
+.price { font-size: 17px; font-weight: bold; color: var(--primary-blue); }
+
+/* Bottom Nav */
+.bottom-nav {
+    position: absolute;
+    bottom: 0; width: 100%;
+    height: 70px;
+    background: var(--white);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #eee;
+}
+
+.nav-item {
+    text-align: center;
+    color: #bbb;
+    font-size: 11px;
+}
+
+.nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
+.nav-item.active { color: var(--primary-blue); }
+
+.nav-fab .fab-button {
+    width: 55px; height: 55px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    margin-top: -30px;
+    box-shadow: 0 4px 10px rgba(112, 161, 255, 0.4);
+}
+
+.icon-wrapper { position: relative; display: inline-block; }
+.nav-badge {
+    position: absolute;
+    top: -5px; right: -8px;
+    background: #ff4757;
+    color: white;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 10px;
+}

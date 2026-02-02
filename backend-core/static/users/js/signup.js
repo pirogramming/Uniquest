@@ -31,7 +31,7 @@ async function handleSignup(){
         password_check:document.getElementById('password_check').value,
     }
 
-    const response = await fetch('/users/signup-data/', {
+    const response = await fetch('/api/users/signup/submit/', {
         method:'POST',
         headers:{
             'Content-Type' : 'application/json',
@@ -62,7 +62,7 @@ async function send_number(){
         return
     }
 
-    const response = await fetch('/users/verify-email/',{
+    const response = await fetch('/api/users/verify-email/',{
         method:'POST',
         headers:{
             'Content-Type':'application/json',
@@ -97,7 +97,7 @@ async function check_number(){
         return;
     }
 
-    const response = await fetch('/users/verify-email/',{
+    const response = await fetch('/api/users/verify-email/',{
         method:'POST',
         headers:{
             'Content-Type':'application/json',
@@ -116,6 +116,6 @@ async function check_number(){
         }
     } else{
         const data = await response.json();
-        alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
+        alert("확인 실패: " + (data.message || "오류가 발생했습니다."));
     }
 }

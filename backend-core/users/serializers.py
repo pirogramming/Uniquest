@@ -14,36 +14,38 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'password', 'nickname', 'university', 'univ_email','is_student_verified']
+        fields = ['username', 'password', 'nickname', 'university', 'univ_email', 'is_student_verified', 'university_name']
         extra_kwargs = {
-            'password': {'write_only': True} # 비밀번호는 응답에 노출되지 않도록 설정
+            'password': {'write_only': True}  # 비밀번호는 응답에 노출되지 않도록 설정
         }
 
     def create(self, validated_data):
-        # 1. 대학 이름 추출 (validated_data에서 제거)
+        # 1. 대학 이름 추출 (View에서 문자열로 넘어옴. validated_data에서 제거)
         univ_name = validated_data.pop('university_name', None)
-        
-        # 2. 유저 생성 (비밀번호 암호화 자동 처리)
+        univ_from_view = validated_data.pop('university', None)  # View의 save(university=대학명) 값
+        univ_name = univ_name or univ_from_view  # 둘 중 하나로 University 조회
+
+        # 2. university FK는 create_user에 넣지 않음 (문자열이라서). 나중에 인스턴스로 연결
+        univ_email = validated_data.get('univ_email', '')
+        is_student_verified = validated_data.get('is_student_verified', False)
+
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
             nickname=validated_data['nickname'],
-            university=validated_data.get('university', ''),
-            univ_email=validated_data.get('univ_email', ''),
-            is_student_verified=validated_data.get('is_student_verified', '')
+            univ_email=univ_email,
+            is_student_verified=is_student_verified,
         )
 
-        # 3. 대학 정보 연결
+        # 3. 대학 정보 연결 (문자열 → University 인스턴스)
         if univ_name:
-            # 대학이 DB에 있으면 가져오고, 없으면 생성 (도메인은 임시값)
-            # 실제 서비스에서는 미리 등록된 대학 리스트만 허용하는 것이 좋습니다.
             university, _ = University.objects.get_or_create(
-                name=univ_name, 
-                defaults={'domain': 'example.com'} 
+                name=univ_name,
+                defaults={'domain': 'example.com'}
             )
             user.university = university
-            user.save()
-            
+            user.save(update_fields=['university'])
+
         return user
 
 class UserProfileSerializer(serializers.ModelSerializer):
