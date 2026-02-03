@@ -1,15 +1,15 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>차단 관리 - Uniquest</title>
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}차단 관리{% endblock %}
+
+{%block extra_css %}
     <link rel="stylesheet" href="{% static 'users/css/blocked_users.css' %}">
-</head>
-<body class="bg-gray-body">
-    <div class="container">
-        <header class="header">
+{% endblock %}
+{%block extra_js %}{% endblock %}
+
+{% block content %}
+<header class="header">
             <button onclick="history.back()" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -56,8 +56,10 @@
                 </ul>
             </section>
         </main>
-    </div>
+{% endblock %}
+
+
+{%block extra_scripts %}
     <script src="{% static 'users/js/auth_helper.js' %}"></script>
     <script src="{% static 'users/js/blocked_users.js' %}"></script>
-</body>
-</html>
+{% endblock %}

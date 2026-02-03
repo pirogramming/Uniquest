@@ -1,18 +1,17 @@
+{%extends "base.html"%}
 {%load static%}
-<!DOCTYPE html>
-<html lang="ko">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uniquest Main</title>
+{% block title %}Uniquest{% endblock %}
+
+{%block extra_css %}
     <link rel="stylesheet" href="{%static 'users/css/homepage.css'%}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+{% endblock %}
 
-<body>
-    <div class="mobile-container">
-        <header class="header">
+{%block extra_js %}{% endblock %}
+
+{% block content %}
+<header class="header">
             <div class="header-top">
                 <div class="user-greeting">
                     <h1>안녕하세요,</h1>
@@ -99,34 +98,13 @@
                 </div>
             </div>
         </section>
+{% endblock %}
 
-        <nav class="bottom-nav">
-            <div class="nav-item active">
-                <i class="fa-solid fa-house"></i>
-                <span>홈</span>
-            </div>
-            <div class="nav-item">
-                <i class="fa-solid fa-list-ul"></i>
-                <span>미션</span>
-            </div>
-            <div class="nav-fab">
-                <div class="fab-button"><i class="fa-solid fa-plus"></i></div>
-            </div>
-            <div class="nav-item">
-                <div class="icon-wrapper">
-                    <i class="fa-regular fa-comment-dots"></i>
-                    <span class="nav-badge">3</span>
-                </div>
-                <span>채팅</span>
-            </div>
-            <div class="nav-item">
-                <i class="fa-regular fa-user"></i>
-                <span>마이</span>
-            </div>
-        </nav>
-    </div>
+{%block bottom_nav %}
+    {% include "_bottom-nav.html" %}
+{% endblock %}
+
+{%block extra_scripts %}
     <script src="{% static 'users/js/auth_helper.js' %}"></script>
     <script src="{%static 'users/js/homepage.js'%}"></script>
-</body>
-
-</html>
+{% endblock %}
