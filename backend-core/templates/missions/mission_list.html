@@ -1,33 +1,43 @@
-{%load static %}
-<!doctype html>
-<html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>미션 목록</title>
-<style>
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}미션 목록{% endblock %}
+
+    {%block extra_css %}
+    <style>
   body { font-family: system-ui; padding: 16px; }
   a { text-decoration: none; }
   .card { border:1px solid #eee; border-radius:12px; padding:12px; margin:10px 0; }
   .muted { color:#666; font-size: 13px; }
 </style>
-  <script src="/static/shared/js/auth.js"></script>
+    {% endblock %}
+    {%block extra_js %}
+    <script src="/static/shared/js/auth.js"></script>
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
   <script src="{% static 'missions/js/mission_list.js' %}" defer></script>
-</head>
-<body>
-  <h2>미션 목록</h2>
+    {% endblock %}
+
+    {% block content %}
+    <h2>미션 목록</h2>
   <p>
     <a href="{% url 'missions:mission_create_view' %}">+ 새 미션</a> |
     <a href="/missions/?urgent=1">#급해요만</a>
   </p>
 
-  <div id="map" style="width:900px;height:600px;"></div>
+  <div id="map" style="width:100%;height:50%;"></div>
 
   <h2>미션 목록</h2>
   <div id="mission-list-container">
     <p class="muted">미션을 불러오는 중...</p>
   </div>
+    {% endblock %}
 
-<script id="mission-data" type="application/json">
+    {%block bottom_nav %}
+        {% include "_bottom-nav.html" %}
+    {% endblock %}
+    
+    {%block extra_scripts %}
+    <script id="mission-data" type="application/json">
 [
     {% for m in missions %}
     {
@@ -40,5 +50,4 @@
     {% endfor %}
 ]
 </script>
-</body>
-</html>
+    {% endblock %}

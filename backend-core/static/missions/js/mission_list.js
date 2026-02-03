@@ -31,7 +31,7 @@ function renderMissionList(missions) {
 
     container.innerHTML = missions.map(m => {
         // 실제 상세 페이지 URL (API 주소가 아님!)
-        const detailViewUrl = `api/missions/${m.id}/`;
+        const detailViewUrl = `${m.id}/`;
         
         return `
         <div class="card" data-id="${m.id}" style="cursor:pointer;" onclick="location.href='${detailViewUrl}'">
@@ -76,7 +76,7 @@ function renderMissionList(missions) {
                 title: mission.title
             });
 
-            const detailViewUrl = `api/missions/${mission.id}/`; // 👈 여기도 수정
+            const detailViewUrl = `${mission.id}/`; // 👈 여기도 수정
             const content = `
             <div style="padding:10px; min-width:160px; font-size: 14px; line-height:1.5;">
                 <div style="font-weight:bold; color:#333;">${mission.title}</div>
