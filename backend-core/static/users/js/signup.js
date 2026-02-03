@@ -134,7 +134,6 @@ let timerInterval;
 function startTimer(seconds) {
     // 혹시 이미 실행 중인 타이머가 있다면 초기화
     clearInterval(timerInterval);
-
     const display = document.getElementById('timer-display');
     let timeLeft = seconds;
 

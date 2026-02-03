@@ -140,3 +140,27 @@ button {
     color: #007bff;
     text-decoration: underline;
 }
+
+#check_number_box_certified {
+    margin-top: 15px;
+    display: none; /* 기본적으로는 숨김 상태 */
+}
+
+.certified-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #589bff; /* 이미지와 유사한 밝은 파란색 */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 40px; /* 양 끝이 둥근 모양 */
+    font-weight: bold;
+    font-size: 1.1rem;
+    gap: 10px; /* 아이콘과 글자 사이 간격 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.certified-badge svg {
+    width: 28px;
+    height: 28px;
+}

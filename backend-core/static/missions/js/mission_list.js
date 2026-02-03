@@ -2,23 +2,53 @@
     let map;
     const API_LIST_URL = '/api/missions/api/list/';
 
-    async function loadMissions() {
-        try {
-            console.log("미션 목록 요청 중...");
-            const response = await Auth.authFetchJson(API_LIST_URL);
-            
-            // 데이터가 어떻게 들어오는지 콘솔에서 확인하세요!
-            console.log("서버 응답 데이터:", response);
+    // mission_list.js
 
-            if (response && response.results) {
-                addMissionMarkers(response.results);
-            } else {
-                console.warn("데이터 형식이 맞지 않거나 결과가 없습니다.");
-            }
-        } catch (err) {
-            console.error("API 요청 실패:", err);
+async function loadMissions() {
+    try {
+        const response = await Auth.authFetchJson(API_LIST_URL);
+        if (response && response.results) {
+            addMissionMarkers(response.results); // 지도에 표시
+            renderMissionList(response.results); // 👈 하단 목록에 표시 (추가)
         }
+    } catch (err) {
+        console.error("API 요청 실패:", err);
     }
+}
+
+// 하단 목록을 동적으로 생성하는 함수
+function renderMissionList(missions) {
+    const container = document.getElementById('mission-list-container');
+    if (!container) return;
+
+    if (missions.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">아직 주변에 미션이 없습니다.</p>';
+        return;
+    }
+
+    // 상태/카테고리 매핑용 객체 (필요시 사용)
+    const categoryMap = { 'ERRAND': '심부름', 'STUDY': '학업', 'RENTAL': '대여', 'LIFE': '생활' };
+
+    container.innerHTML = missions.map(m => {
+        // 실제 상세 페이지 URL (API 주소가 아님!)
+        const detailViewUrl = `api/missions/${m.id}/`;
+        
+        return `
+        <div class="card" data-id="${m.id}" style="cursor:pointer;" onclick="location.href='${detailViewUrl}'">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div style="font-size:1.1rem; font-weight:bold; color:#333;">${m.title}</div>
+                <div style="font-weight:700; color:#28a745;">${m.reward.toLocaleString()}원</div>
+            </div>
+            <div class="muted" style="margin-top:4px;">
+                ${categoryMap[m.category] || m.category} · ${m.status} · ${new Date(m.created_at).toLocaleDateString()}
+            </div>
+            ${m.location_name ? `<div class="muted" style="margin-top:4px;">📍 ${m.location_name}</div>` : ''}
+            <div style="margin-top:8px;">
+                ${m.tags ? m.tags.map(t => `<span class="muted" style="background:#f0f0f0; padding:2px 8px; border-radius:4px; margin-right:4px;">#${t.name}</span>`).join('') : ''}
+            </div>
+        </div>
+    `}).join('');
+}
 
     function addMissionMarkers(missions) {
         if (!missions || missions.length === 0) return;
@@ -46,13 +76,13 @@
                 title: mission.title
             });
 
-            const detailUrl = `/api/missions/${mission.id}/`;
+            const detailViewUrl = `api/missions/${mission.id}/`; // 👈 여기도 수정
             const content = `
-                <div style="padding:10px; min-width:150px; font-size: 14px;">
-                    <div style="font-weight:bold; margin-bottom:5px;">${mission.title}</div>
-                    <div style="color:#666; font-size:11px; margin-bottom:5px;">보상: ${mission.reward}원</div>
-                    <a href="${detailUrl}" style="color:blue; text-decoration:none; font-weight:bold;">상세보기 →</a>
-                </div>`;
+            <div style="padding:10px; min-width:160px; font-size: 14px; line-height:1.5;">
+                <div style="font-weight:bold; color:#333;">${mission.title}</div>
+                <div style="color:#28a745; font-size:12px; margin-bottom:5px;">보상: ${mission.reward.toLocaleString()}원</div>
+                <a href="${detailViewUrl}" style="color:#007bff; text-decoration:none; font-weight:bold; font-size:12px;">상세보기 →</a>
+            </div>`;
 
             const infowindow = new kakao.maps.InfoWindow({
                 content: content,
