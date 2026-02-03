@@ -20,8 +20,6 @@
     function renderMissionList(missions) {
         const container = document.getElementById('mission-list-container');
         if (!container) return;
-        if (container)
-            console.log("dddd")
         if (missions.length === 0) {
             container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">아직 주변에 미션이 없습니다.</p>';
             return;

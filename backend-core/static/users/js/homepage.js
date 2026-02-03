@@ -24,14 +24,7 @@ async function renderHomepage() {
     }
 
     try {
-        const response = await fetch('/api/users/api/homepage/', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
+        const response = await fetch('/api/users/api/homepage');
 
         const userData = await response.json();
         console.log(userData)
@@ -43,13 +36,19 @@ async function renderHomepage() {
         if (userData && userData.id) {
             const nicknameElement = document.getElementById('nickname');
             const missionElement = document.getElementById('mission_cards');
+            const matched = document.getElementById('matched');
+            const waiting = document.getElementById('waiting');
+            const completed = document.getElementById('completed');
+
             if (nicknameElement) {
                 nicknameElement.innerText = userData.nickname;
             }
             if (missionElement) {
-                missionElement.innerHTML = "";
-                (userData.missions || []).forEach(({ title, status, descriptions, category, reward, location_name }) => {
-                    missionElement.innerHTML += `<div class="mission-card">
+                console.log('yeah')
+                userMission = userData.missions
+                missionElement.innerHTML = ""
+                userData.missions.forEach(({ id, title, status, descriptions, category, reward, location_name }) => {
+                    missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'">
                         <div class="card-header">
                             <h3 class="title">${title}</h3>
                             <span class="tag-status">${status}</span>
@@ -65,6 +64,13 @@ async function renderHomepage() {
                     </div>`
                 });
             }
+            if (matched && waiting && completed) {
+                matched.innerHTML = userData.matched_count
+                waiting.innerHTML = userData.waiting_count
+                completed.innerHTML = userData.completed_count
+
+            }
+
 
             // 미션 관련 로직도 여기에 추가 가능
             console.log("환영합니다, " + userData.nickname + "님!");

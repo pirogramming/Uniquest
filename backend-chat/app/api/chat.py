@@ -13,7 +13,7 @@ async def get_chat_history(room_id: str):
     return await chat_manager.get_history(room_id)
 
 
-@router.websocket("/chat/{room_id}")  # ✅ user_id 제거
+@router.websocket("/chat/{room_id}")  # 
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
     await websocket.accept()
     
@@ -43,7 +43,6 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await websocket.close(code=4001)
             return
         
-        # ✅ 토큰에서 user_id 추출
         user_id = payload.get("user_id")
         if not user_id:
             await websocket.close(code=4001)

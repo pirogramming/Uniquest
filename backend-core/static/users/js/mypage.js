@@ -69,7 +69,7 @@ function logout() { // 로그아웃 로직
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     alert("로그아웃 되었습니다.");
-    window.location.href = "/api/users/login/"; // 로그인 페이지로 이동
+    window.location.href = "/users/login/"; // 로그인 페이지로 이동
 }
 
 // 페이지가 로드되면 자동으로 실행
