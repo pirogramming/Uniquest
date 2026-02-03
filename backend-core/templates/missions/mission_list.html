@@ -19,23 +19,13 @@
     <a href="{% url 'missions:mission_create_view' %}">+ 새 미션</a> |
     <a href="/missions/?urgent=1">#급해요만</a>
   </p>
+
   <div id="map" style="width:900px;height:600px;"></div>
-  {% for m in missions %}
-    <div class="card" data-id = "{{m.id}}">
-      <div><a href="{% url 'missions:mission_detail' m.id %}"><b>{{ m.title }}</b></a></div>
-      <div class="muted">{{ m.category }} / {{ m.status }} / {{ m.created_at }}</div>
-      {% if m.location_name %}
-        <div class="muted">📍 {{ m.location_name }}</div>
-      {% endif %}
-      <div>
-        {% for t in m.tags.all %}
-          <span class="muted">#{{ t.name }}</span>
-        {% endfor %}
-      </div>
-    </div>
-  {% empty %}
-    <p>아직 미션이 없습니다.</p>
-  {% endfor %}
+
+  <h2>미션 목록</h2>
+  <div id="mission-list-container">
+    <p class="muted">미션을 불러오는 중...</p>
+  </div>
 
 <script id="mission-data" type="application/json">
 [
