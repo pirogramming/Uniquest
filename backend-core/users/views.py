@@ -235,35 +235,35 @@ def mypage_modify_view(request):
 
 #차단 유저들
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def get_blocked_users_info(request):
     user = request.user
-    target_user_id = request.data.get('target_id')
-    
-    try:
-        target_user = User.objects.get(id=target_user_id)
-        # 1. DB에서 차단 관계 설정
-        user.blocked_people.add(target_user) 
-        
-        # 2. [핵심] 두 유저가 연관된 '진행 중인' 미션방들을 모두 찾음
-        related_missions = Mission.objects.filter(
-            models.Q(author=user, helper=target_user) | 
-            models.Q(author=target_user, helper=user)
-        ).filter(status__in=['WAITING', 'MATCHED']) # 대기나 매칭 중인 방만
-
-        # 3. 찾은 모든 방에 대해 각각 강퇴 이벤트 발행
-        for mission in related_missions:
-            publish_chat_event(
-                room_id=str(mission.id), # 실제 미션 ID를 동적으로 넣음
-                event_type="KICK", 
-                data={"target_id": target_user_id}
-            )
+    if request.method == 'GET':
+        try:
+            # 차단한 유저 목록 가져오기 (id와 nickname만)
+            blocked_users = list(user.blocked_people.all().values('id', 'nickname'))
             
-        return Response({"message": "차단 및 실시간 강퇴 완료"}, status=status.HTTP_200_OK)
+            return Response({
+                "blocked_users": blocked_users,
+                "count": len(blocked_users) # 개수도 같이 주면 프론트가 좋아해요!
+            }, status=status.HTTP_200_OK)
 
-    except User.DoesNotExist:
-        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+        except Exception as e:
+            # 예상치 못한 에러(DB 연결 등) 처리
+            print(f"Error: {e}") 
+            return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)
+    
+    elif request.method == 'POST':
+        target_id = request.data.get('target_id')
+        try:
+            target_user = User.objects.get(id=target_id)
+            user.blocked_people.remove(target_user)
+            return Response({"message":f"{target_user.nickname}님을 차단 해제했습니다."}, status=200)
+        except User.DoesNotExist:
+            return Response({"message":"대상유저가 없습니다"},status=404) 
+
+        
             
 
 
