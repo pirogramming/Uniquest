@@ -1,13 +1,11 @@
-{% load static %}
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>위치 선택</title>
-  <style>
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    #map { width: 100vw; height: calc(100vh - 120px); }
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}위치 추가{% endblock %}
+
+{%block extra_css %}
+ <style>
+    #map { width: 100%; height: calc(100vh - 120px); }
     .panel {
       height: 120px;
       padding: 12px 16px;
@@ -55,10 +53,14 @@
       border-bottom: 1px solid #eee;
       background:#fff;
     }
-  </style>
-</head>
-<body>
-  <div class="topbar">거래 희망 장소 선택</div>
+  </style>{% endblock %}
+
+{%block extra_js %}
+  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services"></script>
+{% endblock %}
+
+{% block content %}
+<div class="topbar">거래 희망 장소 선택</div>
 
   <div style="position: relative;">
     <div id="map"></div>
@@ -69,11 +71,10 @@
     <button class="btn" onclick="confirmLocation()">선택 완료</button>
     <div class="hint" id="hint">지도를 움직여 중앙 마커를 원하는 위치에 맞춘 뒤 선택 완료를 눌러주세요.</div>
   </div>
+{% endblock %}
 
-  {# 카카오 지도 SDK (services 포함) #}
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services"></script>
-
-  <script>
+{%block extra_scripts %}
+<script>
     let map;
     let geocoder;
 
@@ -146,5 +147,4 @@
 
     initMap();
   </script>
-</body>
-</html>
+{% endblock %}
