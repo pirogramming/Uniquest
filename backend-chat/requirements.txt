@@ -4,3 +4,4 @@ motor
 pydantic>=2.0
 pydantic-settings
 redis>=4.2.0
+PyJWT>=2.8.0

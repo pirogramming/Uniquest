@@ -126,3 +126,33 @@ class MissionImage(models.Model):
 
     def __str__(self) -> str:
         return f"MissionImage(mission_id={self.mission_id})"
+
+
+class ChatRoom(models.Model):
+    """
+    미션당 1:1 채팅방. "채팅하기" 클릭 시 생성되고, 채팅방 안에서 미션 수락 가능.
+    """
+    mission = models.ForeignKey(Mission, on_delete=models.CASCADE, related_name="chat_rooms")
+    user1 = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="chat_rooms_as_user1",
+    )
+    user2 = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="chat_rooms_as_user2",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["mission", "user1", "user2"],
+                name="unique_mission_chat_pair",
+            )
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"ChatRoom(mission={self.mission_id}, {self.user1_id}-{self.user2_id})"

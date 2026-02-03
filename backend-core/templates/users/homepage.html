@@ -1,6 +1,7 @@
 {%load static%}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{%static 'users/css/homepage.css'%}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <div class="mobile-container">
         <header class="header">
@@ -21,15 +23,15 @@
                     <span class="badge">2</span>
                 </div>
             </div>
-            
+
             <div class="quick-menu">
-                <a href={%url 'missions:mission_list'%}>
+                <a href={%url 'missions:mission_list' %}>
                     <div class="menu-item">
                         <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
                         <span>미션 찾기</span>
                     </div>
                 </a>
-                <a href={%url 'missions:mission_create_view'%}>
+                <a href={%url 'missions:mission_create_view' %}>
                     <div class="menu-item">
                         <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
                         <span>미션 등록</span>
@@ -126,4 +128,5 @@
     <script src="{% static 'users/js/auth_helper.js' %}"></script>
     <script src="{%static 'users/js/homepage.js'%}"></script>
 </body>
+
 </html>
