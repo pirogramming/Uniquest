@@ -171,12 +171,11 @@ def logout(request):
     return render(request,'users/logout.html')
 
 # 마이 페이지
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
 def get_my_info(request):
     user = request.user
-    missions = list(user.missions.all().values('id','title','reward'))
+    missions = list(user.missions.all().values('id','title','reward','status'))
     blocked_Queryset = user.blocked_people.all()
     return Response({
         "id": user.id,
@@ -281,6 +280,9 @@ def get_homepage_info(request):
     user = request.user
     blocked_list = list(user.blocked_people.all().values('id','nickname'))
     mission_lst = list(user.missions.all().values('title','descriptions','reward','category','status','location_name'))
+    waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
+    matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
+    completed_count = len([m for m in mission_lst if m['status'] == 'COMPLETED'])
     return Response({
         "id":user.id,
         "nickname":user.nickname,
@@ -289,5 +291,8 @@ def get_homepage_info(request):
         "univ_email":user.univ_email,
         "manner_score":user.manner_score,
         "blocked_people":blocked_list,
-        "missions":mission_lst
+        "missions":mission_lst,
+        "waiting_count":waiting_count,
+        "matched_count":matched_count,
+        "completed_count":completed_count
     })

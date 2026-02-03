@@ -46,15 +46,15 @@
             <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
             <div class="status-grid">
                 <div class="status-item">
-                    <span class="count highlight-blue" id="missions">2</span>
+                    <span class="count highlight-blue" id="matched">2</span>
                     <span class="label">진행중</span>
                 </div>
                 <div class="status-item">
-                    <span class="count highlight-yellow">1</span>
+                    <span class="count highlight-yellow" id="waiting">1</span>
                     <span class="label">대기중</span>
                 </div>
                 <div class="status-item">
-                    <span class="count">0</span>
+                    <span class="count" id="completed">0</span>
                     <span class="label">완료</span>
                 </div>
             </div>
@@ -63,7 +63,7 @@
         <section class="mission-list-section">
             <div class="section-title">
                 <h2>진행 중인 미션</h2>
-                <a href="#" class="view-all">전체보기</a>
+                <a href="{% url 'missions:mission_list'%}" class="view-all">전체보기</a>
             </div>
             <div id="mission_cards">
                 <div class="mission-card">
