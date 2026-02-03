@@ -7,7 +7,7 @@ app_name = 'users'
 
 urlpatterns = [
     # 1. 회원가입 (HTML 페이지 연결 삭제 -> API 연결)
-    path('signup/', views.signup_page),
+    path('signup/', views.signup_page,name='signup_view'),
     path('signup/submit/', RegisterView.as_view(), name='signup'),
     
     # 2. 이메일 인증
@@ -22,6 +22,9 @@ urlpatterns = [
 
     # 5. 내 정보 조회
     path('profile/', ProfileView.as_view(), name='profile'),
+
+    #6. 로그아웃 하기
+    path('logout/',views.logout,name="logout"),
 
     # 마이페이지 메인
     path('mypage/', views.mypage_view, name='mypage_screen'),

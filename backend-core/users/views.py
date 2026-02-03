@@ -34,6 +34,9 @@ def verify_email(request):
             data = json.loads(request.body)
             action = data.get('action')
 
+            if (User.objects.filter(univ_email=data.get('email'))).exists():
+                return JsonResponse({'message': '이미 사용된 이메일입니다'}, status=400)
+
             if action == "send_email": # 인증번호 보내기 버튼
                 email = data.get('email')
                 if not email:
@@ -142,21 +145,18 @@ class MyLoginView(APIView):
 
     def post(self, request):
         # 1. 요청에서 데이터 가져오기
-        username = request.data.get('username') # 아이디 (root용)
         email = request.data.get('email')       # 이메일 (학생용)
         password = request.data.get('password')
 
         try:
             # 2. 유저 찾기 (아이디가 있으면 아이디로, 없으면 이메일로 검색)
-            if username:
-                user_obj = User.objects.get(username=username)
-            else:
-                user_obj = User.objects.get(univ_email=email)
+            user_obj = User.objects.get(univ_email=email)
             
             # 3. 비밀번호 검증
             if user_obj.check_password(password):
                 # 4. 토큰 발급
                 refresh = RefreshToken.for_user(user_obj)
+                print(refresh)
                 return Response({
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),
