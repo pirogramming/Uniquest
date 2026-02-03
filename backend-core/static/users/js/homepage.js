@@ -24,13 +24,7 @@ async function renderHomepage(){
     }
 
     try{
-        const response = await fetch('/api/users/api/homepage',{
-            method:'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
+        const response = await fetch('/api/users/api/homepage');
 
         const userData = await response.json();
         console.log(userData)
