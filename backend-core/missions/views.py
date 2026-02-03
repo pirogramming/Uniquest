@@ -4,6 +4,7 @@ import json
 import logging
 from typing import Any
 
+from django.contrib.auth.decorators import login_required
 from django.db import transaction, models
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -16,7 +17,7 @@ from rest_framework import status
 from .serializers import MissionSerializer
 
 from .forms import MissionCreateForm
-from .models import Mission, MissionImage, Tag, Category
+from .models import Mission, MissionImage, Tag, Category, ChatRoom
 from common.utils import publish_chat_event
 
 logger = logging.getLogger(__name__)
@@ -204,7 +205,7 @@ def tag_suggest(request):
 @permission_classes([IsAuthenticated])
 @transaction.atomic
 def mission_accept(request, mission_id):
-    """미션 수락 로직"""
+    """미션 수락 로직. 채팅방 안에서 호출. room_id는 body로 전달해 해당 채팅방에 알림."""
     mission = get_object_or_404(Mission, id=mission_id)
     
     if mission.status != "WAITING":
@@ -217,8 +218,12 @@ def mission_accept(request, mission_id):
     mission.helper = request.user
     mission.save()
 
+    # 채팅방 ID(room_id)가 있으면 그 방에 알림, 없으면 mission_id로(하위 호환)
+    room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
+    rid = str(room_id) if room_id is not None else str(mission.id)
+
     publish_chat_event(
-        room_id=str(mission.id),
+        room_id=rid,
         event_type="SYSTEM",
         data={"content": "매칭이 성사되었습니다! 대화를 시작해보세요."}
     )
@@ -234,6 +239,7 @@ def mission_accept(request, mission_id):
 def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
     """
     채팅방에서 유저 강퇴 (방장만 가능). Redis KICK 이벤트 발행.
+    room_id는 body로 전달해 해당 채팅방에 KICK 전송.
     """
     if request.method != "POST":
         return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
@@ -243,10 +249,10 @@ def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
         return JsonResponse({"error": "방장만 강퇴할 수 있습니다."}, status=403)
 
     try:
-        raw = request.POST.get("target_id")
-        if raw is None and request.body:
-            raw = json.loads(request.body).get("target_id")
+        body = json.loads(request.body) if request.body else {}
+        raw = request.POST.get("target_id") or (body.get("target_id") if body else None)
         target_id = int(raw)
+        room_id = body.get("room_id")
     except (TypeError, ValueError, json.JSONDecodeError):
         return JsonResponse({"error": "target_id가 필요합니다."}, status=400)
 
@@ -255,8 +261,9 @@ def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
     if target_id == request.user.id:
         return JsonResponse({"error": "자신은 강퇴할 수 없습니다."}, status=400)
 
+    rid = str(room_id) if room_id is not None else str(mission.id)
     publish_chat_event(
-        room_id=str(mission.id),
+        room_id=rid,
         event_type="KICK",
         data={"target_id": target_id},
     )
@@ -264,26 +271,57 @@ def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
 
 
 @login_required
-def chat_room(request, mission_id):
+def start_chat(request: HttpRequest, mission_id: int) -> HttpResponse:
     """
-    채팅방 페이지
+    "채팅하기" 클릭 시: 채팅방 생성 또는 기존 방으로 이동.
+    - 비작성자: 작성자와의 1:1 방 생성 후 채팅방으로 리다이렉트.
+    - 작성자: 이 미션의 첫 채팅방으로 이동 (없으면 미션 상세로).
     """
     mission = get_object_or_404(
-        Mission.objects.select_related("author", "helper"),
+        Mission.objects.select_related("author"),
         id=mission_id,
     )
+    author = mission.author
+    if author == request.user:
+        # 작성자: 이 미션에서 내가 참여한 첫 채팅방으로
+        room = (
+            ChatRoom.objects.filter(mission=mission)
+            .filter(models.Q(user1=request.user) | models.Q(user2=request.user))
+            .order_by("-created_at")
+            .first()
+        )
+        if not room:
+            from django.contrib import messages
+            messages.info(request, "아직 채팅방이 없습니다. 다른 사용자가 채팅을 시작하면 표시됩니다.")
+            return redirect("missions:mission_detail", mission_id=mission_id)
+        return redirect("missions:chat_room", mission_id=mission_id, room_id=room.id)
 
-    # 접근 가능: 작성자, 헬퍼, 또는 미션이 대기 중일 때(수락하려는 사용자)
-    if (
-        request.user != mission.author
-        and request.user != mission.helper
-        and mission.status != "WAITING"
-    ):
+    # 비작성자: 작성자와의 방 생성 또는 기존 방으로 (user1 < user2 로 통일)
+    u1_id, u2_id = sorted([author.id, request.user.id])
+    room, _ = ChatRoom.objects.get_or_create(
+        mission=mission,
+        user1_id=u1_id,
+        user2_id=u2_id,
+    )
+    return redirect("missions:chat_room", mission_id=mission_id, room_id=room.id)
+
+
+@login_required
+def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpResponse:
+    """
+    채팅방 페이지. room_id(채팅방 ID) 기준으로 입장.
+    """
+    room = get_object_or_404(
+        ChatRoom.objects.select_related("mission", "mission__author", "mission__helper", "user1", "user2"),
+        id=room_id,
+        mission_id=mission_id,
+    )
+    if request.user not in (room.user1, room.user2):
         raise PermissionDenied("이 채팅방에 접근할 권한이 없습니다.")
 
+    mission = room.mission
     is_author = request.user == mission.author
     can_accept = not is_author and mission.status == "WAITING"
-    # 방장이 강퇴할 수 있는 상대: 헬퍼가 있을 때만 (매칭된 상태)
     kickable_users = []
     if is_author and mission.helper and mission.helper != request.user:
         kickable_users.append({"id": mission.helper.id, "nickname": mission.helper.nickname})
@@ -293,6 +331,9 @@ def chat_room(request, mission_id):
         "chat/room.html",
         {
             "mission": mission,
+            "room": room,
+            "room_id": room.id,
+            "mission_id": mission.id,
             "is_author": is_author,
             "can_accept": can_accept,
             "kickable_users": kickable_users,

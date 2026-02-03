@@ -1,6 +1,7 @@
 class ChatClient {
     constructor(config) {
         this.roomId = config.roomId;
+        this.missionId = config.missionId != null ? config.missionId : config.roomId;
         this.userId = config.userId;
         this.userNickname = config.userNickname;
         this.wsUrl = config.wsUrl;
@@ -75,9 +76,10 @@ class ChatClient {
         if (!acceptBtn || !this.canAccept) return;
         acceptBtn.disabled = true;
         try {
-            const res = await fetch(`/api/missions/${this.roomId}/accept/`, {
+            const res = await fetch(`/api/missions/${this.missionId}/accept/`, {
                 method: 'POST',
                 headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
             });
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.success) {
@@ -100,10 +102,10 @@ class ChatClient {
         if (!confirm(`${nickname || '해당 유저'}를 강퇴하시겠습니까?`)) return;
         btnEl.disabled = true;
         try {
-            const res = await fetch(`/api/missions/${this.roomId}/kick/`, {
+            const res = await fetch(`/api/missions/${this.missionId}/kick/`, {
                 method: 'POST',
                 headers: this.getAuthHeaders(),
-                body: JSON.stringify({ target_id: targetId }),
+                body: JSON.stringify({ target_id: targetId, room_id: this.roomId }),
             });
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.success) {

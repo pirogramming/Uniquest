@@ -48,13 +48,14 @@
         </div>
     </div>
 
-    <!-- 채팅 설정 (Django에서 전달) -->
+    <!-- 채팅 설정 (Django에서 전달): room_id=채팅방 ID, mission_id=미션 ID(수락/강퇴 API용) -->
     <script>
         const CHAT_CONFIG = {
-            roomId: "{{ mission.id }}",
-            userId: {{ request.user.id }},
+            roomId: "{{ room_id }}",
+            missionId: {{ mission_id }},
+        userId: { { request.user.id } },
         userNickname: "{{ request.user.nickname|escapejs }}",
-            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ mission.id }}",
+            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
                 canAccept: { { can_accept | yesno: "true,false" } },
         isAuthor: { { is_author | yesno: "true,false" } },
         kickableUsers: { { kickable_users_json | safe } }
