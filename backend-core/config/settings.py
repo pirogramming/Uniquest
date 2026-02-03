@@ -47,6 +47,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
+# @login_required 리다이렉트 경로
+LOGIN_URL = '/api/users/login/'
 
 # Application definition
 

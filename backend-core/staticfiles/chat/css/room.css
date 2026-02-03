@@ -73,6 +73,46 @@ body {
     color: #ef4444;
 }
 
+/* 액션 버튼: 미션 수락 / 강퇴 */
+.chat-actions {
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background-color: #fafafa;
+}
+
+.chat-actions .btn-accept {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #22c55e;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.chat-actions .btn-accept:hover {
+    background-color: #16a34a;
+}
+
+.chat-actions .btn-kick {
+    padding: 8px 16px;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.chat-actions .btn-kick:hover {
+    background-color: #fef2f2;
+}
+
 /* 메시지 영역 */
 .chat-messages {
     flex: 1;

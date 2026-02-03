@@ -10,7 +10,7 @@ import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -154,9 +154,10 @@ class MyLoginView(APIView):
             
             # 3. 비밀번호 검증
             if user_obj.check_password(password):
-                # 4. 토큰 발급
+                # 4. Django 세션 생성 (채팅하기 등 링크 클릭 시 @login_required 통과용)
+                login(request, user_obj)
+                # 5. JWT 토큰 발급 (API 호출용)
                 refresh = RefreshToken.for_user(user_obj)
-                print(refresh)
                 return Response({
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),
