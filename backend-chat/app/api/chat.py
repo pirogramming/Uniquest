@@ -1,7 +1,10 @@
+import asyncio
+import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from datetime import datetime
 from app.services.chat_service import chat_manager
 from app.models.chat import ChatMessage
+from app.core.auth import verify_token  # ✅ 추가
 
 router = APIRouter()
 
@@ -9,9 +12,61 @@ router = APIRouter()
 async def get_chat_history(room_id: str):
     return await chat_manager.get_history(room_id)
 
-@router.websocket("/chat/{room_id}/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: int):
-    # 수정: user_id를 함께 전달
+
+@router.websocket("/chat/{room_id}")  # ✅ user_id 제거
+async def websocket_endpoint(websocket: WebSocket, room_id: str):
+    await websocket.accept()
+    
+    # ========== 1단계: 인증 대기 (5초 타임아웃) ==========
+    try:
+        raw = await asyncio.wait_for(websocket.receive_text(), timeout=5.0)
+        auth_msg = json.loads(raw)
+        
+        # AUTH 타입인지 확인
+        if auth_msg.get("type") != "AUTH":
+            await websocket.send_text(json.dumps({
+                "type": "ERROR",
+                "content": "첫 메시지는 AUTH 타입이어야 합니다."
+            }))
+            await websocket.close(code=4001)
+            return
+        
+        # 토큰 검증
+        token = auth_msg.get("token")
+        payload = verify_token(token)
+        
+        if not payload:
+            await websocket.send_text(json.dumps({
+                "type": "ERROR", 
+                "content": "유효하지 않은 토큰입니다."
+            }))
+            await websocket.close(code=4001)
+            return
+        
+        # ✅ 토큰에서 user_id 추출
+        user_id = payload.get("user_id")
+        if not user_id:
+            await websocket.close(code=4001)
+            return
+            
+    except asyncio.TimeoutError:
+        await websocket.send_text(json.dumps({
+            "type": "ERROR",
+            "content": "인증 타임아웃"
+        }))
+        await websocket.close(code=4001)
+        return
+    except Exception:
+        await websocket.close(code=4001)
+        return
+    
+    # ========== 2단계: 인증 성공 → 채팅 시작 ==========
+    await websocket.send_text(json.dumps({
+        "type": "AUTH_SUCCESS",
+        "content": "인증 성공",
+        "user_id": user_id
+    }))
+    
     await chat_manager.connect(websocket, room_id, user_id)
     
     # 입장 알림
@@ -22,6 +77,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: int):
         "time": datetime.now().strftime("%H:%M")
     }, room_id)
 
+    # ========== 3단계: 메시지 수신 루프 ==========
     try:
         while True:
             data = await websocket.receive_text()
@@ -37,5 +93,4 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, user_id: int):
             }, room_id)
 
     except WebSocketDisconnect:
-        # 연결 끊길 때 user_id 전달
         await chat_manager.disconnect(room_id, user_id)

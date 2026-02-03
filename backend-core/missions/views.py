@@ -1,6 +1,7 @@
 # missions/views.py
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -262,3 +263,74 @@ def mission_accept(request: HttpRequest, mission_id: int) -> HttpResponse:
         "message": "미션 수락이 완료되었습니다.",
         "mission_id": mission.id
     })
+
+
+@login_required
+def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
+    """
+    채팅방에서 유저 강퇴 (방장만 가능). Redis KICK 이벤트 발행.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
+    mission = get_object_or_404(Mission.objects.select_related("author", "helper"), id=mission_id)
+    if request.user != mission.author:
+        return JsonResponse({"error": "방장만 강퇴할 수 있습니다."}, status=403)
+
+    try:
+        raw = request.POST.get("target_id")
+        if raw is None and request.body:
+            raw = json.loads(request.body).get("target_id")
+        target_id = int(raw)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return JsonResponse({"error": "target_id가 필요합니다."}, status=400)
+
+    if not mission.helper or mission.helper.id != target_id:
+        return JsonResponse({"error": "해당 유저는 이 방의 참여자가 아닙니다."}, status=400)
+    if target_id == request.user.id:
+        return JsonResponse({"error": "자신은 강퇴할 수 없습니다."}, status=400)
+
+    publish_chat_event(
+        room_id=str(mission.id),
+        event_type="KICK",
+        data={"target_id": target_id},
+    )
+    return JsonResponse({"success": True, "message": "강퇴되었습니다."})
+
+
+@login_required
+def chat_room(request, mission_id):
+    """
+    채팅방 페이지
+    """
+    mission = get_object_or_404(
+        Mission.objects.select_related("author", "helper"),
+        id=mission_id,
+    )
+
+    # 접근 가능: 작성자, 헬퍼, 또는 미션이 대기 중일 때(수락하려는 사용자)
+    if (
+        request.user != mission.author
+        and request.user != mission.helper
+        and mission.status != "WAITING"
+    ):
+        raise PermissionDenied("이 채팅방에 접근할 권한이 없습니다.")
+
+    is_author = request.user == mission.author
+    can_accept = not is_author and mission.status == "WAITING"
+    # 방장이 강퇴할 수 있는 상대: 헬퍼가 있을 때만 (매칭된 상태)
+    kickable_users = []
+    if is_author and mission.helper and mission.helper != request.user:
+        kickable_users.append({"id": mission.helper.id, "nickname": mission.helper.nickname})
+
+    return render(
+        request,
+        "chat/room.html",
+        {
+            "mission": mission,
+            "is_author": is_author,
+            "can_accept": can_accept,
+            "kickable_users": kickable_users,
+            "kickable_users_json": json.dumps(kickable_users),
+        },
+    )
