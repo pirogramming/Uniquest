@@ -14,16 +14,16 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function renderHomepage(){
+async function renderHomepage() {
     const token = localStorage.getItem('access_token');
 
-    if(!token){
+    if (!token) {
         console.warn('로그인 토큰이 없어용');
-        window.location.href="/users/login/"
-        return null
+        window.location.href = '/api/users/login/';
+        return null;
     }
 
-    try{
+    try {
         const response = await fetch('/api/users/api/homepage');
 
         const userData = await response.json();
@@ -43,11 +43,11 @@ async function renderHomepage(){
             if (nicknameElement) {
                 nicknameElement.innerText = userData.nickname;
             }
-            if (missionElement){
+            if (missionElement) {
                 console.log('yeah')
                 userMission = userData.missions
                 missionElement.innerHTML = ""
-                userData.missions.forEach(({id,title,status,descriptions,category,reward,location_name}) => {
+                userData.missions.forEach(({ id, title, status, descriptions, category, reward, location_name }) => {
                     missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'">
                         <div class="card-header">
                             <h3 class="title">${title}</h3>
@@ -64,22 +64,22 @@ async function renderHomepage(){
                     </div>`
                 });
             }
-            if (matched && waiting && completed){
+            if (matched && waiting && completed) {
                 matched.innerHTML = userData.matched_count
                 waiting.innerHTML = userData.waiting_count
                 completed.innerHTML = userData.completed_count
 
             }
 
-            
+
             // 미션 관련 로직도 여기에 추가 가능
             console.log("환영합니다, " + userData.nickname + "님!");
         }
     } catch (error) {
-        console.error("네트워크 오류 감지",error);
+        console.error("네트워크 오류 감지", error);
         return null;
     }
 
 }
 
-window.addEventListener('DOMContentLoaded',renderHomepage);
+window.addEventListener('DOMContentLoaded', renderHomepage);

@@ -1,0 +1,175 @@
+/* 기본 배경색 및 폰트 설정 */
+.bg-gray-body {
+    background-color: #f9fafb;
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: #f9fafb;
+    min-height: 100vh;
+}
+
+/* 헤더 */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+}
+
+.back-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #4b5563;
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    margin-left: 8px;
+}
+
+/* 안내 배너 */
+.info-banner {
+    background-color: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 16px;
+    display: flex;
+    gap: 12px;
+}
+
+.info-icon {
+    background-color: #3b82f6;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.info-text h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #1e40af;
+}
+
+.info-text p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #2563eb;
+    line-height: 1.5;
+}
+
+/* 유저 리스트 */
+.list-section {
+    padding: 0 16px;
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.list-header h2 {
+    font-size: 18px;
+    margin: 0;
+    color: #1f2937;
+}
+
+.user-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background-color: #e5e7eb;
+    border-radius: 50%;
+}
+
+.nickname {
+    margin: 0;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.date {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.unblock-btn {
+    background-color: #fff1f2;
+    color: #f43f5e;
+    border: 1px solid #ffe4e6;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 하단 주의사항 */
+.limit-notice {
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 16px;
+}
+
+.limit-notice h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.limit-notice ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.limit-notice li {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    padding-left: 12px;
+    position: relative;
+}
+
+.limit-notice li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+}

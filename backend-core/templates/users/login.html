@@ -17,7 +17,7 @@
                 <h2>로그인</h2>
                 <p>Uniquest에 오신 것을 환영합니다</p>
             </div>
-            
+
             <form method="submit">
                 {%csrf_token%}
                 <div class="input-section">
@@ -34,7 +34,7 @@
 
                 <button type="button" class="btn-main" onclick="handleLogin()">로그인</button>
             </form>
-            
+
             <div class="footer">
                 <a href="#" id="search_key">비밀번호 찾기</a>
                 <a href="{%url 'users:signup_view'%}" id="signup">회원가입하기</a>
