@@ -24,6 +24,7 @@ class MissionCreateForm(forms.ModelForm):
     )
 
     # ✅ FileInput을 상속받은 MultiFileInput을 사용해야 ValueError가 안 납니다.
+    '''
     images = forms.FileField(
         widget=MultiFileInput(attrs={
             "multiple": True, 
@@ -33,6 +34,7 @@ class MissionCreateForm(forms.ModelForm):
         required=False, # 파일 없어도 제출 가능하게
         label="미션 이미지들",
     )
+    '''
 
     location_name = forms.CharField(required=False)
     location_lat = forms.FloatField(required=False)
