@@ -12,8 +12,6 @@ class ConnectionManager:
         self.pubsub_tasks = {}
 
     async def connect(self, websocket: WebSocket, room_id: str, user_id: int):
-        await websocket.accept()
-        
         if room_id not in self.active_connections:
             self.active_connections[room_id] = {} # 딕셔너리로 초기화
             # Redis 구독 시작 (방이 처음 생길 때만)
@@ -56,6 +54,19 @@ class ConnectionManager:
                             "type": "SYSTEM",
                             "content": "미션이 완료되었습니다."
                         }, room_id)
+                    else:
+                        message = payload
+                        if msg_type == "SYSTEM" and "content" not in payload:
+                            content = ""
+                            if isinstance(data, dict):
+                                content = data.get("content", "")
+                            else:
+                                content = str(data)
+                            message = {
+                                "type": "SYSTEM",
+                                "content": content
+                            }
+                        await self._local_broadcast(message, room_id)
         except Exception as e:
             print(f"FastAPI Redis 리스너 에러: {e}")
 

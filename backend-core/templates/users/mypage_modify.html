@@ -1,14 +1,14 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>유니퀘스트 - 프로필 수정</title>
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}프로필 수정{% endblock %}
+
+{%block extra_css %}
     <link rel="stylesheet" href="{%static 'users/css/mypage_modify.css'%}">
-    </head>
-<body>
-    <div class="profile-container">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
         <h2><a href="/api/users/mypage/" id="left_arrow">←</a> 프로필 수정</h2>
         
         <div class="profile-image-section">
@@ -44,7 +44,9 @@
 
         <button type="button" class="save-btn" onclick="patchProfile()">저장하기</button>
     </div>
+{% endblock %}
+
+{%block extra_scripts %}
     <script src="{% static 'users/js/auth_helper.js' %}"></script>
     <script src="{% static 'users/js/mypage_modify.js' %}"></script>
-</body>
-</html>
+{% endblock %}

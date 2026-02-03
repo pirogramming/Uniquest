@@ -1,12 +1,11 @@
-{% load static %}
-<!doctype html>
-<html lang="ko">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ mission.title }}</title>
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}{{ mission.title }}{% endblock %}
+
+
+{%block extra_css %}
     <style>
-        body { font-family: system-ui; padding: 16px; line-height: 1.6; }
         .muted { color:#666; font-size: 13px; }
         img { max-width: 100%; border-radius: 12px; margin: 8px 0; }
         #map { width: 100%; max-width: 500px; height: 400px; border-radius: 12px; margin-top: 10px; }
@@ -15,12 +14,17 @@
         .btn-secondary { background-color: #6c757d; color: white; }
         #action-area { margin: 20px 0; }
     </style>
-    <script src="/static/shared/js/auth.js"></script>
+{% endblock %}
+
+{%block extra_js %}
+<script src="/static/shared/js/auth.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
     <script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
-</head>
-<body>
-    <p><a href="{% url 'missions:mission_list' %}" style="text-decoration: none;">← 목록으로 돌아가기</a></p>
+{% endblock %}
+
+
+{% block content %}
+<p><a href="{% url 'missions:mission_list' %}" style="text-decoration: none;">← 목록으로 돌아가기</a></p>
     
     <h2>{{ mission.title }}</h2>
     <div class="muted">
@@ -53,5 +57,8 @@
     {% for img in mission.images.all %}
         <img src="{{ img.image.url }}" alt="mission image">
     {% endfor %}
-</body>
-</html>
+{% endblock %}
+
+{%block bottom_nav %}
+    {% include "_bottom-nav.html" %}
+{% endblock %}

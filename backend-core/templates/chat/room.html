@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 - Uniquest</title>
+    <link rel="stylesheet" href="{% static 'chat/css/room.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="chat-wrapper">
+        <div class="chat-container">
+            <!-- 헤더 -->
+            <div class="chat-header">
+                <a href="{% url 'missions:mission_list' %}" class="back-btn">←</a>
+                <div class="header-info">
+                    <h2>{{ mission.title|default:"채팅방" }}</h2>
+                    <span class="status">연결 중...</span>
+                </div>
+            </div>
+
+            <!-- 액션 버튼: 미션 수락 / 강퇴 -->
+            <div class="chat-actions" id="chatActions">
+                {% if can_accept %}
+                <button type="button" class="btn-accept" id="acceptMissionBtn">미션 수락</button>
+                {% endif %}
+                {% if is_author and kickable_users %}
+                {% for u in kickable_users %}
+                <button type="button" class="btn-kick" data-target-id="{{ u.id }}"
+                    data-nickname="{{ u.nickname|escapejs }}">강퇴: {{ u.nickname }}</button>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- 메시지 영역 -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- 메시지가 여기에 추가됩니다 -->
+            </div>
+
+            <!-- 입력 영역 -->
+            <div class="chat-input-area">
+                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" disabled>
+                <button id="sendBtn" disabled>전송</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 채팅 설정 (Django에서 전달): room_id=채팅방 ID, mission_id=미션 ID(수락/강퇴 API용) -->
+    <script>
+        const CHAT_CONFIG = {
+            roomId: "{{ room_id }}",
+            missionId: {{ mission_id }},
+        userId: {{ request.user.id }},
+        userNickname: "{{ request.user.nickname|escapejs }}",
+            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
+                canAccept: {{ can_accept|yesno:"true,false" }},
+        isAuthor: {{ is_author|yesno:"true,false" }},
+        kickableUsers: {{ kickable_users_json|safe }}
+        };
+    </script>
+    <script src="{% static 'chat/js/room.js' %}"></script>
+</body>
+
+</html>

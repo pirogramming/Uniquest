@@ -1,11 +1,10 @@
-{% load static %}
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% if is_update %}미션 수정{% else %}미션 등록{% endif %}</title>
-  <style>
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}미션 등록{% endblock %}
+
+{%block extra_css %}
+<style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px; }
     .field { margin-bottom: 12px; }
     label { display:block; font-weight: 600; margin-bottom: 6px; }
@@ -19,15 +18,17 @@
     .pill { display:inline-block; padding: 6px 10px; border:1px solid #ddd; border-radius:999px; margin: 4px 6px 0 0; cursor:pointer; }
     .chipbox { margin-top: 8px; }
   </style>
+{% endblock %}
 
-  {# 지도 관련 스크립트(혹시 폼 페이지에서도 쓰면 유지) #}
-  <script src="/static/shared/js/auth.js"></script>
+{%block extra_js %}
+<script src="/static/shared/js/auth.js"></script>
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&autoload=false&libraries=services"></script>
   <script src="{% static 'missions/js/sy_map.js' %}" defer></script>
   <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
-</head>
-<body>
-  <h2>
+{% endblock %}
+
+{% block content %}
+<h2>
   {% if is_update %}
     미션 수정
   {% else %}
@@ -156,7 +157,4 @@
     {% endif %}
 
   </form>
-
-
-</body>
-</html>
+{% endblock %}
