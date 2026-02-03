@@ -17,6 +17,7 @@ from rest_framework.decorators import api_view, permission_classes
 from common.utils import publish_chat_event
 from missions.models import Mission
 from django.db import models
+from django.urls import reverse
 
 #유저모델 불러오기
 User = get_user_model()
@@ -279,7 +280,7 @@ def get_home_page(request):
 def get_homepage_info(request):
     user = request.user
     blocked_list = list(user.blocked_people.all().values('id','nickname'))
-    mission_lst = list(user.missions.all().values('title','descriptions','reward','category','status','location_name'))
+    mission_lst = list(user.missions.all().values('id','title','descriptions','reward','category','status','location_name'))
     waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
     matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
     completed_count = len([m for m in mission_lst if m['status'] == 'COMPLETED'])
