@@ -24,7 +24,7 @@ async function renderHomepage(){
     }
 
     try{
-        const response = await fetch('/users/api/homepage',{
+        const response = await fetch('/api/users/api/homepage',{
             method:'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -37,14 +37,34 @@ async function renderHomepage(){
         if (!response.ok) {
             throw new Error(`서버 응답 오류: ${response.status}`);
         }
-        
-        console.log(userData);
 
         // 데이터 렌더링 로직을 try 블록 안으로 이동
         if (userData && userData.id) {
             const nicknameElement = document.getElementById('nickname');
+            const missionElement = document.getElementById('mission_cards');
             if (nicknameElement) {
                 nicknameElement.innerText = userData.nickname;
+            }
+            if (missionElement){
+                console.log('yeah')
+                userMission = userData.missions
+                missionElement.innerHTML = ""
+                userData.missions.forEach(({title,status,descriptions,category,reward,location_name}) => {
+                    missionElement.innerHTML += `<div class="mission-card">
+                        <div class="card-header">
+                            <h3 class="title">${title}</h3>
+                            <span class="tag-status">${status}</span>
+                        </div>
+                        <p class="description">${descriptions}</p>
+                        <div class="card-footer">
+                            <div class="info">
+                                <span class="tag-category category-delivery">${category}</span>
+                                <span class="location">${location_name}</span>
+                            </div>
+                            <span class="price">${reward}</span>
+                        </div>
+                    </div>`
+                });
             }
             
             // 미션 관련 로직도 여기에 추가 가능

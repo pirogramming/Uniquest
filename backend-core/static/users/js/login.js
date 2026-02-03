@@ -42,7 +42,7 @@ async function handleLogin() {
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('refresh_token', data.refresh);
             alert('로그인 성공!');
-            window.location.href = '/api/users/mypage/';
+            window.location.href = '/api/users/homepage/';
         } else {
             const msg = data.detail || data.error || JSON.stringify(data);
             alert('로그인 실패: ' + msg);
