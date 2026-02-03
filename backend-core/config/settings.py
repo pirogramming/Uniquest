@@ -203,6 +203,9 @@ REST_FRAMEWORK = {
         # 💡 이 설정이 있으면 장고가 API 호출 시마다 자동으로 토큰을 해독합니다.
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 # settings.py

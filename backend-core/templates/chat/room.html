@@ -53,11 +53,11 @@
         const CHAT_CONFIG = {
             roomId: "{{ mission.id }}",
             userId: {{ request.user.id }},
-            userNickname: "{{ request.user.nickname|escapejs }}",
-            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ mission.i",
-     canAccept: {{ can_accept|yesno:"true,false" }},
-            isAuthor: {{ is_author|yesno:"true,false" }},
-            kickableUsers: {{ kickable_users_json|safe }}
+        userNickname: "{{ request.user.nickname|escapejs }}",
+            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ mission.id }}",
+                canAccept: { { can_accept | yesno: "true,false" } },
+        isAuthor: { { is_author | yesno: "true,false" } },
+        kickableUsers: { { kickable_users_json | safe } }
         };
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>

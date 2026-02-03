@@ -30,6 +30,7 @@ services:
       - .env
     environment:
       - TZ=Asia/Seoul
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
       - postgres
       - redis
@@ -39,7 +40,7 @@ services:
   # [3] 채팅 서버 (FastAPI): 실시간 웹소켓 통신 및 MongoDB 저장
   backend-chat:
     build: ./backend-chat
-    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
     volumes:
       - ./backend-chat:/app
     environment:
