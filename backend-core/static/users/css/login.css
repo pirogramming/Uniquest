@@ -9,19 +9,19 @@
 body {
     background-color: #f8fafc; /* 연한 그레이 블루 톤 배경 */
     display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
 }
 
 .signup-wrapper {
     width: 100%;
+    min-height: 100vh;
     max-width: 420px;
-    padding: 20px;
+    justify-content: center;
+    align-items: center;
 }
 
 .signup-container {
-    background-color: #ffffff;
+    background-color:#ffffff;
     padding: 45px 35px;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
