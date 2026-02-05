@@ -54,13 +54,19 @@ async function handleSignup() {
 }
 
 async function send_number() {
+    const send = document.getElementById('send-btn')
     const email = document.getElementById('email').value
+    const transmitting = document.getElementById('transmitting')
     const csrftoken = getCookie('csrftoken')
 
     if (!email) {
         alert("이메일을 입력해주세요!")
         return
     }
+
+    // 전송중 버튼 띄우기
+    send.style.display = 'none'
+    transmitting.style.display = 'block'
 
     const response = await fetch('/api/users/verify-email/', {
         method: 'POST',
@@ -79,6 +85,9 @@ async function send_number() {
         document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
         startTimer(300);
         alert(data.message + data.university);
+        send.style.display = 'block'
+        send.innerText = '인증번호 재발송'
+        transmitting.style.display = 'none'
     } else {
         const data = await response.json();
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
