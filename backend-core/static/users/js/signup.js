@@ -14,8 +14,7 @@ function getCookie(name) {
 }
 
 async function handleSignup() {
-    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)){
-        alert('비밀번호 형식 오류')
+    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value))
         return
     }
 
