@@ -39,4 +39,6 @@ urlpatterns = [
     #홈페이지
     path('homepage/',views.get_home_page,name="homepage"),
     path('api/homepage/',views.get_homepage_info,name="homepage_info"),
+
+    path('api/signout/',views.signout,name="signout"),
 ]

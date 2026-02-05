@@ -72,5 +72,42 @@ function logout() { // 로그아웃 로직
     window.location.href = "/api/users/login/"; // 로그인 페이지로 이동
 }
 
+async function signout() {
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        console.warn("로그인 토큰이 없습니다.");
+        return null;
+    }
+
+    try {
+        // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
+        const res = await fetch('/api/users/api/signout/', { // 팀장님의 API 주소
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            console.error("회원 탈퇴 완료");
+            window.location.href = "/api/users/login/"
+            return
+        } else {
+            console.error("탈퇴 중 에러발생");
+            alert('에러')
+            return null;
+        }
+    } catch (error) {
+        console.error("네트워크 오류 발생:", error);
+        return null;
+    }
+
+}
+
 // 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);

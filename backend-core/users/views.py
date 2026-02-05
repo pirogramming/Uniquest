@@ -298,3 +298,19 @@ def get_homepage_info(request):
         "matched_count":matched_count,
         "completed_count":completed_count
     })
+
+#회원 탈퇴
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def signout(request):
+    user = request.user
+    try:
+        user.delete()
+        return Response({
+            "message":"회원탈퇴 완료"
+        },status=200)
+    except Exception as e:
+        # 예상치 못한 에러(DB 연결 등) 처리
+        print(f"Error: {e}") 
+        return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)

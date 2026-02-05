@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비밀번호 찾기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input.error {
+            border-color: #f44336;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .code-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .code-input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .timer {
+            text-align: center;
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .resend-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .resend-link button {
+            background: none;
+            border: none;
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .resend-link button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .password-strength {
+            margin-top: 10px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .password-requirements {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .password-requirements li {
+            padding: 4px 0;
+            color: #666;
+        }
+
+        .password-requirements li.valid {
+            color: #4caf50;
+        }
+
+        .password-requirements li.valid::before {
+            content: "✓ ";
+            font-weight: bold;
+        }
+
+        .password-requirements li::before {
+            content: "○ ";
+        }
+
+        .security-info {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .security-info strong {
+            color: #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 비밀번호 찾기</h1>
+            <p>등록된 이메일로 인증 코드를 보내드립니다</p>
+        </div>
+
+        <!-- Step 1: 이메일 입력 -->
+        <div class="step active" id="step1">
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="email">이메일 주소</label>
+                    <input type="email" id="email" placeholder="example@email.com" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                <button type="submit" class="btn" id="sendCodeBtn">인증 코드 발송</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">로그인으로 돌아가기</button>
+            </form>
+        </div>
+
+        <!-- Step 2: 인증 코드 입력 -->
+        <div class="step" id="step2">
+            <div class="success-message" id="codeSentMessage">
+                인증 코드가 이메일로 발송되었습니다.
+            </div>
+            <form id="codeForm">
+                <div class="form-group">
+                    <label>인증 코드 (6자리)</label>
+                    <div class="code-inputs">
+                        <input type="text" class="code-input" maxlength="1" data-index="0">
+                        <input type="text" class="code-input" maxlength="1" data-index="1">
+                        <input type="text" class="code-input" maxlength="1" data-index="2">
+                        <input type="text" class="code-input" maxlength="1" data-index="3">
+                        <input type="text" class="code-input" maxlength="1" data-index="4">
+                        <input type="text" class="code-input" maxlength="1" data-index="5">
+                    </div>
+                    <div class="timer" id="timer"></div>
+                    <div class="error-message" id="codeError"></div>
+                </div>
+                <button type="submit" class="btn" id="verifyCodeBtn">인증하기</button>
+                <div class="resend-link">
+                    <button type="button" id="resendBtn">인증 코드 재발송</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 3: 새 비밀번호 설정 -->
+        <div class="step" id="step3">
+            <div class="success-message show">
+                인증이 완료되었습니다. 새 비밀번호를 설정해주세요.
+            </div>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="newPassword">새 비밀번호</label>
+                    <input type="password" id="newPassword" placeholder="새 비밀번호 입력" required>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">비밀번호 확인</label>
+                    <input type="password" id="confirmPassword" placeholder="비밀번호 재입력" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <div class="password-requirements">
+                    <ul id="requirements">
+                        <li data-requirement="length">8자 이상</li>
+                        <li data-requirement="uppercase">대문자 포함</li>
+                        <li data-requirement="lowercase">소문자 포함</li>
+                        <li data-requirement="number">숫자 포함</li>
+                        <li data-requirement="special">특수문자 포함</li>
+                    </ul>
+                </div>
+                <button type="submit" class="btn" id="resetPasswordBtn">비밀번호 재설정</button>
+            </form>
+        </div>
+
+        <div class="security-info">
+            <strong>보안 안내:</strong> 인증 코드는 5분간 유효하며, 3회 실패 시 새로운 코드를 요청해야 합니다.
+        </div>
+    </div>
+
+    <script>
+        // 보안을 위한 상태 관리
+        let securityToken = null;
+        let verificationCode = null;
+        let userEmail = null;
+        let codeExpiry = null;
+        let attemptCount = 0;
+        const MAX_ATTEMPTS = 3;
+
+        // Step 1: 이메일 제출
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const emailError = document.getElementById('emailError');
+            
+            // 이메일 유효성 검사
+            if (!validateEmail(email)) {
+                showError(emailError, '올바른 이메일 주소를 입력해주세요.');
+                return;
+            }
+            
+            // 실제 구현시에는 서버로 요청
+            // const response = await fetch('/api/request-password-reset', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ email })
+            // });
+            
+            // 시뮬레이션: 인증 코드 생성 (실제로는 서버에서 생성하고 이메일로 발송)
+            verificationCode = generateSecureCode();
+            securityToken = generateToken();
+            userEmail = email;
+            codeExpiry = Date.now() + 5 * 60 * 1000; // 5분 후 만료
+            attemptCount = 0;
+            
+            console.log('인증 코드 (개발용):', verificationCode); // 실제 배포시 제거
+            
+            // Step 2로 이동
+            switchStep(1, 2);
+            startTimer();
+        });
+
+        // Step 2: 인증 코드 검증
+        const codeInputs = document.querySelectorAll('.code-input');
+        
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    codeInputs[index - 1].focus();
+                }
+            });
+        });
+
+        document.getElementById('codeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = Array.from(codeInputs).map(input => input.value).join('');
+            const codeError = document.getElementById('codeError');
+            
+            // 코드 길이 확인
+            if (code.length !== 6) {
+                showError(codeError, '6자리 인증 코드를 모두 입력해주세요.');
+                return;
+            }
+            
+            // 만료 시간 확인
+            if (Date.now() > codeExpiry) {
+                showError(codeError, '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.');
+                return;
+            }
+            
+            // 시도 횟수 확인
+            if (attemptCount >= MAX_ATTEMPTS) {
+                showError(codeError, '최대 시도 횟수를 초과했습니다. 새로운 코드를 요청해주세요.');
+                return;
+            }
+            
+            attemptCount++;
+            
+            // 실제 구현시에는 서버로 검증 요청
+            // const response = await fetch('/api/verify-code', {
+            //     method: 'POST',
+            //     headers: { 
+            //         'Content-Type': 'application/json',
+            //         'X-Security-Token': securityToken
+            //     },
+            //     body: JSON.stringify({ email: userEmail, code })
+            // });
+            
+            // 시뮬레이션: 코드 검증
+            if (code === verificationCode) {
+                switchStep(2, 3);
+            } else {
+                showError(codeError, `인증 코드가 일치하지 않습니다. (${MAX_ATTEMPTS - attemptCount}회 남음)`);
+                codeInputs.forEach(input => input.value = '');
+                codeInputs[0].focus();
+            }
+        });
+
+        // 인증 코드 재발송
+        document.getElementById('resendBtn').addEventListener('click', () => {
+            verificationCode = generateSecureCode();
+            codeExpiry = Date.now() + 5 * 60 * 1000;
+            attemptCount = 0;
+            
+            console.log('새 인증 코드 (개발용):', verificationCode);
+            
+            document.getElementById('codeSentMessage').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('codeSentMessage').classList.remove('show');
+            }, 3000);
+            
+            startTimer();
+        });
+
+        // Step 3: 비밀번호 재설정
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        
+        newPasswordInput.addEventListener('input', (e) => {
+            checkPasswordStrength(e.target.value);
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const passwordError = document.getElementById('passwordError');
+            
+            // 비밀번호 일치 확인
+            if (newPassword !== confirmPassword) {
+                showError(passwordError, '비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            // 비밀번호 강도 확인
+            const strength = getPasswordStrength(newPassword);
+            if (strength.score < 4) {
+                showError(passwordError, '더 강력한 비밀번호를 설정해주세요.');
+                return;
+            }
+            
+            // 실제 구현시에는 서버로 비밀번호 재설정 요청
+            // const response = await fetch('/api/reset-password', {
+            //     method: 'POST',
+            //     headers: { 
+            //         'Content-Type': 'application/json',
+            //         'X-Security-Token': securityToken
+            //     },
+            //     body: JSON.stringify({ 
+            //         email: userEmail, 
+            //         newPassword: hashPassword(newPassword) // 클라이언트 측 해싱
+            //     })
+            // });
+            
+            // 성공 시
+            alert('비밀번호가 성공적으로 재설정되었습니다.');
+            window.location.href = 'login.html'; // 로그인 페이지로 이동
+        });
+
+        // 유틸리티 함수들
+        function switchStep(from, to) {
+            document.getElementById(`step${from}`).classList.remove('active');
+            document.getElementById(`step${to}`).classList.add('active');
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function generateSecureCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function generateToken() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => element.classList.remove('show'), 5000);
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            resendBtn.disabled = true;
+            
+            const interval = setInterval(() => {
+                const remaining = Math.max(0, Math.floor((codeExpiry - Date.now()) / 1000));
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                
+                timerElement.textContent = `남은 시간: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remaining === 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = '인증 코드가 만료되었습니다.';
+                    resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        function checkPasswordStrength(password) {
+            const strength = getPasswordStrength(password);
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+            
+            const colors = ['#f44336', '#ff9800', '#ffc107', '#8bc34a', '#4caf50'];
+            const labels = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
+            
+            fill.style.width = (strength.score * 20) + '%';
+            fill.style.background = colors[strength.score];
+            text.textContent = labels[strength.score];
+            text.style.color = colors[strength.score];
+            
+            // 요구사항 체크
+            document.querySelectorAll('[data-requirement]').forEach(li => {
+                const req = li.dataset.requirement;
+                if (strength.requirements[req]) {
+                    li.classList.add('valid');
+                } else {
+                    li.classList.remove('valid');
+                }
+            });
+        }
+
+        function getPasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+            
+            const score = Object.values(requirements).filter(Boolean).length;
+            
+            return { requirements, score };
+        }
+    </script>
+</body>
+</html>
