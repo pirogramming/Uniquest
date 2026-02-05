@@ -94,7 +94,7 @@ async function signout() {
             const data = await res.json();
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            console.error("회원 탈퇴 완료");
+            alert("회원 탈퇴 완료");
             window.location.href = "/api/users/login/"
             return
         } else {

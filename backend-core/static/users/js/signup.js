@@ -14,10 +14,8 @@ function getCookie(name) {
 }
 
 async function handleSignup() {
-    if (document.getElementById('password').value !== document.getElementById('password_check').value) {
-        document.getElementById('password_check').value = "";
-        document.getElementById('password_check').focus();
-        alert('비밀번호 불일치')
+    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)){
+        alert('비밀번호 형식 오류')
         return
     }
 
@@ -158,4 +156,20 @@ function startTimer(seconds) {
             display.style.color = "red";
         }
     }, 1000);
+}
+
+function checkPassword(password,confirmPassword){
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+    alert("비밀번호는 8자 이상이며, 영문과 숫자를 포함해야 합니다.");
+    return false
+    }
+
+    if (password !== confirmPassword) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return false
+    }
+
+    return true
 }
