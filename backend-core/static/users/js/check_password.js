@@ -42,12 +42,15 @@ async function send_number() {
 
     if (response.ok) {
         const data = await response.json();
-        document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
+        if (data.token) {
+            sessionStorage.setItem('password_reset_token', data.token);
+        }
+        document.getElementById('check_number_box').style.display = 'block';
         startTimer(300);
-        alert(data.message + data.university);
-        send.style.display = 'block'
-        send.innerText = '인증번호 재발송'
-        transmitting.style.display = 'none'
+        alert(data.message + ' ' + (data.university || ''));
+        send.style.display = 'block';
+        send.innerText = '인증번호 재발송';
+        transmitting.style.display = 'none';
     } else {
         const data = await response.json();
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
@@ -86,17 +89,26 @@ async function check_number() {
         const complete = document.getElementById('complete')
         const send = document.getElementById('send-btn')
         if (data.is_varified) {
-            check_box.style.display = 'none'
-            check_box_certified.style.display = 'block'
-            send.style.display = 'none'
-            complete.style.display = 'block'
-            alert('메일 인증 성공!')
-            window.location.href = '/api/users/homepage/';
+            check_box.style.display = 'none';
+            check_box_certified.style.display = 'block';
+            send.style.display = 'none';
+            complete.style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+            alert('메일 인증 성공! 아래 "다음" 버튼을 눌러 비밀번호를 재설정하세요.');
         }
 
     } else {
         const data = await response.json();
         alert("확인 실패: " + (data.message || "오류가 발생했습니다."));
+    }
+}
+
+function goToChangePassword() {
+    const token = sessionStorage.getItem('password_reset_token');
+    if (token) {
+        window.location.href = '/api/users/change_password/?token=' + encodeURIComponent(token);
+    } else {
+        alert('인증번호 발송부터 다시 진행해주세요.');
     }
 }
 
