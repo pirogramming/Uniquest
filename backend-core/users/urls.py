@@ -46,4 +46,6 @@ urlpatterns = [
     #비밀번호 찾기
     path('check_password/',views.check_password,name="check_password"),
     path('verify-email-check/', views.verify_email_check, name='verify-email-check'),
+    path('change_password/',views.change_password_render,name="change_password"),
+    path('change_password/info/',views.change_password,name="change_password_info")
 ]

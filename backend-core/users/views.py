@@ -315,10 +315,6 @@ def get_blocked_users_info(request):
         except User.DoesNotExist:
             return Response({"message":"대상유저가 없습니다"},status=404) 
 
-        
-            
-
-
 
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
@@ -369,3 +365,24 @@ def signout(request):
     
 def check_password(request):
     return render(request,'users/check_password.html')
+
+# 비밀번호 갱신
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def change_password(request):
+    password = request.data.get('password')
+    email = "2022132036@yonsei.ac.kr" # 특정 사용자를 지정하신 이유가 있겠지만, 보통은 request.user를 사용합니다.
+
+    try:
+        target_user = User.objects.get(univ_email=email)
+        target_user.set_password(password)
+        print(target_user.password)
+        target_user.save()
+        return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    
+    except User.DoesNotExist:
+        return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
+    
+def change_password_render(request):
+    return render(request,'users/change_password.html')
