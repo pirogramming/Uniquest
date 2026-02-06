@@ -81,6 +81,58 @@ def verify_email(request):
 
     return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
 
+def verify_email_check(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+
+            if not (User.objects.filter(univ_email=data.get('email'))).exists():
+                return JsonResponse({'message': '회원정보에 없는 이메일입니다'}, status=400)
+
+            if action == "send_email": # 인증번호 보내기 버튼
+                email = data.get('email')
+                if not email:
+                    return JsonResponse({'message': '이메일 주소를 입력해주세요.'}, status=400)
+
+                # 1. 대학 도메인 검증
+                university = extract_univ(email)
+                if not university:
+                    return JsonResponse({'message': '학사 이메일(@.ac.kr) 형식이 아닙니다.'}, status=400)
+
+                # 2. 메일 발송
+                try:
+                    send_verification_email(email)
+                    # 디버깅: 인증번호 확인용 (배포 시 삭제)
+                    # print(f"DEBUG: {email} -> {cache.get(f'auth_{email}')}")
+                except Exception as e:
+                    return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
+
+                #메일 전송 완료
+                return JsonResponse({
+                    'message': f'{university} 메일로 인증번호를 보냈습니다.',
+                    'university': university,
+                }, status=200)
+
+            elif action == "check_number": #인증하기 버튼
+                email = data.get('email')
+                number = data.get('number')
+                university = extract_univ(email)
+
+                if verify_code(email,number):
+                    print('True')
+                    cache.set(f"university_info_{email}", university, timeout=600)
+                    cache.set(f"varified_info_{email}", True, timeout=600)
+                    return JsonResponse({'is_varified': True,'email':email}, status=200)
+                else:
+                    print('False')
+                    return JsonResponse({'is_varified': False}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'message': '잘못된 데이터 형식입니다.'}, status=400)
+
+    return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
+
 #유저 생성 로직
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -314,3 +366,6 @@ def signout(request):
         # 예상치 못한 에러(DB 연결 등) 처리
         print(f"Error: {e}") 
         return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)
+    
+def check_password(request):
+    return render(request,'users/check_password.html')
