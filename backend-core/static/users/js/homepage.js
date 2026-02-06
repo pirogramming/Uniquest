@@ -68,7 +68,6 @@ async function renderHomepage() {
                 matched.innerHTML = userData.matched_count
                 waiting.innerHTML = userData.waiting_count
                 completed.innerHTML = userData.completed_count
-
             }
 
 
