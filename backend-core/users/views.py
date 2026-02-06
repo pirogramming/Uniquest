@@ -5,6 +5,7 @@ from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
+import uuid
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
@@ -74,6 +75,58 @@ def verify_email(request):
                     return JsonResponse({'is_varified': True,'email':email}, status=200)
                 else:
                     print('False')
+                    return JsonResponse({'is_varified': False}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'message': '잘못된 데이터 형식입니다.'}, status=400)
+
+    return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
+
+def verify_email_check(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+
+            if not (User.objects.filter(univ_email=data.get('email'))).exists():
+                return JsonResponse({'message': '회원정보에 없는 이메일입니다'}, status=400)
+
+            if action == "send_email": # 인증번호 보내기 버튼
+                email = data.get('email')
+                if not email:
+                    return JsonResponse({'message': '이메일 주소를 입력해주세요.'}, status=400)
+
+                # 1. 대학 도메인 검증
+                university = extract_univ(email)
+                if not university:
+                    return JsonResponse({'message': '학사 이메일(@.ac.kr) 형식이 아닙니다.'}, status=400)
+
+                # 2. 메일 발송
+                try:
+                    send_verification_email(email)
+                except Exception as e:
+                    return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
+
+                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 email 저장, URL에는 토큰만 노출)
+                reset_token = str(uuid.uuid4())
+                cache.set(f"reset_token_{reset_token}", email, timeout=600)
+
+                return JsonResponse({
+                    'message': f'{university} 메일로 인증번호를 보냈습니다.',
+                    'university': university,
+                    'token': reset_token,
+                }, status=200)
+
+            elif action == "check_number": #인증하기 버튼
+                email = data.get('email')
+                number = data.get('number')
+                university = extract_univ(email)
+
+                if verify_code(email, number):
+                    cache.set(f"university_info_{email}", university, timeout=600)
+                    cache.set(f"varified_info_{email}", True, timeout=600)
+                    return JsonResponse({'is_varified': True, 'email': email}, status=200)
+                else:
                     return JsonResponse({'is_varified': False}, status=200)
 
         except json.JSONDecodeError:
@@ -263,10 +316,6 @@ def get_blocked_users_info(request):
         except User.DoesNotExist:
             return Response({"message":"대상유저가 없습니다"},status=404) 
 
-        
-            
-
-
 
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
@@ -298,3 +347,57 @@ def get_homepage_info(request):
         "matched_count":matched_count,
         "completed_count":completed_count
     })
+
+#회원 탈퇴
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def signout(request):
+    user = request.user
+    try:
+        user.delete()
+        return Response({
+            "message":"회원탈퇴 완료"
+        },status=200)
+    except Exception as e:
+        # 예상치 못한 에러(DB 연결 등) 처리
+        print(f"Error: {e}") 
+        return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)
+    
+def check_password(request):
+    return render(request,'users/check_password.html')
+
+# 비밀번호 갱신
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def change_password(request):
+    """비밀번호 찾기 후 재설정. 토큰은 check_password 인증 성공 시 캐시에 저장된 일회용 값."""
+    token = request.data.get('token')
+    password = request.data.get('password')
+
+    if not token or not password:
+        return Response(
+            {"error": "토큰과 새 비밀번호를 모두 입력해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    email = cache.get(f"reset_token_{token}")
+    if not email:
+        return Response(
+            {"error": "링크가 만료되었거나 유효하지 않습니다. 비밀번호 찾기를 다시 진행해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        target_user = User.objects.get(univ_email=email)
+        target_user.set_password(password)
+        target_user.save()
+        cache.delete(f"reset_token_{token}")
+        cache.delete(f"auth_{email}")
+        return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
+    
+def change_password_render(request):
+    return render(request,'users/change_password.html')
