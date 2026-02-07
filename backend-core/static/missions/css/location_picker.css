@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 및 모바일 규격 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.signup-wrapper, .mobile-container {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* 2. 상단 타이틀 바 (뒤로가기 화살표 포함) */
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #F2F4F7;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1D2939;
+    z-index: 100;
+}
+
+.topbar::before {
+    content: '\2190';      /* 뒤로가기 화살표 유니코드 */
+    font-size: 26px;       /* 요청하신 크기 */
+    font-weight: bold;     /* 요청하신 굵기 */
+    color: #344054;        /* 요청하신 색상 */
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* 3. 지도 영역 및 중앙 마커 */
+#map {
+    width: 100%;
+    flex: 1;               /* 남은 화면 공간을 모두 지도로 채움 */
+    height: calc(100vh - 120px - 60px); /* 패널과 상단바 제외 높이 */
+}
+
+/* 지도 위 상대적 위치를 위한 컨테이너 */
+.map-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+}
+
+.center-marker {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -100%) rotate(-45deg); /* 핀 모양을 위한 회전 */
+    width: 32px;
+    height: 32px;
+    background: #57A6FF;   /* 브랜드 메인 컬러 적용 */
+    border-radius: 50% 50% 50% 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.center-marker::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+}
+
+/* 4. 하단 패널 및 선택 완료 버튼 */
+.panel {
+    height: 130px;
+    padding: 20px 25px;
+    background-color: #ffffff;
+    border-top: 1px solid #F2F4F7;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+.btn {
+    width: 100%;
+    height: 54px;
+    background-color: #57A6FF; /* 로그인 페이지와 동일한 색상 */
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;       /* 12px 곡률 통일 */
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:active {
+    background-color: #4A90E2;
+    transform: translateY(1px);
+}
+
+.hint {
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
