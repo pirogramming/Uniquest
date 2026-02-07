@@ -5,7 +5,6 @@ from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
-import uuid
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
@@ -104,17 +103,15 @@ def verify_email_check(request):
                 # 2. 메일 발송
                 try:
                     send_verification_email(email)
+                    # 디버깅: 인증번호 확인용 (배포 시 삭제)
+                    # print(f"DEBUG: {email} -> {cache.get(f'auth_{email}')}")
                 except Exception as e:
                     return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
 
-                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 email 저장, URL에는 토큰만 노출)
-                reset_token = str(uuid.uuid4())
-                cache.set(f"reset_token_{reset_token}", email, timeout=600)
-
+                #메일 전송 완료
                 return JsonResponse({
                     'message': f'{university} 메일로 인증번호를 보냈습니다.',
                     'university': university,
-                    'token': reset_token,
                 }, status=200)
 
             elif action == "check_number": #인증하기 버튼
@@ -122,11 +119,13 @@ def verify_email_check(request):
                 number = data.get('number')
                 university = extract_univ(email)
 
-                if verify_code(email, number):
+                if verify_code(email,number):
+                    print('True')
                     cache.set(f"university_info_{email}", university, timeout=600)
                     cache.set(f"varified_info_{email}", True, timeout=600)
-                    return JsonResponse({'is_varified': True, 'email': email}, status=200)
+                    return JsonResponse({'is_varified': True,'email':email}, status=200)
                 else:
+                    print('False')
                     return JsonResponse({'is_varified': False}, status=200)
 
         except json.JSONDecodeError:
@@ -372,30 +371,16 @@ def check_password(request):
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def change_password(request):
-    """비밀번호 찾기 후 재설정. 토큰은 check_password 인증 성공 시 캐시에 저장된 일회용 값."""
-    token = request.data.get('token')
     password = request.data.get('password')
-
-    if not token or not password:
-        return Response(
-            {"error": "토큰과 새 비밀번호를 모두 입력해주세요."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    email = cache.get(f"reset_token_{token}")
-    if not email:
-        return Response(
-            {"error": "링크가 만료되었거나 유효하지 않습니다. 비밀번호 찾기를 다시 진행해주세요."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    email = "2022132036@yonsei.ac.kr" # 특정 사용자를 지정하신 이유가 있겠지만, 보통은 request.user를 사용합니다.
 
     try:
         target_user = User.objects.get(univ_email=email)
         target_user.set_password(password)
+        print(target_user.password)
         target_user.save()
-        cache.delete(f"reset_token_{token}")
-        cache.delete(f"auth_{email}")
         return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    
     except User.DoesNotExist:
         return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
     
