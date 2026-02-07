@@ -1,64 +1,99 @@
-{%extends "base.html"%}
-{%load static%}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ mission.title }}{% endblock %}
 
-
-{%block extra_css %}
-    <style>
-        .muted { color:#666; font-size: 13px; }
-        img { max-width: 100%; border-radius: 12px; margin: 8px 0; }
-        #map { width: 100%; max-width: 500px; height: 400px; border-radius: 12px; margin-top: 10px; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-secondary { background-color: #6c757d; color: white; }
-        #action-area { margin: 20px 0; }
-    </style>
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'missions/css/mission_detail.css' %}">
 {% endblock %}
 
-{%block extra_js %}
-<script src="/static/shared/js/auth.js"></script>
+{% block extra_js %}
+    <script src="/static/shared/js/auth.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
     <script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
 {% endblock %}
 
-
 {% block content %}
-<p><a href="{% url 'missions:mission_list' %}" style="text-decoration: none;">← 목록으로 돌아가기</a></p>
-    
-    <h2>{{ mission.title }}</h2>
-    <div class="muted">
-      <span id="mission-author" style="font-weight: bold; color: #333;">
-        {{ mission.author.username }}
-      </span> |
-        {{ mission.get_category_display }} / {{ mission.get_status_display }}</div>
+<div class="mobile-container">
+    <header class="top-header">
+        <a href="{% url 'missions:mission_list' %}" class="back-btn">←</a>
+        <h2 class="header-title">미션 상세</h2>
+        <div id="header-edit-area"></div>
+    </header>
 
-    <div id="action-area">
-        <p class="muted">권한 확인 중...</p>
+    <div class="visual-section">
+        {% if mission.location_name %}
+            <div id="map"></div>
+            <div class="map-overlay-info">
+                <span class="pin-icon">📍</span>
+                <span class="loc-name">{{ mission.location_name }}</span>
+            </div>
+        {% endif %}
     </div>
 
-    <p>{{ mission.descriptions|linebreaksbr }}</p>
+    <main class="detail-main">
+        <div class="status-price-row">
+            <span class="status-badge {{ mission.status }}">
+                {{ mission.get_status_display }}
+            </span>
+            <span class="price-text">{{ mission.reward }}원</span>
+        </div>
 
-    <p><b>보상:</b> {{ mission.reward }}원</p>
-    <p><b>마감:</b> {{ mission.deadline|date:"Y-m-d H:i" }}</p>
+        <h1 class="mission-title">{{ mission.title }}</h1>
+        <p class="mission-desc">{{ mission.descriptions|linebreaksbr }}</p>
 
-    {% if mission.location_name %}
-        <p><b>거래 희망 장소:</b> {{ mission.location_name }}</p>
-        <div id="map"></div>
-        <p class="muted">{{ mission.location_address }}</p>
-    {% endif %}
+        <div class="meta-info-list">
+            <div class="meta-item">
+                <span class="meta-label">🏷️ 카테고리</span>
+                <span class="meta-value">{{ mission.get_category_display }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">📍 위치</span>
+                <span class="meta-value">{{ mission.location_name }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">📅 마감 기한</span>
+                <span class="meta-value">{{ mission.deadline|date:"Y-m-d H:i" }}</span>
+            </div>
+        </div>
 
-    <p>
-        {% for t in mission.tags.all %}
-            <span class="muted">#{{ t.name }}</span>
-        {% endfor %}
-    </p>
+        <div class="tag-container">
+            {% for t in mission.tags.all %}
+                <span class="tag-pill">#{{ t.name }}</span>
+            {% endfor %}
+        </div>
 
-    {% for img in mission.images.all %}
-        <img src="{{ img.image.url }}" alt="mission image">
-    {% endfor %}
-{% endblock %}
+        <section class="author-card">
+            <div class="author-label">등록자 정보</div>
+            <div class="author-profile">
+                <div class="profile-img">
+                    <img src="{% static 'shared/img/default_user.png' %}" alt="프로필">
+                </div>
+                <div class="author-text">
+                    <div class="author-name">{{ mission.author.nickname|default:mission.author.username }}</div>
+                    <div class="author-score">🌡️ 점수 <span>{{ mission.author.manner_score|default:"36.5" }}점</span></div>
+                </div>
+                <a href="#" class="view-profile">프로필 보기</a>
+            </div>
+        </section>
+    </main>
 
-{%block bottom_nav %}
-    {% include "_bottom-nav.html" %}
+    <div class="bottom-action">
+            {% if user.is_authenticated %}
+                {% if user == mission.author %}
+                    <a href="#" class="btn btn-edit-style">
+                        미션 수정하기
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-chat-style">
+                        채팅하기
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="/api/users/login/" class="btn btn-chat-style">
+                    로그인 후 채팅하기
+                </a>
+            {% endif %}
+        </div>
+</div>
 {% endblock %}

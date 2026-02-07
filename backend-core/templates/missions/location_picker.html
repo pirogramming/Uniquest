@@ -1,150 +1,202 @@
-{%extends "base.html"%}
-{%load static%}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}위치 추가{% endblock %}
 
-{%block extra_css %}
- <style>
-    #map { width: 100%; height: calc(100vh - 120px); }
-    .panel {
-      height: 120px;
-      padding: 12px 16px;
-      box-sizing: border-box;
-      border-top: 1px solid #eee;
-      background: #fff;
-    }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      font-weight: 800;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-    }
-    .btn:active { transform: translateY(1px); }
-    .hint { color:#666; font-size: 13px; margin-top: 6px; }
-    /* 중앙 고정 마커 */
-    .center-marker {
-      position: absolute;
-      left: 50%;
-      top: calc((100vh - 120px) / 2);
-      transform: translate(-50%, -100%);
-      width: 22px;
-      height: 22px;
-      background: #111;
-      border-radius: 50% 50% 50% 0;
-      transform: translate(-50%, -100%) rotate(-45deg);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-      z-index: 10;
-    }
-    .center-marker::after {
-      content: "";
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #fff;
-      border-radius: 50%;
-      top: 6px;
-      left: 6px;
-    }
-    .topbar {
-      padding: 10px 16px;
-      font-weight: 800;
-      border-bottom: 1px solid #eee;
-      background:#fff;
-    }
-  </style>{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'missions/css/location_picker.css' %}">
 
-{%block extra_js %}
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services"></script>
+    <style>
+        /* 기본 레이아웃 및 화면 중앙 배치 (로그인 페이지 스타일 이식) */
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* 450px 모바일 규격 */
+        .mobile-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* 상단 바 및 화살표 디자인 */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #101828;
+            border-bottom: 1px solid #F2F4F7;
+            background: #fff;
+        }
+
+        /* 요청하신 26px Bold 화살표 */
+        .topbar::before {
+            content: '\2190'; 
+            font-size: 26px;
+            font-weight: bold;
+            color: #344054;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* 지도 및 마커 디자인 */
+        #map { 
+            width: 100%; 
+            flex: 1; /* 남은 영역을 지도가 꽉 채움 */
+        }
+
+        .center-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -100%) rotate(-45deg);
+            width: 32px;
+            height: 32px;
+            background: #57A6FF; /* 브랜드 컬러 #57A6FF 적용 */
+            border-radius: 50% 50% 50% 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .center-marker::after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+
+        /* 하단 패널 및 버튼 */
+        .panel {
+            padding: 20px 25px;
+            background: #fff;
+            border-top: 1px solid #F2F4F7;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            height: 56px;
+            background-color: #57A6FF; /* 로그인 버튼과 동일색상 */
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px; /* 12px 곡률 적용 */
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:active {
+            background-color: #4A90E2;
+            transform: translateY(1px);
+        }
+
+        .hint {
+            color: #667085;
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+    </style>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services"></script>
 {% endblock %}
 
 {% block content %}
-<div class="topbar">거래 희망 장소 선택</div>
+<div class="mobile-container">
+    <div class="topbar">거래 희망 장소 선택</div>
 
-  <div style="position: relative;">
-    <div id="map"></div>
-    <div class="center-marker"></div>
-  </div>
+    <div style="position: relative; flex: 1; display: flex; flex-direction: column;">
+        <div id="map"></div>
+        <div class="center-marker"></div>
+    </div>
 
-  <div class="panel">
-    <button class="btn" onclick="confirmLocation()">선택 완료</button>
-    <div class="hint" id="hint">지도를 움직여 중앙 마커를 원하는 위치에 맞춘 뒤 선택 완료를 눌러주세요.</div>
-  </div>
+    <div class="panel">
+        <button class="btn" onclick="confirmLocation()">선택 완료</button>
+        <div class="hint" id="hint">지도를 움직여 중앙 마커를 원하는 위치에 맞춘 뒤 선택 완료를 눌러주세요.</div>
+    </div>
+</div>
 {% endblock %}
 
-{%block extra_scripts %}
+{% block extra_scripts %}
 <script>
     let map;
     let geocoder;
 
     function initMap() {
-      const container = document.getElementById('map');
-      const options = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), // 기본(서울시청)
-        level: 3
-      };
-      map = new kakao.maps.Map(container, options);
-      geocoder = new kakao.maps.services.Geocoder();
+        const container = document.getElementById('map');
+        const options = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 3
+        };
+        map = new kakao.maps.Map(container, options);
+        geocoder = new kakao.maps.services.Geocoder();
 
-      // 가능하면 현위치로 이동
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const loc = new kakao.maps.LatLng(lat, lng);
-            map.setCenter(loc);
-          },
-          () => { /* 실패 시 기본 center 유지 */ },
-          { enableHighAccuracy: true, timeout: 5000 }
-        );
-      }
-    }
-
-    function getCenterLatLng() {
-      const center = map.getCenter();
-      return { lat: center.getLat(), lng: center.getLng() };
-    }
-
-    function reverseGeocode(lat, lng) {
-      return new Promise((resolve) => {
-        geocoder.coord2Address(lng, lat, (result, status) => {
-          if (status === kakao.maps.services.Status.OK && result && result.length > 0) {
-            const road = result[0].road_address ? result[0].road_address.address_name : "";
-            const jibun = result[0].address ? result[0].address.address_name : "";
-            resolve(road || jibun || "");
-          } else {
-            resolve("");
-          }
-        });
-      });
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const loc = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                    map.setCenter(loc);
+                },
+                () => {},
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
+        }
     }
 
     async function confirmLocation() {
-      const { lat, lng } = getCenterLatLng();
+        const center = map.getCenter();
+        const lat = center.getLat();
+        const lng = center.getLng();
 
-      // 장소명 입력
-      const name = prompt("선택한 곳의 장소명을 입력해주세요 (예: 학생회관 1층 앞)");
-      if (!name) return;
+        const name = prompt("선택한 곳의 장소명을 입력해주세요 (예: 학생회관 1층 앞)");
+        if (!name) return;
 
-      const addr = await reverseGeocode(lat, lng);
+        geocoder.coord2Address(lng, lat, async (result, status) => {
+            let addr = "";
+            if (status === kakao.maps.services.Status.OK && result[0]) {
+                addr = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+            }
 
-      const params = new URLSearchParams({
-        loc_name: name,
-        lat: String(lat),
-        lng: String(lng),
-        addr: addr
-      });
+            const params = new URLSearchParams({
+                loc_name: name,
+                lat: String(lat),
+                lng: String(lng),
+                addr: addr
+            });
 
-      // return 파라미터 있으면 거기로, 없으면 기본 new로
-      const urlParams = new URLSearchParams(window.location.search);
-      const returnUrl = urlParams.get("return") || "/missions/new/";
-      const joiner = returnUrl.includes("?") ? "&" : "?";
-
-      window.location.href = returnUrl + joiner + params.toString();
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get("return") || "/missions/new/";
+            window.location.href = returnUrl + (returnUrl.includes("?") ? "&" : "?") + params.toString();
+        });
     }
 
+    // 뒤로가기 화살표 클릭 이벤트
+    document.querySelector('.topbar').addEventListener('click', (e) => {
+        if (e.offsetX < 60) history.back();
+    });
+
     initMap();
-  </script>
+</script>
 {% endblock %}

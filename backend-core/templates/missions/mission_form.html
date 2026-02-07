@@ -1,160 +1,74 @@
-{%extends "base.html"%}
-{%load static%}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}미션 등록{% endblock %}
 
-{%block extra_css %}
-<style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px; }
-    .field { margin-bottom: 12px; }
-    label { display:block; font-weight: 600; margin-bottom: 6px; }
-    input, textarea, select { width: 100%; padding: 10px; box-sizing: border-box; }
-    .btn { width: 100%; padding: 12px; font-weight: 700; }
-    .subbtn { width: 100%; padding: 10px; margin-top: 6px; }
-    .muted { color: #666; font-size: 13px; }
-    .errorlist { color: #c00; }
-    .row { display:flex; gap: 8px; }
-    .row > * { flex:1; }
-    .pill { display:inline-block; padding: 6px 10px; border:1px solid #ddd; border-radius:999px; margin: 4px 6px 0 0; cursor:pointer; }
-    .chipbox { margin-top: 8px; }
-  </style>
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'missions/css/mission_form.css' %}">
 {% endblock %}
 
-{%block extra_js %}
-<script src="/static/shared/js/auth.js"></script>
-  <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&autoload=false&libraries=services"></script>
-  <script src="{% static 'missions/js/sy_map.js' %}" defer></script>
-  <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
+{% block extra_js %}
+    <script src="/static/shared/js/auth.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&autoload=false&libraries=services"></script>
+    <script src="{% static 'missions/js/sy_map.js' %}" defer></script>
+    <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
-<h2>
-  {% if is_update %}
-    미션 수정
-  {% else %}
-    미션 등록
-  {% endif %}
-</h2>
+<div class="mobile-container">
+    <h2>
+        {% if is_update %} 미션 수정 {% else %} 미션 등록 {% endif %}
+    </h2>
 
-
-  <form id="mission-form" enctype="multipart/form-data" data-mission-id="{{ mission.id|default:'' }}">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-
-    <div class="field">
-      <label>제목</label>
-      {{ form.title }}
-      {{ form.title.errors }}
-    </div>
-
-    <div class="field">
-      <label>설명</label>
-      {{ form.descriptions }}
-      {{ form.descriptions.errors }}
-    </div>
-
-    <div class="row">
-      <div class="field">
-        <label>마감기한</label>
-
-        {# 실제 저장될 deadline input (숨김) #}
-        <div style="display:none;">
-          {{ form.deadline }}
+    <form id="mission-form" enctype="multipart/form-data" data-mission-id="{{ mission.id|default:'' }}">
+        {% csrf_token %}
+        
+        <div class="field">
+            <label>사진 (0/5)</label>
+            <div class="photo-upload-placeholder" onclick="document.getElementById('id_images').click()">
+                <div class="plus-icon">+</div>
+                <span>추가</span>
+            </div>
+            <div style="display:none;">
+                {{ form.images }}
+            </div>
+            <p class="muted">미션을 더 자세히 설명할 수 있는 사진을 추가하세요. (최대 5장)</p>
         </div>
 
-        {# 빠른 선택 버튼 #}
-        <div class="row" style="gap:6px;">
-          <button type="button" class="subbtn" id="btn_due_today">오늘</button>
-          <button type="button" class="subbtn" id="btn_due_3d">3일 이내</button>
-          <button type="button" class="subbtn" id="btn_due_7d">일주일 이내</button>
-          <button type="button" class="subbtn" id="btn_due_pick">날짜 선택</button>
+        <div class="field">
+            <label>제목</label>
+            {{ form.title }}
         </div>
 
-        {# 사용자에게 보여줄 마감기한 텍스트 #}
-        <div class="muted" style="margin-top:8px;" id="due_preview">
-          마감기한을 선택해주세요.
+        <div class="field">
+            <label>설명</label>
+            {{ form.descriptions }}
         </div>
 
-        {# 날짜 선택용 입력(일주일 이후도 가능) #}
-        <div id="due_picker_wrap" style="display:none; margin-top:10px;">
-          <input type="datetime-local" id="due_picker" />
-          <div class="muted" style="margin-top:6px;">직접 날짜/시간을 선택할 수 있어요.</div>
+        <div class="field">
+            <label>카테고리</label>
+            <div class="category-grid">
+                {{ form.category }}
+            </div>
         </div>
 
-        {{ form.deadline.errors }}
-      </div>
+        <div class="field">
+            <label>금액</label>
+            {{ form.reward }}
+        </div>
 
-      <div class="field">
-        <label>보상</label>
-        {{ form.reward }}
-        {{ form.reward.errors }}
-      </div>
-    </div>
+        <div class="field">
+            <label>위치</label>
+            <input type="text" id="location_name_display" placeholder="예: 학생회관 앞" readonly />
+            <button type="button" class="subbtn" onclick="goPickLocation()">지도에서 위치 선택</button>
+        </div>
 
-    <div class="field">
-      <label>카테고리</label>
-      {{ form.category }}
-      {{ form.category.errors }}
-    </div>
+        <div class="info-box">
+            <strong class="title">안내</strong>
+            <p class="text">등록된 미션은 "대기중" 상태로 시작됩니다. 다른 학생이 신청하면 채팅으로 연락받을 수 있습니다.</p>
+        </div>
 
-    {# 위치 #}
-    <div class="field">
-      <label>거래 희망 장소</label>
-
-      {# 사용자에게 보여줄 장소명 #}
-      <input type="text" id="location_name_display"
-             placeholder="위치추가 버튼을 눌러 선택"
-             value="{{ form.initial.location_name|default_if_none:'' }}"
-             readonly />
-
-      <button type="button" class="subbtn" onclick="goPickLocation()">위치추가</button>
-      <div class="muted">지도에서 위치 선택 → 장소명 입력 → 자동으로 여기 채워짐</div>
-
-      {# 실제 저장용 hidden #}
-      <input type="hidden" name="location_name" id="location_name" value="{{ form.initial.location_name|default_if_none:'' }}">
-      <input type="hidden" name="location_lat" id="location_lat" value="{{ form.initial.location_lat|default_if_none:'' }}">
-      <input type="hidden" name="location_lng" id="location_lng" value="{{ form.initial.location_lng|default_if_none:'' }}">
-      <input type="hidden" name="location_address" id="location_address" value="{{ form.initial.location_address|default_if_none:'' }}">
-
-      {{ form.location_name.errors }}
-      {{ form.location_lat.errors }}
-      {{ form.location_lng.errors }}
-      {{ form.location_address.errors }}
-    </div>
-
-    {# 태그 (기존 태그 선택 + 엔터 입력 태그) #}
-    <div class="field">
-      <label>해시태그 (최대 5개)</label>
-
-      <div class="muted">추천/기존 태그를 선택하거나, 아래 입력창에서 엔터로 추가</div>
-
-      {# 기존 태그 선택 #}
-      {{ form.tags_existing }}
-      {{ form.tags_existing.errors }}
-
-      <div style="margin-top:10px;">
-        <input type="text" id="tag_input" placeholder="#우산 처럼 입력 후 엔터" autocomplete="off">
-        <div id="tag_suggest_box" class="muted"></div>
-        <div id="tag_chips" class="chipbox"></div>
-        {# 서버로 보낼 커스텀 태그들 #}
-        <input type="hidden" name="tags_input" id="tags_input" value="">
-      </div>
-    </div>
-
-    {# 이미지 multiple #}
-    <div class="field">
-      <label>사진 (여러 장 가능)</label>
-      <input type="file" name="images" id="id_images" multiple accept="image/*" class="form-control">
-      {{ form.images.errors }}
-      <div class="muted">※ 위치 선택 페이지 다녀오면 브라우저 정책상 첨부 파일은 유지되지 않을 수 있어요.</div>
-    </div>
-
-    <button class="btn" id="submit_btn">{% if is_update %}수정 완료{% else %}등록하기{% endif %}</button>
-    {% if is_update %}
-    <a href="{% url 'missions:mission_detail' mission.id %}" class="subbtn">
-      취소
-    </a>
-    {% endif %}
-
-  </form>
+        <button class="btn" id="submit_btn">{% if is_update %}수정 완료{% else %}미션 등록하기{% endif %}</button>
+    </form>
+</div>
 {% endblock %}
