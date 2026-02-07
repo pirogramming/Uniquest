@@ -5,6 +5,7 @@ from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
+import uuid
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
@@ -103,15 +104,17 @@ def verify_email_check(request):
                 # 2. 메일 발송
                 try:
                     send_verification_email(email)
-                    # 디버깅: 인증번호 확인용 (배포 시 삭제)
-                    # print(f"DEBUG: {email} -> {cache.get(f'auth_{email}')}")
                 except Exception as e:
                     return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
 
-                #메일 전송 완료
+                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 저장 후 프론트에 전달)
+                reset_token = str(uuid.uuid4())
+                cache.set(f"reset_token_{reset_token}", email, timeout=600)
+
                 return JsonResponse({
                     'message': f'{university} 메일로 인증번호를 보냈습니다.',
                     'university': university,
+                    'token': reset_token,
                 }, status=200)
 
             elif action == "check_number": #인증하기 버튼
@@ -119,13 +122,11 @@ def verify_email_check(request):
                 number = data.get('number')
                 university = extract_univ(email)
 
-                if verify_code(email,number):
-                    print('True')
+                if verify_code(email, number):
                     cache.set(f"university_info_{email}", university, timeout=600)
                     cache.set(f"varified_info_{email}", True, timeout=600)
-                    return JsonResponse({'is_varified': True,'email':email}, status=200)
+                    return JsonResponse({'is_varified': True, 'email': email}, status=200)
                 else:
-                    print('False')
                     return JsonResponse({'is_varified': False}, status=200)
 
         except json.JSONDecodeError:
