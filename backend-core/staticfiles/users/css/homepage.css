@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 /* 1. 배경 설정 및 화면 중앙 배치 */
 body {
     background-color: #f8f9fa;
@@ -27,7 +29,7 @@ body {
 /* 2. 헤더 섹션 (겹침 현상 제거) */
 .header {
     background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
-    padding: 50px 25px 30px 25px; /* 하단 패딩을 줄여 겹침 방지 준비 */
+    padding: 50px 25px 30px 25px; 
     border-radius: 0;
     color: white;
 }
@@ -56,12 +58,9 @@ body {
     opacity: 0.9;
 }
 
-/* ----------------------------------------------------------------
-    퀵 메뉴 정렬 해결 (자식 요소 태그 종류 상관없이 3분할 고정)
-------------------------------------------------------------------- */
+/* 퀵 메뉴 정렬 */
 .quick-menu {
     display: flex;
-    /* 내부 요소들이 양 끝을 채우며 정렬되도록 설정 */
     justify-content: space-between; 
     align-items: center;
     background: rgba(255, 255, 255, 0.2); 
@@ -69,14 +68,10 @@ body {
     border-radius: 25px;
 }
 
-/* [수정됨] .quick-menu a 대신 .quick-menu > * 를 사용하여 <a>와 <div> 모두 잡음 */
 .quick-menu > * {
-    /* [가장 중요] 글자 길이에 상관없이 33.3% 너비를 강제 부여 */
     flex: 1; 
     text-decoration: none;
     color: white;
-    
-    /* 내부 아이템들을 각 3등분된 영역의 한가운데로 정렬 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -84,7 +79,6 @@ body {
 }
 
 .menu-item {
-    /* 이미 상위 요소에서 정렬을 잡았으므로 간격만 설정 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -94,15 +88,13 @@ body {
 .menu-item span {
     font-size: 14px;
     font-weight: 500;
-    /* 텍스트가 길어져서 줄바꿈되며 정렬이 깨지는 것 방지 */
     white-space: nowrap; 
     letter-spacing: -0.5px;
 }
 
-/* 3. 내 미션 현황 카드 (겹치지 않게 수정) */
+/* 3. 내 미션 현황 카드 */
 .mission-status-card {
     background: #FFFFFF;
-    /* margin-top을 양수로 변경하여 헤더와 겹치지 않고 아래로 배치 */
     margin: 20px 25px; 
     padding: 20px;
     border-radius: 20px;
@@ -195,13 +187,31 @@ body {
     color: #1D2939;
 }
 
-.tag-status {
+/* 모든 상태 배지 컬러링 (대기중, 진행중, 완료 대소문자 완벽 대응) */
+.tag-status, .status-badge {
     font-size: 11px;
     font-weight: 600;
-    color: #4DA6FF;
-    background: #EBF5FF;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 12px;
+    display: inline-block;
+}
+
+.tag-status.waiting, .tag-status.WAITING, 
+.status-badge.waiting, .status-badge.WAITING {
+    background-color: #FFF4ED !important;
+    color: #FB923C !important;
+}
+
+.tag-status.ongoing, .tag-status.ONGOING, 
+.status-badge.ongoing, .status-badge.ONGOING {
+    background-color: #EFF8FF !important;
+    color: #57A6FF !important;
+}
+
+.tag-status.completed, .tag-status.COMPLETED, 
+.status-badge.completed, .status-badge.COMPLETED {
+    background-color: #F2F4F7 !important;
+    color: #667085 !important;
 }
 
 .description {
@@ -209,15 +219,11 @@ body {
     color: #667085;
     line-height: 1.5;
     margin: 0 0 15px 0;
-
-    /* 여러 줄 생략을 위한 필수 속성 */
     overflow: hidden;
-    display: -webkit-box;           /* 구형 브라우저 및 크롬/사파리 호환 */
-    -webkit-box-orient: vertical;   /* 박스 방향 설정 */
-    -webkit-line-clamp: 2;          /* 표시할 줄 수 (2줄) */
-    
-    /* 최신 표준 속성 정의 */
-    line-clamp: 2;                  
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .card-footer {
@@ -240,8 +246,13 @@ body {
     color: white;
 }
 
-.category-delivery { background-color: #FF7EAD; }
-.category-task { background-color: #2ECC71; }
+/* 카테고리별 배경색 지정 */
+.category-errand { background-color: #3679E3 !important; } /* 심부름 - Blue */
+.category-study  { background-color: #27C27B !important; } /* 학업 - Green */
+.category-rent   { background-color: #FFB800 !important; } /* 대여 - Yellow */
+.category-job    { background-color: #8B5CF6 !important; } /* 구인 - Purple */
+.category-life   { background-color: #FF6B9A !important; } /* 생활 - Pink */
+.category-etc    { background-color: #94A3B8 !important; } /* 기타 - Gray */
 
 .location {
     font-size: 12px;
@@ -254,7 +265,7 @@ body {
     color: #4DA6FF;
 }
 
-/* 하단 네비게이션 스타일 */
+/* 하단 네비게이션 */
 .bottom-nav {
     position: absolute;
     bottom: 0;
@@ -271,7 +282,6 @@ body {
     display: none !important;
 }
 
-/* 중앙 + 버튼 */
 .nav-item.center-btn {
     width: 50px;
     height: 50px;
