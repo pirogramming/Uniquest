@@ -52,8 +52,8 @@ async function renderHomepage(){
                 console.log('yeah')
                 userMission = userData.missions
                 missionElement.innerHTML = ""
-                userData.missions.forEach(({title,status,descriptions,category,reward,location_name}) => {
-                    missionElement.innerHTML += `<div class="mission-card">
+                userData.missions.forEach(({id,title,status,descriptions,category,reward,location_name}) => {
+                    missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'">
                         <div class="card-header">
                             <h3 class="title">${title}</h3>
                             <span class="tag-status">${status}</span>
