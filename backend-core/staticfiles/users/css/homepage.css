@@ -1,45 +1,35 @@
-:root {
-    --primary-blue: #70a1ff;
-    --bg-light-blue: #f0f7ff;
-    --text-dark: #333;
-    --text-gray: #777;
-    --white: #ffffff;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Pretendard', sans-serif;
-}
-
-a{
-    color:white;
-    text-decoration: none;
-}
-
+/* 1. 배경 설정 및 화면 중앙 배치 */
 body {
-    background-color: #f5f5f5;
+    background-color: #f8f9fa;
+    margin: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
 }
 
-.mobile-container {
+/* 전체 모바일 컨테이너 구조 */
+.signup-wrapper {
     width: 100%;
     max-width: 450px;
-    background-color: #fcfcfc;
-    min-height: 100vh;
-    padding-bottom: 80px;
+    height: 100vh;
+    background-color: #ffffff;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: auto;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* Header */
+/* 2. 헤더 섹션 (겹침 현상 제거) */
 .header {
-    background-color: var(--primary-blue);
-    padding: 30px 20px 80px 20px;
-    border-radius: 0 0 40px 40px;
-    color: var(--white);
+    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+    padding: 50px 25px 30px 25px; /* 하단 패딩을 줄여 겹침 방지 준비 */
+    border-radius: 0;
+    color: white;
 }
 
 .header-top {
@@ -49,54 +39,87 @@ body {
     margin-bottom: 30px;
 }
 
-.user-greeting h1 { font-size: 24px; font-weight: 300; }
-.user-greeting p { font-size: 20px; font-weight: 600; }
-
 .notification {
-    position: relative;
+    display: none;
+}
+
+.user-greeting h1 {
     font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.4;
 }
 
-.badge {
-    position: absolute;
-    top: -5px; right: -5px;
-    background: #ff4757;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 10px;
+.user-greeting p#nickname {
+    font-size: 18px;
+    margin: 5px 0 0 0;
+    opacity: 0.9;
 }
 
-/* Quick Menu */
+/* ----------------------------------------------------------------
+    퀵 메뉴 정렬 해결 (자식 요소 태그 종류 상관없이 3분할 고정)
+------------------------------------------------------------------- */
 .quick-menu {
     display: flex;
-    justify-content: space-around;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px 10px;
-    border-radius: 20px;
+    /* 내부 요소들이 양 끝을 채우며 정렬되도록 설정 */
+    justify-content: space-between; 
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2); 
+    padding: 25px 15px;
+    border-radius: 25px;
+}
+
+/* [수정됨] .quick-menu a 대신 .quick-menu > * 를 사용하여 <a>와 <div> 모두 잡음 */
+.quick-menu > * {
+    /* [가장 중요] 글자 길이에 상관없이 33.3% 너비를 강제 부여 */
+    flex: 1; 
+    text-decoration: none;
+    color: white;
+    
+    /* 내부 아이템들을 각 3등분된 영역의 한가운데로 정렬 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .menu-item {
-    text-align: center;
-    font-size: 12px;
+    /* 이미 상위 요소에서 정렬을 잡았으므로 간격만 설정 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; 
 }
 
-.icon-box {
-    font-size: 22px;
-    margin-bottom: 8px;
+.menu-item span {
+    font-size: 14px;
+    font-weight: 500;
+    /* 텍스트가 길어져서 줄바꿈되며 정렬이 깨지는 것 방지 */
+    white-space: nowrap; 
+    letter-spacing: -0.5px;
 }
 
-/* Status Card */
+/* 3. 내 미션 현황 카드 (겹치지 않게 수정) */
 .mission-status-card {
-    background: var(--white);
-    margin: -50px 20px 25px 20px;
+    background: #FFFFFF;
+    /* margin-top을 양수로 변경하여 헤더와 겹치지 않고 아래로 배치 */
+    margin: 20px 25px; 
     padding: 20px;
     border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .mission-status-card h3 {
-    font-size: 14px;
-    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mission-status-card h3 i {
+    color: #4DA6FF;
 }
 
 .status-grid {
@@ -110,13 +133,26 @@ body {
     flex-direction: column;
 }
 
-.count { font-size: 22px; font-weight: bold; color: #aaa; }
-.highlight-blue { color: var(--primary-blue); }
-.highlight-yellow { color: #fbc531; }
-.label { font-size: 12px; color: var(--text-gray); margin-top: 5px; }
+.status-item .count {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: #333;
+}
 
-/* Mission List */
-.mission-list-section { padding: 0 20px; }
+.status-item .label {
+    font-size: 13px;
+    color: #888;
+}
+
+.highlight-blue { color: #4DA6FF !important; }
+.highlight-yellow { color: #FFB800 !important; }
+
+/* 4. 미션 리스트 섹션 */
+.mission-list-section {
+    padding: 0 25px 100px 25px;
+}
+
 .section-title {
     display: flex;
     justify-content: space-between;
@@ -124,37 +160,64 @@ body {
     margin-bottom: 15px;
 }
 
-.section-title h2 { font-size: 18px; }
-.view-all { font-size: 13px; color: var(--primary-blue); text-decoration: none; }
+.section-title h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
 
+.view-all {
+    font-size: 13px;
+    color: #4DA6FF;
+    text-decoration: none;
+}
+
+/* 개별 미션 카드 */
 .mission-card {
-    background: var(--white);
-    border: 1px solid #eee;
-    padding: 20px;
+    background: #FFFFFF;
+    border: 1px solid #F2F4F7;
     border-radius: 20px;
+    padding: 20px;
     margin-bottom: 15px;
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
-.title { font-size: 16px; font-weight: bold; }
+.card-header .title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #1D2939;
+}
+
 .tag-status {
-    background: #eef5ff;
-    color: var(--primary-blue);
-    padding: 4px 10px;
-    border-radius: 10px;
     font-size: 11px;
+    font-weight: 600;
+    color: #4DA6FF;
+    background: #EBF5FF;
+    padding: 4px 8px;
+    border-radius: 12px;
 }
 
 .description {
-    font-size: 13px;
-    color: var(--text-gray);
+    font-size: 14px;
+    color: #667085;
     line-height: 1.5;
-    margin-bottom: 15px;
+    margin: 0 0 15px 0;
+
+    /* 여러 줄 생략을 위한 필수 속성 */
+    overflow: hidden;
+    display: -webkit-box;           /* 구형 브라우저 및 크롬/사파리 호환 */
+    -webkit-box-orient: vertical;   /* 박스 방향 설정 */
+    -webkit-line-clamp: 2;          /* 표시할 줄 수 (2줄) */
+    
+    /* 최신 표준 속성 정의 */
+    line-clamp: 2;                  
 }
 
 .card-footer {
@@ -163,60 +226,60 @@ body {
     align-items: center;
 }
 
-.tag-category {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 8px;
-    margin-right: 5px;
+.info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.category-delivery { background: #fff5eb; color: #ff9f43; }
-.category-task { background: #eef2ff; color: #5352ed; }
+.tag-category {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    color: white;
+}
 
-.location { font-size: 11px; color: #aaa; }
-.price { font-size: 17px; font-weight: bold; color: var(--primary-blue); }
+.category-delivery { background-color: #FF7EAD; }
+.category-task { background-color: #2ECC71; }
 
-/* Bottom Nav */
+.location {
+    font-size: 12px;
+    color: #98A2B3;
+}
+
+.price {
+    font-size: 17px;
+    font-weight: 700;
+    color: #4DA6FF;
+}
+
+/* 하단 네비게이션 스타일 */
 .bottom-nav {
     position: absolute;
-    bottom: 0; width: 100%;
+    bottom: 0;
+    width: 100%;
     height: 70px;
-    background: var(--white);
+    background: white;
     display: flex;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #eee;
 }
 
-.nav-item {
-    text-align: center;
-    color: #bbb;
-    font-size: 11px;
+.bottom-nav .badge, .bottom-nav .notification-dot {
+    display: none !important;
 }
 
-.nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
-.nav-item.active { color: var(--primary-blue); }
-
-.nav-fab .fab-button {
-    width: 55px; height: 55px;
-    background: var(--primary-blue);
+/* 중앙 + 버튼 */
+.nav-item.center-btn {
+    width: 50px;
+    height: 50px;
+    background-color: #4DA6FF;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 24px;
-    margin-top: -30px;
-    box-shadow: 0 4px 10px rgba(112, 161, 255, 0.4);
-}
-
-.icon-wrapper { position: relative; display: inline-block; }
-.nav-badge {
-    position: absolute;
-    top: -5px; right: -8px;
-    background: #ff4757;
-    color: white;
-    font-size: 9px;
-    padding: 1px 4px;
-    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3);
 }
