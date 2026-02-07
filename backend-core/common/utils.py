@@ -8,6 +8,18 @@ logger = logging.getLogger(__name__)
 # Redis 연결 풀 생성 (실무 효율성 포인트)
 REDIS_POOL = redis.ConnectionPool(host='redis', port=6379, db=0)
 
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=0,
+    decode_responses=True
+)
+
+def publish_mission_update(data: dict):
+    """미션 변경사항을 Redis로 발행"""
+    redis_client.publish("mission_updates", json.dumps(data))
+
+
 def publish_chat_event(room_id: str, event_type: str, data: dict):
     """
     room_id: 미션 ID (예: "15")

@@ -19,6 +19,8 @@ from .serializers import MissionSerializer
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
 from common.utils import publish_chat_event
+from common.utils import publish_mission_update  # ✨ 추가
+
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +102,12 @@ def mission_create(request):
             images = request.FILES.getlist("images")
             for f in images:
                 if f: MissionImage.objects.create(mission=mission, image=f)
+
+            publish_mission_update({
+                "action": "CREATE",
+                "mission_id": mission.id,
+                "data": MissionSerializer(mission).data
+            })
 
             return Response({"success": True, "mission_id": mission.id}, status=status.HTTP_201_CREATED)
         except Exception:
