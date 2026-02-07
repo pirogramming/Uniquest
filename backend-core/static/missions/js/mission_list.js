@@ -130,47 +130,51 @@
             console.warn('토큰이 없어 SSE 연결을 건너뜁니다.');
             return;
         }
+        console.log("SSE용 토큰:", SSE_URL);
 
-        eventSource = new EventSource(`${SSE_URL}?token=${token}`);
+        try{
+            eventSource = new EventSource(`${SSE_URL}?token=${token}`);
+            eventSource.onopen = () => {
+                console.log('✅ SSE 연결 성공');
+            };
 
-        eventSource.onopen = () => {
-            console.log('✅ SSE 연결 성공');
-        };
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log('📨 SSE 수신:', data);
 
-        eventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                console.log('📨 SSE 수신:', data);
-
-                switch (data.action) {
-                    case 'CREATE':
-                        addMissionToDOM(data.data);
-                        break;
-                    case 'UPDATE':
-                        updateMissionInDOM(data.data);
-                        break;
-                    case 'DELETE':
-                        removeMissionFromDOM(data.mission_id);
-                        break;
-                    case 'CONNECTED':
-                        console.log('SSE 연결 확인');
-                        break;
+                    switch (data.action) {
+                        case 'CREATE':
+                            addMissionToDOM(data.data);
+                            break;
+                        case 'UPDATE':
+                            updateMissionInDOM(data.data);
+                            break;
+                        case 'DELETE':
+                            removeMissionFromDOM(data.mission_id);
+                            break;
+                        case 'CONNECTED':
+                            console.log('SSE 연결 확인');
+                            break;
+                    }
+                } catch (err) {
+                    console.error('SSE 메시지 파싱 오류:', err);
                 }
-            } catch (err) {
-                console.error('SSE 메시지 파싱 오류:', err);
-            }
-        };
+            };
 
-        eventSource.onerror = (error) => {
-            console.error('❌ SSE 오류:', error);
-            eventSource.close();
-            
-            // 3초 후 재연결 시도
-            setTimeout(() => {
-                console.log('🔄 SSE 재연결 시도...');
-                connectSSE();
-            }, 3000);
-        };
+            eventSource.onerror = (error) => {
+                console.error('❌ SSE 오류:', error);
+                eventSource.close();
+                
+                // 3초 후 재연결 시도
+                setTimeout(() => {
+                    console.log('🔄 SSE 재연결 시도...');
+                    connectSSE();
+                }, 3000);
+            };
+        } catch (err) {
+            console.error('❌ EventSource 생성 실패:', err);
+        }
     }
 
     // ========== 지도 관련 함수 ==========

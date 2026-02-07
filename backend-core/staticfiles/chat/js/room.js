@@ -1,9 +1,13 @@
 class ChatClient {
     constructor(config) {
         this.roomId = config.roomId;
+        this.missionId = config.missionId != null ? config.missionId : config.roomId;
         this.userId = config.userId;
         this.userNickname = config.userNickname;
         this.wsUrl = config.wsUrl;
+        this.canAccept = config.canAccept === true;
+        this.isAuthor = config.isAuthor === true;
+        this.kickableUsers = Array.isArray(config.kickableUsers) ? config.kickableUsers : [];
 
         this.ws = null;
         this.isAuthenticated = false;
@@ -17,6 +21,25 @@ class ChatClient {
         this.init();
     }
 
+    getToken() {
+        return localStorage.getItem('access_token') || localStorage.getItem('access') || '';
+    }
+
+    getCsrfToken() {
+        const match = document.cookie.match(/csrftoken=([^;]+)/);
+        return match ? match[1] : '';
+    }
+
+    getAuthHeaders() {
+        const token = this.getToken();
+        const csrf = this.getCsrfToken();
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+            ...(csrf ? { 'X-CSRFToken': csrf } : {}),
+        };
+    }
+
     init() {
         // 이벤트 리스너 등록
         this.sendBtn.addEventListener('click', () => this.sendMessage());
@@ -27,10 +50,77 @@ class ChatClient {
             }
         });
 
+        // 미션 수락 버튼
+        const acceptBtn = document.getElementById('acceptMissionBtn');
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', () => this.acceptMission());
+        }
+
+        // 강퇴 버튼들
+        document.querySelectorAll('.btn-kick').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.currentTarget.dataset.targetId;
+                const nickname = e.currentTarget.dataset.nickname || '';
+                if (targetId) this.kickUser(parseInt(targetId, 10), nickname, e.currentTarget);
+            });
+        });
+
         // 채팅 히스토리 로드 후 WebSocket 연결
         this.loadHistory().then(() => {
             this.connect();
         });
+    }
+
+    async acceptMission() {
+        const acceptBtn = document.getElementById('acceptMissionBtn');
+        if (!acceptBtn || !this.canAccept) return;
+        acceptBtn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/accept/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '미션 수락이 완료되었습니다.');
+                acceptBtn.remove();
+                this.canAccept = false;
+            } else {
+                alert(data.error || '미션 수락에 실패했습니다.');
+                acceptBtn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            acceptBtn.disabled = false;
+        }
+    }
+
+    async kickUser(targetId, nickname, btnEl) {
+        if (!this.isAuthor || !btnEl) return;
+        if (!confirm(`${nickname || '해당 유저'}를 강퇴하시겠습니까?`)) return;
+        btnEl.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/${this.missionId}/kick/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ target_id: targetId, room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                btnEl.textContent = '강퇴됨';
+            } else {
+                alert(data.error || '강퇴에 실패했습니다.');
+                btnEl.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btnEl.disabled = false;
+        }
     }
 
     async loadHistory() {
@@ -69,7 +159,7 @@ class ChatClient {
             if (!token) {
                 this.updateStatus('토큰 없음', 'error');
                 alert('로그인이 필요합니다.');
-                window.location.href = '/users/login/';
+                window.location.href = '/api/users/login/';
                 return;
             }
 
@@ -131,7 +221,7 @@ class ChatClient {
 
             case 'KICK':
                 alert(msg.content || '방장에 의해 강퇴되었습니다.');
-                window.location.href = '/';
+                window.location.href = '/api/users/homepage/';
                 break;
 
             default:
