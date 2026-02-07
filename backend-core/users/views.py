@@ -298,3 +298,43 @@ def get_homepage_info(request):
         "matched_count":matched_count,
         "completed_count":completed_count
     })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def block_user(request):
+    """
+    차단 = 1) 차단한 유저 목록에 추가  2) 해당 채팅방에서 강퇴
+    """
+    user = request.user
+    target_user_id = request.data.get('target_id')
+    room_id = request.data.get('room_id')
+
+    print(f"[DEBUG] block_user 호출 - target_id={target_user_id!r}, room_id={room_id!r}")
+
+    if not target_user_id:
+        return Response({'error': 'target_id가 필요합니다.'}, status=400)
+
+    try:
+        target_user = User.objects.get(id=target_user_id)
+    except User.DoesNotExist:
+        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+
+    if target_user.id == user.id:
+        return Response({"error": '자신은 차단할 수 없습니다.'}, status=400)
+
+    # 1) 차단한 유저 목록에 추가
+    user.blocked_people.add(target_user)
+
+    # 2) 채팅방에서 강퇴 (Redis로 WebSocket 서버에 전달)
+    if room_id is not None and str(room_id).strip() != '':
+        room_id_str = str(room_id).strip()
+        target_id_int = int(target_user_id)
+        publish_chat_event(
+            room_id=room_id_str,
+            event_type="KICK",
+            data={"target_id": target_id_int}
+        )
+        print(f"[DEBUG] Redis Publish 완료 - channel=chat_{room_id_str}, target_id={target_id_int}")
+
+    return Response({'message': '차단되었습니다'}, status=200)
+    

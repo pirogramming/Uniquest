@@ -12,18 +12,25 @@ class ConnectionManager:
         self.pubsub_tasks = {}
 
     async def connect(self, websocket: WebSocket, room_id: str, user_id: int):
+        room_id = str(room_id)  # room_id 항상 str로 통일
+        user_id = int(user_id)  # user_id 항상 int로 통일
         if room_id not in self.active_connections:
-            self.active_connections[room_id] = {} # 딕셔너리로 초기화
+            self.active_connections[room_id] = {}  # 딕셔너리로 초기화
             # Redis 구독 시작 (방이 처음 생길 때만)
             self.pubsub_tasks[room_id] = asyncio.create_task(self._redis_sub_listener(room_id))
-            
-        # 유저 ID를 키로 소켓 저장
+
+        # 유저 ID를 키로 소켓 저장 (int 고정)
         self.active_connections[room_id][user_id] = websocket
 
     async def disconnect(self, room_id: str, user_id: int):
+        room_id = str(room_id)
+        user_id = int(user_id)
         if room_id in self.active_connections:
-            if user_id in self.active_connections[room_id]:
-                del self.active_connections[room_id][user_id]
+            room = self.active_connections[room_id]
+            if user_id in room:
+                del room[user_id]
+            elif str(user_id) in room:
+                del room[str(user_id)]
             
             # 방에 아무도 없으면 구독 취소 및 방 삭제
             if not self.active_connections[room_id]:
@@ -44,9 +51,12 @@ class ConnectionManager:
                     data = payload.get("data", {})
 
                     if msg_type == "KICK":
-                        # Django가 쏜 target_id를 받아서 소켓 강제 종료
-                        target_id = int(data.get("target_id"))
-                        await self._kick_user(room_id, target_id)
+                        # 차단 시 Django가 전달한 target_id → 해당 유저 채팅방에서 강퇴
+                        raw_id = data.get("target_id")
+                        target_id = int(raw_id) if raw_id is not None else None
+                        print(f"[DEBUG] Redis KICK 수신 - room_id={room_id!r}, target_id={target_id!r}")
+                        if target_id is not None:
+                            await self._kick_user(room_id, target_id)
                     
                     elif msg_type == "COMPLETE":
                         # 미션 완료 시 시스템 메시지 브로드캐스트
@@ -70,23 +80,27 @@ class ConnectionManager:
         except Exception as e:
             print(f"FastAPI Redis 리스너 에러: {e}")
 
-    # 특정 유저 강퇴 메서드
+    # 차단된 유저를 채팅방에서 강퇴 (WebSocket 종료)
     async def _kick_user(self, room_id, target_id):
-        if room_id in self.active_connections:
-            target_socket = self.active_connections[room_id].get(target_id)
-            if target_socket:
-                try:
-                    # 1. 강퇴 알림 전송
-                    await target_socket.send_text(json.dumps({
-                        "type": "KICK", 
-                        "content": "방장에 의해 강퇴되었습니다."
-                    }, ensure_ascii=False))
-                    # 2. 소켓 연결 종료
-                    await target_socket.close(code=4000) 
-                except:
-                    pass
-                # 목록에서 삭제는 disconnect에서 처리되거나 여기서 명시적 삭제
-                # (웹소켓이 닫히면 api/chat.py의 finally 블록 등에서 disconnect가 호출됨)
+        room_id = str(room_id)
+        target_id = int(target_id)
+        room_conns = self.active_connections.get(room_id) or self.active_connections.get(str(room_id))
+        if not room_conns:
+            print(f"[DEBUG] Kick 실패: room_id={room_id!r} 없음. 접속방 목록={list(self.active_connections.keys())}")
+            return
+        target_socket = room_conns.get(target_id) or room_conns.get(str(target_id))
+        if not target_socket:
+            print(f"[DEBUG] Kick 실패: target_id={target_id!r} 해당 소켓 없음. 현재 접속자={list(room_conns.keys())}")
+            return
+        try:
+            await target_socket.send_text(json.dumps({
+                "type": "KICK",
+                "content": "차단되어 채팅방에서 나가셨습니다."
+            }, ensure_ascii=False))
+            await target_socket.close(code=4000)
+            print(f"[DEBUG] Kick 성공: user_id={target_id} 종료됨")
+        except Exception as e:
+            print(f"[DEBUG] Kick 중 예외: {e}")
 
     async def _local_broadcast(self, message, room_id):
         if room_id in self.active_connections:
