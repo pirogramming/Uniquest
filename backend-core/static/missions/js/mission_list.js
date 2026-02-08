@@ -290,7 +290,7 @@
     async function init() {
         const container = document.getElementById('map');
         if (!container) return;
-
+        
         try {
             // 1. 지도 초기화
             mapManager = new KakaoMapManager('map', {
