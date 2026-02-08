@@ -32,7 +32,7 @@ h2 {
     border-bottom: 1px solid #F2F4F7;
 }
 
-h2::before {
+#back-btn::before {
     content: '\2190'; /* 로그인 페이지와 동일한 화살표 */
     font-size: 26px;
     font-weight: bold;

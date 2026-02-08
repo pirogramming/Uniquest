@@ -27,10 +27,27 @@
         'LIFE': '생활',
         'OTHER': '기타'
     };
-
-    // ==================== 미션 목록 로딩 ====================
+// ==================== 미션 목록 로딩 수정 ====================
     
     async function loadMissions() {
+        const scriptData = document.getElementById('mission-data');
+        
+        if (scriptData) {
+            // 1. HTML에 포함된 초기 데이터(DB 데이터) 사용
+            try {
+                const initialMissions = JSON.parse(scriptData.textContent);
+                console.log("📍 초기 DB 데이터 로드:", initialMissions);
+                
+                // 마커와 리스트 렌더링 (SSE와 동일한 데이터 구조여야 함)
+                addMissionMarkers(initialMissions);
+                renderMissionList(initialMissions);
+                return; // API 호출 생략
+            } catch (e) {
+                console.error("초기 데이터 파싱 실패, API 호출로 전환:", e);
+            }
+        }
+
+        // 2. 만약 데이터가 없으면 기존처럼 API 호출
         try {
             const response = await Auth.getData(API_LIST_URL);
             if (response && response.results) {
@@ -290,32 +307,32 @@
     async function init() {
         const container = document.getElementById('map');
         if (!container) return;
-        const missionPromise  = loadMissions();
+        
         try {
-            // 2. 지도 초기화와 사용자 위치 파악은 동시에 진행
+            // 1. 지도 초기화
             mapManager = new KakaoMapManager('map', {
                 center: { lat: 37.5665, lng: 126.9780 },
                 level: 3
             });
             
-            // 지도 로드와 위치 파악을 병렬로 처리
-            await Promise.all([
-                mapManager.init(),
-                MapUtils.displayUserLocation(mapManager).catch(err => console.warn(err))
-            ]);
-            
-            console.log("✅ 지도 및 위치 준비 완료");
+            await mapManager.init();
+            console.log("✅ 카카오 지도 로드 완료");
 
-            // 3. 이미 시작된 미션 목록 로드가 끝날 때까지 대기
-            await missionPromise;
+            // 2. 사용자 위치 표시 (실패해도 계속 진행)
+            try {
+                await MapUtils.displayUserLocation(mapManager);
+            } catch (err) {
+                console.warn("사용자 위치 표시 실패:", err);
+            }
+
+            // 3. 미션 목록 로드
+            await loadMissions();
 
             // 4. SSE 연결
             connectSSE();
             
         } catch (err) {
             console.error("초기화 실패:", err);
-            // 지도 실패해도 목록은 보여줘야 하므로 한 번 더 보장
-            await missionPromise; 
         }
     }
 

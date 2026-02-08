@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    <h2>
+    <h2><span id = "back-btn"></span>
         {% if is_update %} 미션 수정 {% else %} 미션 등록 {% endif %}
     </h2>
 
@@ -111,4 +111,17 @@
     
     <script src="/static/shared/js/auth.js"></script>
     <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const backBtn = document.getElementById("back-btn");
+    if (backBtn) {
+        backBtn.addEventListener("click", function() {
+            // 작성 중인 내용이 있다면 확인창을 띄울 수도 있습니다.
+            if (confirm("작성 중인 내용은 저장되지 않습니다. 돌아가시겠습니까?")) {
+                window.history.back();
+            }
+        });
+    }
+});
+    </script>
     {% endblock %}
