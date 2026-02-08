@@ -97,11 +97,43 @@
         try {
             const mission = await Auth.authFetchJson(API_DETAIL_URL);
 
-            if (!mission) {
-                console.error("미션 데이터를 가져올 수 없습니다.");
-                document.getElementById('action-area').innerHTML = 
-                    `<p class="muted">로그인이 필요하거나 삭제된 미션입니다.</p>`;
-                return;
+            if (mission) {
+                // 1. 지도 표시 (좌표가 있을 때만)
+                if (mission.location_lat && mission.location_lng) {
+                    initMap(mission.location_lat, mission.location_lng);
+                }
+
+                // 2. 작성자 정보 업데이트
+                const authorEl = document.getElementById('mission-author');
+                if (authorEl && mission.author_username) {
+                    authorEl.textContent = mission.author_username;
+                }
+
+                // 3. 버튼 렌더링 (작성자는 채팅하기 없음, 다른 사람이 채팅 시작 시 채팅 목록에 표시됨)
+                const actionArea = document.getElementById('action-area');
+                if (actionArea) {
+                    if (mission.is_author) {
+                        actionArea.innerHTML = `
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                                <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다. 다른 사람이 채팅을 시작하면 채팅 목록에 표시됩니다.</p>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button onclick="location.href='/api/missions/${mission.id}/edit/'" class="btn btn-secondary" style="flex: 1; min-width: 120px;">
+                                        수정하기
+                                    </button>
+                                    <button onclick="window.deleteMission()" class="btn btn-danger" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                        삭제하기
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        actionArea.innerHTML = `
+                            <a href="/api/missions/${mission.id}/chat/start/" class="btn btn-primary" style="display: inline-block; width: 100%; max-width: 500px; height: 50px; font-size: 16px; line-height: 50px; text-align: center; text-decoration: none; color: white; border-radius: 8px;">
+                                채팅하기
+                            </a>
+                        `;
+                    }
+                }
             }
 
             // 1. 지도 표시 (좌표가 있을 때만)
