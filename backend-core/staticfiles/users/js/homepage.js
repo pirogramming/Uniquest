@@ -47,6 +47,7 @@ async function renderHomepage() {
                 console.log('yeah')
                 userMission = userData.missions
                 missionElement.innerHTML = ""
+<<<<<<< HEAD
                 
                 // [수정 부분] 카테고리 및 상태 배지 동적 클래스 적용
                 userData.missions.forEach(({ id, title, status, descriptions, category, reward, location_name }) => {
@@ -69,6 +70,10 @@ async function renderHomepage() {
                     const categoryClass = categoryMap[categoryKey] || 'etc';
 
                     missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'" style="cursor:pointer;">
+=======
+                userData.missions.forEach(({ id, title, status, descriptions, category, reward, location_name }) => {
+                    missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'">
+>>>>>>> bf92e18fed94543b529bd4938cd76c898b926ce8
                         <div class="card-header">
                             <h3 class="title">${title}</h3>
                             <span class="tag-status ${statusClass}">${status}</span>
@@ -90,6 +95,11 @@ async function renderHomepage() {
                 completed.innerHTML = userData.completed_count
             }
 
+<<<<<<< HEAD
+=======
+
+            // 미션 관련 로직도 여기에 추가 가능
+>>>>>>> bf92e18fed94543b529bd4938cd76c898b926ce8
             console.log("환영합니다, " + userData.nickname + "님!");
         }
     } catch (error) {

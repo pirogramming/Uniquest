@@ -8,6 +8,7 @@ class ChatClient {
         this.canAccept = config.canAccept === true;
         this.isAuthor = config.isAuthor === true;
         this.kickableUsers = Array.isArray(config.kickableUsers) ? config.kickableUsers : [];
+        this.csrfToken = config.csrfToken || '';
 
         this.ws = null;
         this.isAuthenticated = false;
@@ -26,28 +27,30 @@ class ChatClient {
     }
 
     getCsrfToken() {
+        if (this.csrfToken) return this.csrfToken;
         const match = document.cookie.match(/csrftoken=([^;]+)/);
-        return match ? match[1] : '';
+        return match ? match[1].trim() : '';
     }
 
     getAuthHeaders() {
         const token = this.getToken();
         const csrf = this.getCsrfToken();
-        return {
+        const headers = {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
-            ...(csrf ? { 'X-CSRFToken': csrf } : {}),
         };
+        if (csrf) headers['X-CSRFToken'] = csrf;
+        return headers;
     }
 
     init() {
-        // 이벤트 리스너 등록
-        this.sendBtn.addEventListener('click', () => this.sendMessage());
-        this.messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
+        // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
+        document.querySelectorAll('.btn-block').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.currentTarget.dataset.targetId;
+                const nickname = e.currentTarget.dataset.nickname || '';
+                if (targetId) this.blockUser(parseInt(targetId, 10), nickname, e.currentTarget);
+            });
         });
 
         // 미션 수락 버튼
@@ -56,14 +59,18 @@ class ChatClient {
             acceptBtn.addEventListener('click', () => this.acceptMission());
         }
 
-        // 강퇴 버튼들
-        document.querySelectorAll('.btn-kick').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const targetId = e.currentTarget.dataset.targetId;
-                const nickname = e.currentTarget.dataset.nickname || '';
-                if (targetId) this.kickUser(parseInt(targetId, 10), nickname, e.currentTarget);
+        // 메시지 전송 (null이면 리스너 생략)
+        if (this.sendBtn) {
+            this.sendBtn.addEventListener('click', () => this.sendMessage());
+        }
+        if (this.messageInput) {
+            this.messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
             });
-        });
+        }
 
         // 채팅 히스토리 로드 후 WebSocket 연결
         this.loadHistory().then(() => {
@@ -98,22 +105,26 @@ class ChatClient {
         }
     }
 
-    async kickUser(targetId, nickname, btnEl) {
-        if (!this.isAuthor || !btnEl) return;
-        if (!confirm(`${nickname || '해당 유저'}를 강퇴하시겠습니까?`)) return;
+    async blockUser(targetId, nickname, btnEl) {
+        if (!btnEl) return;
+        if (!confirm(`${nickname || '해당 유저'}를 차단하시겠습니까?`)) return;
         btnEl.disabled = true;
         try {
-            const res = await fetch(`/api/missions/${this.missionId}/kick/`, {
+            // 차단 = 1) 차단 목록 추가 2) 채팅방에서 강퇴 (room_id 필요)
+            const res = await fetch('/api/users/api/block_user/', {
                 method: 'POST',
                 credentials: 'include',
                 headers: this.getAuthHeaders(),
                 body: JSON.stringify({ target_id: targetId, room_id: this.roomId }),
             });
             const data = await res.json().catch(() => ({}));
-            if (res.ok && data.success) {
-                btnEl.textContent = '강퇴됨';
+            if (res.ok) {
+                alert(data.message || '차단되었습니다.');
+                btnEl.textContent = '차단됨';
             } else {
-                alert(data.error || '강퇴에 실패했습니다.');
+                const msg = data.error || data.detail || (typeof data === 'object' ? JSON.stringify(data) : String(data)) || `차단 실패 (${res.status})`;
+                console.warn('block_user 실패:', res.status, data);
+                alert(msg);
                 btnEl.disabled = false;
             }
         } catch (err) {
@@ -182,8 +193,10 @@ class ChatClient {
             if (event.code === 4001) {
                 this.updateStatus('인증 실패', 'error');
             } else if (event.code === 4000) {
-                // 강퇴됨
+                // 강퇴됨: 알림 후 다른 페이지로 이동
                 this.updateStatus('연결 종료됨', 'error');
+                alert('차단되어 채팅방에서 나가셨습니다.');
+                window.location.href = '/api/users/homepage/';
             } else {
                 this.updateStatus('연결 끊김', 'error');
                 // 5초 후 재연결 시도
@@ -230,6 +243,7 @@ class ChatClient {
     }
 
     sendMessage() {
+        if (!this.messageInput) return;
         const content = this.messageInput.value.trim();
 
         if (!content || !this.isAuthenticated) return;
@@ -240,6 +254,7 @@ class ChatClient {
     }
 
     displayMessage(msg) {
+        if (!this.messagesContainer) return;
         const messageEl = document.createElement('div');
         messageEl.classList.add('message');
 
@@ -264,6 +279,7 @@ class ChatClient {
     }
 
     displaySystemMessage(content) {
+        if (!this.messagesContainer) return;
         const messageEl = document.createElement('div');
         messageEl.classList.add('message', 'system');
         messageEl.textContent = content;
@@ -272,6 +288,7 @@ class ChatClient {
     }
 
     updateStatus(text, className) {
+        if (!this.statusEl) return;
         this.statusEl.textContent = text;
         this.statusEl.className = 'status';
         if (className) {
@@ -280,16 +297,18 @@ class ChatClient {
     }
 
     setInputEnabled(enabled) {
-        this.messageInput.disabled = !enabled;
-        this.sendBtn.disabled = !enabled;
+        if (this.messageInput) this.messageInput.disabled = !enabled;
+        if (this.sendBtn) this.sendBtn.disabled = !enabled;
 
-        if (enabled) {
+        if (enabled && this.messageInput) {
             this.messageInput.focus();
         }
     }
 
     scrollToBottom() {
-        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        if (this.messagesContainer) {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }
     }
 
     escapeHtml(text) {
@@ -300,10 +319,15 @@ class ChatClient {
 }
 
 // 페이지 로드 시 채팅 클라이언트 초기화
-document.addEventListener('DOMContentLoaded', () => {
+function initChatClient() {
     if (typeof CHAT_CONFIG !== 'undefined') {
         window.chatClient = new ChatClient(CHAT_CONFIG);
     } else {
         console.error('CHAT_CONFIG가 정의되지 않았습니다.');
     }
-});
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatClient);
+} else {
+    initChatClient();
+}

@@ -35,6 +35,7 @@ urlpatterns = [
     #차단 유저 관리
     path('blocked_users/',views.get_blocked_users,name="blocked_users"),
     path('api/blocked_users/',views.get_blocked_users_info,name="blocked_user_info"),
+    path('api/block_user/', views.block_user, name="block_user"),
 
     #홈페이지
     path('homepage/',views.get_home_page,name="homepage"),
@@ -46,4 +47,6 @@ urlpatterns = [
     #비밀번호 찾기
     path('check_password/',views.check_password,name="check_password"),
     path('verify-email-check/', views.verify_email_check, name='verify-email-check'),
+    path('change_password/',views.change_password_render,name="change_password"),
+    path('change_password/info/',views.change_password,name="change_password_info")
 ]

@@ -73,6 +73,7 @@ function logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     alert("로그아웃 되었습니다.");
+<<<<<<< HEAD
     window.location.href = "/api/users/login/";
 }
 
@@ -97,6 +98,9 @@ async function signout() {
     } catch (error) {
         console.error("오류 발생:", error);
     }
+=======
+    window.location.href = "/users/login/"; // 로그인 페이지로 이동
+>>>>>>> bf92e18fed94543b529bd4938cd76c898b926ce8
 }
 
 window.addEventListener('DOMContentLoaded', renderProfile);

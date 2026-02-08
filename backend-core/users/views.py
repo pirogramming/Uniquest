@@ -5,6 +5,7 @@ from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
+import uuid
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
@@ -103,15 +104,17 @@ def verify_email_check(request):
                 # 2. 메일 발송
                 try:
                     send_verification_email(email)
-                    # 디버깅: 인증번호 확인용 (배포 시 삭제)
-                    # print(f"DEBUG: {email} -> {cache.get(f'auth_{email}')}")
                 except Exception as e:
                     return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
 
-                #메일 전송 완료
+                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 email 저장, URL에는 토큰만 노출)
+                reset_token = str(uuid.uuid4())
+                cache.set(f"reset_token_{reset_token}", email, timeout=600)
+
                 return JsonResponse({
                     'message': f'{university} 메일로 인증번호를 보냈습니다.',
                     'university': university,
+                    'token': reset_token,
                 }, status=200)
 
             elif action == "check_number": #인증하기 버튼
@@ -119,13 +122,11 @@ def verify_email_check(request):
                 number = data.get('number')
                 university = extract_univ(email)
 
-                if verify_code(email,number):
-                    print('True')
+                if verify_code(email, number):
                     cache.set(f"university_info_{email}", university, timeout=600)
                     cache.set(f"varified_info_{email}", True, timeout=600)
-                    return JsonResponse({'is_varified': True,'email':email}, status=200)
+                    return JsonResponse({'is_varified': True, 'email': email}, status=200)
                 else:
-                    print('False')
                     return JsonResponse({'is_varified': False}, status=200)
 
         except json.JSONDecodeError:
@@ -315,10 +316,6 @@ def get_blocked_users_info(request):
         except User.DoesNotExist:
             return Response({"message":"대상유저가 없습니다"},status=404) 
 
-        
-            
-
-
 
 def get_blocked_users(request):
     return render(request,'users/blocked_users.html')
@@ -351,6 +348,45 @@ def get_homepage_info(request):
         "completed_count":completed_count
     })
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def block_user(request):
+    """
+    차단 = 1) 차단한 유저 목록에 추가  2) 해당 채팅방에서 강퇴
+    """
+    user = request.user
+    target_user_id = request.data.get('target_id')
+    room_id = request.data.get('room_id')
+
+    print(f"[DEBUG] block_user 호출 - target_id={target_user_id!r}, room_id={room_id!r}")
+
+    if not target_user_id:
+        return Response({'error': 'target_id가 필요합니다.'}, status=400)
+
+    try:
+        target_user = User.objects.get(id=target_user_id)
+    except User.DoesNotExist:
+        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
+
+    if target_user.id == user.id:
+        return Response({"error": '자신은 차단할 수 없습니다.'}, status=400)
+
+    # 1) 차단한 유저 목록에 추가
+    user.blocked_people.add(target_user)
+
+    # 2) 채팅방에서 강퇴 (Redis로 WebSocket 서버에 전달)
+    if room_id is not None and str(room_id).strip() != '':
+        room_id_str = str(room_id).strip()
+        target_id_int = int(target_user_id)
+        publish_chat_event(
+            room_id=room_id_str,
+            event_type="KICK",
+            data={"target_id": target_id_int}
+        )
+        print(f"[DEBUG] Redis Publish 완료 - channel=chat_{room_id_str}, target_id={target_id_int}")
+
+    return Response({'message': '차단되었습니다'}, status=200)
+    
 #회원 탈퇴
 
 @api_view(['DELETE'])
@@ -369,3 +405,38 @@ def signout(request):
     
 def check_password(request):
     return render(request,'users/check_password.html')
+
+# 비밀번호 갱신
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def change_password(request):
+    """비밀번호 찾기 후 재설정. 토큰은 check_password 인증 성공 시 캐시에 저장된 일회용 값."""
+    token = request.data.get('token')
+    password = request.data.get('password')
+
+    if not token or not password:
+        return Response(
+            {"error": "토큰과 새 비밀번호를 모두 입력해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    email = cache.get(f"reset_token_{token}")
+    if not email:
+        return Response(
+            {"error": "링크가 만료되었거나 유효하지 않습니다. 비밀번호 찾기를 다시 진행해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        target_user = User.objects.get(univ_email=email)
+        target_user.set_password(password)
+        target_user.save()
+        cache.delete(f"reset_token_{token}")
+        cache.delete(f"auth_{email}")
+        return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
+    
+def change_password_render(request):
+    return render(request,'users/change_password.html')

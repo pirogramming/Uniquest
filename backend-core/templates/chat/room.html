@@ -22,16 +22,14 @@
                 </div>
             </div>
 
-            <!-- 액션 버튼: 미션 수락 / 강퇴 -->
+            <!-- 액션 버튼: 미션 수락 / 차단 -->
             <div class="chat-actions" id="chatActions">
                 {% if can_accept %}
                 <button type="button" class="btn-accept" id="acceptMissionBtn">미션 수락</button>
                 {% endif %}
-                {% if is_author and kickable_users %}
-                {% for u in kickable_users %}
-                <button type="button" class="btn-kick" data-target-id="{{ u.id }}"
-                    data-nickname="{{ u.nickname|escapejs }}">강퇴: {{ u.nickname }}</button>
-                {% endfor %}
+                {% if blockable_user %}
+                <button type="button" class="btn-block" data-target-id="{{ blockable_user.id }}"
+                    data-nickname="{{ blockable_user.nickname|escapejs }}">차단: {{ blockable_user.nickname }}</button>
                 {% endif %}
             </div>
 
@@ -48,7 +46,7 @@
         </div>
     </div>
 
-    <!-- 채팅 설정 (Django에서 전달): room_id=채팅방 ID, mission_id=미션 ID(수락/강퇴 API용) -->
+    <!-- 채팅 설정 (Django에서 전달): room_id=채팅방 ID, mission_id=미션 ID(수락/차단 API용) -->
     <script>
         const CHAT_CONFIG = {
             roomId: "{{ room_id }}",
@@ -56,9 +54,10 @@
         userId: {{ request.user.id }},
         userNickname: "{{ request.user.nickname|escapejs }}",
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
-                canAccept: {{ can_accept|yesno:"true,false" }},
-        isAuthor: {{ is_author|yesno:"true,false" }},
-        kickableUsers: {{ kickable_users_json|safe }}
+                canAccept: {{ can_accept | yesno:"true,false" }},
+        isAuthor: {{ is_author | yesno:"true,false" }},
+        kickableUsers: [],
+            csrfToken: "{{ csrf_token }}"
         };
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>
