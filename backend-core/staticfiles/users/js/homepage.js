@@ -34,7 +34,7 @@ async function renderHomepage() {
 
         const quick_menu = document.getElementById('quick-menu');
         const mission_status_card = document.getElementById('mission-status-card');
-        if (quick_menu) quick_menu.style.display = 'block';
+        if (quick_menu) quick_menu.style.display = 'flex';
         if (mission_status_card) mission_status_card.style.display = 'block';
 
         if (userData && userData.id) {
