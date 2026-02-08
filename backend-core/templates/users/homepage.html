@@ -8,98 +8,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
-{% block extra_js %}{% endblock %}
-
 {% block content %}
-<header class="header">
-    <div class="header-top">
-        <div class="user-greeting">
-            <h1>안녕하세요,</h1>
-            <p id="nickname">{{ user.nickname|default:user.username }}님!</p>
-        </div>
-        <div class="notification">
-            <i class="fa-regular fa-bell"></i>
-            <span class="badge"></span>
-        </div>
-    </div>
-
-    <div class="quick-menu">
-        <a href="{% url 'missions:mission_list' %}">
-            <div class="menu-item">
-                <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                <span>미션 찾기</span>
-            </div>
-        </a>
-        <a href="{% url 'missions:mission_create_view' %}">
-            <div class="menu-item">
-                <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
-                <span>미션 등록</span>
-            </div>
-        </a>
-        <div class="menu-item">
-            <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
-            <span>채팅</span>
-        </div>
-    </div>
-</header>
-
-<section class="mission-status-card">
-    <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
-    <div class="status-grid">
-        <div class="status-item">
-            <span class="count highlight-blue" id="matched">{{ ongoing_count|default:0 }}</span>
-            <span class="label">진행중</span>
-        </div>
-        <div class="status-item">
-            <span class="count highlight-yellow" id="waiting">{{ waiting_count|default:0 }}</span>
-            <span class="label">대기중</span>
-        </div>
-        <div class="status-item">
-            <span class="count" id="completed">{{ completed_count|default:0 }}</span>
-            <span class="label">완료</span>
-        </div>
-    </div>
-</section>
-
-<section class="mission-list-section">
-    <div class="section-title">
-        <h2>진행 중인 미션</h2>
-        <a href="{% url 'missions:mission_list' %}" class="view-all">전체보기</a>
-    </div>
+<div class="mobile-container has-nav">
     
-    <div id="mission_cards">
-        {% for mission in missions %}
-        <a href="{% url 'missions:mission_detail' mission.id %}" class="mission-card-link">
-            <div class="mission-card">
-                <div class="card-header">
-                    <h3 class="title">{{ mission.title }}</h3>
-                    <span class="tag-status {{ mission.status|lower }}">
-                        {{ mission.get_status_display }}
-                    </span>
-                </div>
-                <p class="description">{{ mission.descriptions|truncatechars:60 }}</p>
-                <div class="card-footer">
-                    <div class="info">
-                        <span class="tag-category category-{{ mission.category|lower }}">
-                            {{ mission.get_category_display }}
-                        </span>
-                        <span class="location">{{ mission.location_name|default:"장소 미정" }}</span>
-                    </div>
-                    <span class="price">{{ mission.reward }}원</span>
-                </div>
+    <header class="header">
+        <div class="header-top">
+            <div class="user-greeting">
+                <h1>안녕하세요,</h1>
+                <p id="nickname">{{ user.nickname|default:user.username }}님!</p>
             </div>
-        </a>
-        {% empty %}
-        <div class="empty-box" style="text-align: center; padding: 40px; color: #98A2B3;">
-            <p>현재 등록된 미션이 없습니다.</p>
+            <div class="notification">
+                <i class="fa-regular fa-bell"></i>
+                <span class="badge"></span>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-</section>
-{% endblock %}
 
-{% block bottom_nav %}
-    {% include "_bottom-nav.html" %}
+        <div class="quick-menu">
+            <a href="{% url 'missions:mission_list' %}">
+                <div class="menu-item">
+                    <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <span>미션 찾기</span>
+                </div>
+            </a>
+            <a href="{% url 'missions:mission_create_view' %}">
+                <div class="menu-item">
+                    <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
+                    <span>미션 등록</span>
+                </div>
+            </a>
+            <div class="menu-item">
+                <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
+                <span>채팅</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="mission-status-card">
+        <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
+        <div class="status-grid">
+            <div class="status-item">
+                <span class="count highlight-blue" id="matched">{{ ongoing_count|default:0 }}</span>
+                <span class="label">진행중</span>
+            </div>
+            <div class="status-item">
+                <span class="count highlight-yellow" id="waiting">{{ waiting_count|default:0 }}</span>
+                <span class="label">대기중</span>
+            </div>
+            <div class="status-item">
+                <span class="count" id="completed">{{ completed_count|default:0 }}</span>
+                <span class="label">완료</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="mission-list-section">
+        <div class="section-title">
+            <h2>진행 중인 미션</h2>
+            <a href="{% url 'missions:mission_list' %}" class="view-all">전체보기</a>
+        </div>
+        
+        <div id="mission_cards">
+            {% for mission in missions %}
+            <a href="{% url 'missions:mission_detail' mission.id %}" class="mission-card-link">
+                <div class="mission-card">
+                    <div class="card-header">
+                        <h3 class="title">{{ mission.title }}</h3>
+                        <span class="tag-status {{ mission.status|lower }}">
+                            {{ mission.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="description">{{ mission.descriptions|truncatechars:60 }}</p>
+                    <div class="card-footer">
+                        <div class="info">
+                            <span class="tag-category category-{{ mission.category|lower }}">
+                                {{ mission.get_category_display }}
+                            </span>
+                            <span class="location">{{ mission.location_name|default:"장소 미정" }}</span>
+                        </div>
+                        <span class="price">{{ mission.reward }}원</span>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-box" style="text-align: center; padding: 40px; color: #98A2B3;">
+                <p>현재 등록된 미션이 없습니다.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {% block bottom_nav_internal %}
+        {% include "_bottom-nav.html" %}
+    {% endblock %}
+
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
