@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import transaction, models
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -19,6 +20,8 @@ from .serializers import MissionSerializer
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
 from common.utils import publish_chat_event
+from common.utils import publish_mission_update  # ✨ 추가
+
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +103,12 @@ def mission_create(request):
             images = request.FILES.getlist("images")
             for f in images:
                 if f: MissionImage.objects.create(mission=mission, image=f)
+
+            publish_mission_update({
+                "action": "CREATE",
+                "mission_id": mission.id,
+                "data": MissionSerializer(mission).data
+            })
 
             return Response({"success": True, "mission_id": mission.id}, status=status.HTTP_201_CREATED)
         except Exception:
@@ -201,6 +210,41 @@ def tag_suggest(request):
     data = [{"id": t.id, "name": t.name, "display": f"#{t.name}", "slug": t.slug} for t in qs]
     return Response({"results": data})
 
+# views.py에 추가할 부분 (mission_accept 함수 바로 위에 추가하세요)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def mission_delete(request, mission_id):
+    """미션 삭제 API - 작성자만 삭제 가능"""
+    mission = get_object_or_404(Mission, id=mission_id)
+    
+    # 작성자만 삭제 가능
+    if mission.author != request.user:
+        return Response({"error": "작성자만 삭제할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # SSE로 삭제 알림 (삭제 전에 먼저 발행)
+        publish_mission_update({
+            "action": "DELETE",
+            "mission_id": mission.id
+        })
+        
+        # 미션 삭제 (연관된 MissionImage, MissionTag도 CASCADE로 자동 삭제됨)
+        mission.delete()
+        
+        return Response({
+            "success": True,
+            "message": "미션이 삭제되었습니다."
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.exception("미션 삭제 중 오류 발생")
+        return Response({
+            "error": "미션 삭제 중 오류가 발생했습니다."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @transaction.atomic
@@ -270,18 +314,36 @@ def kick_from_chat_room(request: HttpRequest, mission_id: int) -> JsonResponse:
     return JsonResponse({"success": True, "message": "강퇴되었습니다."})
 
 
+def _is_blocked_between(user_a, user_b) -> bool:
+    """두 유저 중 한 명이라도 상대를 차단했으면 True"""
+    if not user_a or not user_b:
+        return False
+    return (
+        user_a.blocked_people.filter(id=user_b.id).exists()
+        or user_b.blocked_people.filter(id=user_a.id).exists()
+    )
+
+
 @login_required
 def start_chat(request: HttpRequest, mission_id: int) -> HttpResponse:
     """
     "채팅하기" 클릭 시: 채팅방 생성 또는 기존 방으로 이동.
     - 비작성자: 작성자와의 1:1 방 생성 후 채팅방으로 리다이렉트.
     - 작성자: 이 미션의 첫 채팅방으로 이동 (없으면 미션 상세로).
+    - 차단 관계가 있으면 채팅 불가.
     """
     mission = get_object_or_404(
         Mission.objects.select_related("author"),
         id=mission_id,
     )
     author = mission.author
+
+    # 차단 관계 확인: 서로 차단한 유저끼리는 채팅 불가
+    if _is_blocked_between(request.user, author):
+        from django.contrib import messages
+        messages.error(request, "차단된 사용자와는 채팅할 수 없습니다.")
+        return redirect("missions:mission_detail", mission_id=mission_id)
+
     if author == request.user:
         # 작성자: 이 미션에서 내가 참여한 첫 채팅방으로
         room = (
@@ -293,6 +355,12 @@ def start_chat(request: HttpRequest, mission_id: int) -> HttpResponse:
         if not room:
             from django.contrib import messages
             messages.info(request, "아직 채팅방이 없습니다. 다른 사용자가 채팅을 시작하면 표시됩니다.")
+            return redirect("missions:mission_detail", mission_id=mission_id)
+        # 작성자가 들어가는 방의 상대방과도 차단 확인
+        other = room.user2 if room.user1 == request.user else room.user1
+        if _is_blocked_between(request.user, other):
+            from django.contrib import messages
+            messages.error(request, "차단된 사용자와는 채팅할 수 없습니다.")
             return redirect("missions:mission_detail", mission_id=mission_id)
         return redirect("missions:chat_room", mission_id=mission_id, room_id=room.id)
 
@@ -307,9 +375,11 @@ def start_chat(request: HttpRequest, mission_id: int) -> HttpResponse:
 
 
 @login_required
+@ensure_csrf_cookie
 def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpResponse:
     """
     채팅방 페이지. room_id(채팅방 ID) 기준으로 입장.
+    차단 관계가 있으면 접근 불가.
     """
     room = get_object_or_404(
         ChatRoom.objects.select_related("mission", "mission__author", "mission__helper", "user1", "user2"),
@@ -319,12 +389,16 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
     if request.user not in (room.user1, room.user2):
         raise PermissionDenied("이 채팅방에 접근할 권한이 없습니다.")
 
+    other_user = room.user2 if room.user1 == request.user else room.user1
+    if _is_blocked_between(request.user, other_user):
+        from django.contrib import messages
+        messages.error(request, "차단된 사용자와는 채팅할 수 없습니다.")
+        return redirect("missions:mission_detail", mission_id=mission_id)
+
     mission = room.mission
     is_author = request.user == mission.author
     can_accept = not is_author and mission.status == "WAITING"
-    kickable_users = []
-    if is_author and mission.helper and mission.helper != request.user:
-        kickable_users.append({"id": mission.helper.id, "nickname": mission.helper.nickname})
+    blockable_user = {"id": other_user.id, "nickname": other_user.nickname} if other_user else None
 
     return render(
         request,
@@ -336,7 +410,31 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "mission_id": mission.id,
             "is_author": is_author,
             "can_accept": can_accept,
-            "kickable_users": kickable_users,
-            "kickable_users_json": json.dumps(kickable_users),
+            "blockable_user": blockable_user,
         },
+    )
+
+@login_required
+def chat_list(request: HttpRequest) -> HttpResponse:
+    """내가 참여한 채팅방 목록 (차단된 유저 제외)"""
+    rooms = (
+        ChatRoom.objects
+        .filter(models.Q(user1=request.user) | models.Q(user2=request.user))
+        .select_related("mission", "mission__author", "user1", "user2")
+        .order_by("-created_at")
+    )
+    room_list = []
+    for room in rooms:
+        other = room.user2 if room.user1 == request.user else room.user1
+        if _is_blocked_between(request.user, other):
+            continue
+        room_list.append({
+            "room": room,
+            "other_user": other,
+            "mission": room.mission,
+        })
+    return render(
+        request,
+        "chat/list.html",
+        {"room_list": room_list},
     )

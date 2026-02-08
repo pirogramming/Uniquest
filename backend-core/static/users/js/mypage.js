@@ -1,5 +1,4 @@
 async function getUserData() {
-    // 1. 금고(로컬스토리지)에서 토큰 꺼내기
     const token = localStorage.getItem('access_token');
     
     if (!token) {
@@ -8,11 +7,10 @@ async function getUserData() {
     }
 
     try {
-        // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/api/users/api/profile/', { // 팀장님의 API 주소
+        const response = await fetch('/api/users/api/profile/', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
@@ -23,8 +21,6 @@ async function getUserData() {
             return userData;
         } else {
             console.error("토큰이 만료되었거나 유효하지 않습니다.");
-            alert('노 토큰')
-            // window.location.href = '/api/users/login/';
             return null;
         }
     } catch (error) {
@@ -37,16 +33,16 @@ async function renderProfile() {
     const user = await getUserData();
     
     if (user) {
-        const my_missions = user.missions
-        const blockers = user.blocked_people
+        const my_missions = user.missions;
+        const blockers = user.blocked_people;
 
         const nicknameElement = document.getElementById('user-nickname');
         const univElement = document.getElementById('user-univ');
-        const mannerScore = document.getElementById('user-score');
+        const mannerScore = document.getElementById('user-score'); // 점수 텍스트
         const register_missions = document.getElementById('my-registered-missions');
         const performed_missions = document.getElementById('my-performed-missions');
 
-
+        // 1. 기본 정보 반영
         if (nicknameElement) nicknameElement.innerText = user.nickname;
         if (univElement) univElement.innerText = user.university;
         if (mannerScore) mannerScore.innerText = user.manner_score;
@@ -113,34 +109,46 @@ async function renderProfile() {
         // console.log('나의 미션들',my_missions)
         // console.log('블락 인원들',blockers)
 
-    } else {
-        // 토큰이 없거나 문제가 있다면 로그인 페이지로 보낼 수도 있습니다.
-        // window.location.href = '/users/login/';
+        // 2. 점수 텍스트 및 막대 그래프 업데이트 [핵심 수정 부분]
+        if (mannerScore) {
+            // 서버 점수를 반영 (예: 85점)
+            mannerScore.innerText = `${user.manner_score}점`; 
+
+            // 막대 그래프 너비(width)를 점수와 동일하게 설정
+            const scoreBar = document.querySelector('.score-bar-fill');
+            if (scoreBar) {
+                scoreBar.style.width = `${user.manner_score}%`;
+            }
+        }
+
+        // 차단 관리/미션 리스트 로직 (필요 시 수정)
+        if (register_missions) {
+            register_missions.innerHTML = ""; // 초기화
+            blockers.forEach(({id, nickname}) => {
+                register_missions.innerHTML += `<div>${id} : ${nickname}</div>`;
+            });
+        }
+
     }
 }
 
-function logout() { // 로그아웃 로직
+function logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     alert("로그아웃 되었습니다.");
-    window.location.href = "/api/users/login/"; // 로그인 페이지로 이동
+    window.location.href = "/api/users/login/";
 }
 
 
 async function signout() {
     const token = localStorage.getItem('access_token');
-    
-    if (!token) {
-        console.warn("로그인 토큰이 없습니다.");
-        return null;
-    }
+    if (!token) return;
 
     try {
-        // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const res = await fetch('/api/users/api/signout/', { // 팀장님의 API 주소
+        const res = await fetch('/api/users/api/signout/', {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
@@ -158,12 +166,8 @@ async function signout() {
             return null;
         }
     } catch (error) {
-        console.error("네트워크 오류 발생:", error);
-        return null;
+        console.error("오류 발생:", error);
     }
-
 }
 
-// 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);
-//ㅗㅑ

@@ -43,11 +43,14 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await websocket.close(code=4001)
             return
         
-        user_id = payload.get("user_id")
+        # SimpleJWT: user_id (또는 sub) → 항상 int로 저장 (타입 불일치 방지)
+        raw_id = payload.get("user_id") or payload.get("sub") or payload.get("id")
+        user_id = int(raw_id) if raw_id is not None else None
         if not user_id:
+            print(f"[DEBUG] JWT payload에 user_id 없음. payload keys={list(payload.keys())}")
             await websocket.close(code=4001)
             return
-            
+
     except asyncio.TimeoutError:
         await websocket.send_text(json.dumps({
             "type": "ERROR",
@@ -65,7 +68,9 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
         "content": "인증 성공",
         "user_id": user_id
     }))
-    
+
+    print(f"[DEBUG] WebSocket connect - room_id={room_id!r}, user_id={user_id!r}")
+
     await chat_manager.connect(websocket, room_id, user_id)
     
     # 입장 알림

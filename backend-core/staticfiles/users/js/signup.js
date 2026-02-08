@@ -14,10 +14,7 @@ function getCookie(name) {
 }
 
 async function handleSignup() {
-    if (document.getElementById('password').value !== document.getElementById('password_check').value) {
-        document.getElementById('password_check').value = "";
-        document.getElementById('password_check').focus();
-        alert('비밀번호 불일치')
+    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)) {
         return
     }
 
@@ -54,13 +51,19 @@ async function handleSignup() {
 }
 
 async function send_number() {
+    const send = document.getElementById('send-btn')
     const email = document.getElementById('email').value
+    const transmitting = document.getElementById('transmitting')
     const csrftoken = getCookie('csrftoken')
 
     if (!email) {
         alert("이메일을 입력해주세요!")
         return
     }
+
+    // 전송중 버튼 띄우기
+    send.style.display = 'none'
+    transmitting.style.display = 'block'
 
     const response = await fetch('/api/users/verify-email/', {
         method: 'POST',
@@ -79,6 +82,9 @@ async function send_number() {
         document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
         startTimer(300);
         alert(data.message + data.university);
+        send.style.display = 'block'
+        send.innerText = '인증번호 재발송'
+        transmitting.style.display = 'none'
     } else {
         const data = await response.json();
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
@@ -149,4 +155,20 @@ function startTimer(seconds) {
             display.style.color = "red";
         }
     }, 1000);
+}
+
+function checkPassword(password,confirmPassword){
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+    alert("비밀번호는 8자 이상이며, 영문과 숫자를 포함해야 합니다.");
+    return false
+    }
+
+    if (password !== confirmPassword) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return false
+    }
+
+    return true
 }

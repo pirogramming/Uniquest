@@ -13,17 +13,35 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function handleSignup() {
-    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)) {
-        return
+function getResetToken() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('token') || '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!getResetToken()) {
+        alert('유효한 링크가 아닙니다. 비밀번호 찾기부터 진행해주세요.');
+        window.location.href = '/api/users/check_password/';
     }
-    console.log('uyyy')
+});
+
+async function handleSignup() {
+    if (!checkPassword(document.getElementById('password').value, document.getElementById('password_check').value)) {
+        return;
+    }
+
+    const token = getResetToken();
+    if (!token) {
+        alert('유효한 링크가 아닙니다. 비밀번호 찾기부터 다시 진행해주세요.');
+        window.location.href = '/api/users/check_password/';
+        return;
+    }
 
     const csrftoken = getCookie('csrftoken');
-
     const changeData = {
+        token: token,
         password: document.getElementById('password').value,
-    }
+    };
 
     const response = await fetch('/api/users/change_password/info/', {
         method: 'PATCH',
@@ -36,11 +54,11 @@ async function handleSignup() {
 
     if (response.ok) {
         alert("비밀번호 변경 성공!");
-        window.location.href = "/api/users/login/"; // 가입 후 로그인 페이지로 이동
+        window.location.href = "/api/users/login/";
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);
-        alert("변경 실패 ㅠㅠ: " + JSON.stringify(errorData));
+        alert("변경 실패: " + (errorData.error || JSON.stringify(errorData)));
     }
 }
 

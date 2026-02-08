@@ -1,0 +1,327 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 및 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa; /* 화면 외부 배경 */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 450px;
+    min-height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 120px; /* 하단 고정 버튼을 위한 여백 */
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* 2. 상단 헤더 */
+.top-header {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #F2F4F7;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 12px; 
+}
+
+.back-btn {
+    font-size: 24px;
+    text-decoration: none;
+    color: #344054;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #101828;
+    margin: 0; 
+}
+
+.edit-icon-link {
+    margin-left: auto; 
+}
+
+.edit-icon-link img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+/* 3. 지도 및 이미지 영역 */
+.visual-section {
+    width: 100%;
+    height: 220px;
+    background-color: #F2F4F7;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.map-overlay-info {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+/* 4. 미션 본문 콘텐츠 */
+.detail-main {
+    padding: 25px;
+}
+
+.status-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* ----------------------------------------------------------------
+   [수정된 내용] 상태 배지 스타일 (대기중, 진행중, 완료)
+------------------------------------------------------------------- */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* 1. 대기중 (Waiting) - 주황색 테마 */
+.status-badge.waiting, .status-badge.WAITING {
+    background-color: #FFF4ED !important;
+    color: #FB923C !important;
+}
+
+/* 2. 진행중 (Ongoing) - 파란색 테마 */
+.status-badge.ongoing, .status-badge.ONGOING {
+    background-color: #EFF8FF !important;
+    color: #57A6FF !important;
+}
+
+/* 3. 완료 (Completed) - 회색 테마 */
+.status-badge.completed, .status-badge.COMPLETED {
+    background-color: #F2F4F7 !important;
+    color: #667085 !important;
+}
+
+.price-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #57A6FF;
+}
+
+.mission-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1D2939;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.mission-desc {
+    font-size: 15px;
+    color: #475467;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    word-break: break-all;
+}
+
+/* 5. 상세 정보 리스트 */
+.meta-info-list {
+    border-top: 1px solid #F2F4F7;
+    padding-top: 20px;
+    margin-bottom: 25px;
+}
+
+.meta-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.meta-label {
+    font-size: 14px;
+    color: #667085;
+}
+
+.meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #344054;
+}
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 30px;
+}
+
+.tag-pill {
+    font-size: 13px;
+    color: #667085;
+    background: #F2F4F7;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
+/* 6. 등록자 프로필 카드 */
+.author-card {
+    background-color: #F9FAFB;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.author-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #667085;
+    margin-bottom: 15px;
+}
+
+.author-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-img img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #57A6FF;
+    object-fit: cover;
+}
+
+.author-text {
+    flex: 1;
+}
+
+.author-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1D2939;
+}
+
+.author-score {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 2px;
+}
+
+.author-score span {
+    color: #57A6FF;
+    font-weight: 600;
+}
+
+.view-profile {
+    font-size: 12px;
+    color: #57A6FF;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* 7. 하단 액션 버튼 영역 */
+.bottom-action {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 50px);
+    max-width: 400px;
+    z-index: 1000;
+}
+
+.bottom-action .muted {
+    text-align: center;
+    font-size: 14px;
+    color: #98A2B3;
+    padding: 15px;
+    background: #F9FAFB;
+    border-radius: 12px;
+}
+
+.bottom-action .btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.btn-edit-style {
+    background-color: #ffffff;
+    border: 1.5px solid #57A6FF;
+    color: #57A6FF;
+}
+
+.btn-edit-style:active {
+    background-color: #F2F8FF;
+}
+
+.btn-chat-style {
+    background-color: #57A6FF;
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(87, 166, 255, 0.3);
+}
+
+.btn-chat-style:active {
+    background-color: #4A90E2;
+    transform: translateY(1px);
+}
+
+.btn-chat-style::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+}

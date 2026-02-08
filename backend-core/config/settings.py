@@ -173,10 +173,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
 
-# collectstatic 결과물 디렉터리 (소스인 static/와 달라야 함. nginx는 이 경로 서빙)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -197,6 +199,10 @@ SIMPLE_JWT = {
 }
 
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_DB = int(os.getenv('REDIS_DB', 0))
 
 # 개발 중에만 True로 설정
 CORS_ALLOW_ALL_ORIGINS = True

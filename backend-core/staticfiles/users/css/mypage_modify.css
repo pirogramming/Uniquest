@@ -41,7 +41,7 @@ h2 {
 .image-circle {
     width: 110px;
     height: 110px;
-    background-color: #7fb5ff;
+    background-color: #4DA6FF;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -55,7 +55,7 @@ h2 {
 .img-change-btn {
     background: none;
     border: none;
-    color: #4a90e2;
+    color: #4DA6FF;
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -89,7 +89,7 @@ h2 {
 
 .input-group input:focus {
     outline: none;
-    border-color: #7fb5ff;
+    border-color: #4DA6FF;
 }
 
 /* 수정 불가 영역 (p 태그 박스화) */
@@ -128,7 +128,7 @@ h2 {
 .save-btn {
     width: 100%;
     height: 56px;
-    background-color: #7fb5ff;
+    background-color: #4DA6FF;
     color: white;
     border: none;
     border-radius: 16px;

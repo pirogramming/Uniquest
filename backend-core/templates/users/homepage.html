@@ -1,110 +1,78 @@
-{%extends "base.html"%}
-{%load static%}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}Uniquest{% endblock %}
 
-{%block extra_css %}
-    <link rel="stylesheet" href="{%static 'users/css/homepage.css'%}">
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
-{%block extra_js %}{% endblock %}
-
 {% block content %}
 <header class="header">
-            <div class="header-top" id="header-top">
-                <div class="user-greeting">
-                    <h1>안녕하세요,</h1>
-                    <p id="nickname"></p>
-                </div>
-                <div class="notification">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="badge"></span>
-                </div>
-            </div>
+    <div class="header-top" id="header-top">
+        <div class="user-greeting">
+            <h1>안녕하세요,</h1>
+            <p id="nickname"></p>
+        </div>
+        <div class="notification">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge"></span>
+        </div>
+    </div>
 
-            <div class="quick-menu" id="quick-menu">
-                <a href={%url 'missions:mission_list' %}>
-                    <div class="menu-item">
-                        <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span>미션 찾기</span>
-                    </div>
-                </a>
-                <a href={%url 'missions:mission_create_view' %}>
-                    <div class="menu-item">
-                        <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
-                        <span>미션 등록</span>
-                    </div>
-                </a>
-                <div class="menu-item">
-                    <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
-                    <span>채팅</span>
-                </div>
+    <div class="quick-menu" id="quick-menu">
+        <a href="{% url 'missions:mission_list' %}">
+            <div class="menu-item">
+                <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <span>미션 찾기</span>
             </div>
-        </header>
+        </a>
+        <a href="{% url 'missions:mission_create_view' %}">
+            <div class="menu-item">
+                <div class="icon-box"><i class="fa-solid fa-plus"></i></div>
+                <span>미션 등록</span>
+            </div>
+        </a>
+        <div class="menu-item">
+            <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
+            <span>채팅</span>
+        </div>
+    </div>
+</header>
 
-        <section class="mission-status-card" id="mission-status-card">
-            <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
-            <div class="status-grid">
-                <div class="status-item">
-                    <span class="count highlight-blue" id="matched">0</span>
-                    <span class="label">진행중</span>
-                </div>
-                <div class="status-item">
-                    <span class="count highlight-yellow" id="waiting">0</span>
-                    <span class="label">대기중</span>
-                </div>
-                <div class="status-item">
-                    <span class="count" id="completed">0</span>
-                    <span class="label">완료</span>
-                </div>
-            </div>
-        </section>
+<section class="mission-status-card" id="mission-status-card">
+    <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
+    <div class="status-grid">
+        <div class="status-item">
+            <span class="count highlight-blue" id="matched">0</span>
+            <span class="label">진행중</span>
+        </div>
+        <div class="status-item">
+            <span class="count highlight-yellow" id="waiting">0</span>
+            <span class="label">대기중</span>
+        </div>
+        <div class="status-item">
+            <span class="count" id="completed">0</span>
+            <span class="label">완료</span>
+        </div>
+    </div>
+</section>
 
-        <section class="mission-list-section" id="mission-list-section">
-            <div class="section-title">
-                <h2>진행 중인 미션</h2>
-                <a href="{% url 'missions:mission_list'%}" class="view-all">전체보기</a>
-            </div>
-            <div id="mission_cards">
-                <div class="mission-card">
-                    <div class="card-header">
-                        <h3 class="title">점심 배달 대신 받아주실 분</h3>
-                        <span class="tag-status">진행중</span>
-                    </div>
-                    <p class="description">12시 30분경 학생회관 앞에서 배달 받아주세요. 제가 수업 중이라 직접 못 받습니다.</p>
-                    <div class="card-footer">
-                        <div class="info">
-                            <span class="tag-category category-delivery">배달</span>
-                            <span class="location">학생회관 앞</span>
-                        </div>
-                        <span class="price">5,000원</span>
-                    </div>
-                </div>
-
-                <div class="mission-card">
-                    <div class="card-header">
-                        <h3 class="title">과제 도움 구합니다</h3>
-                        <span class="tag-status">진행중</span>
-                    </div>
-                    <p class="description">파이썬 기초 과제 도와주실 분 구해요. 1시간 정도 소요될 것 같습니다.</p>
-                    <div class="card-footer">
-                        <div class="info">
-                            <span class="tag-category category-task">과제도움</span>
-                            <span class="location">중앙도서관</span>
-                        </div>
-                        <span class="price">15,000원</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+<section class="mission-list-section" id="mission-list-section">
+    <div class="section-title">
+        <h2>진행 중인 미션</h2>
+        <a href="{% url 'missions:mission_list' %}" class="view-all">전체보기</a>
+    </div>
+    <div id="mission_cards"></div>
+</section>
 {% endblock %}
 
-{%block bottom_nav %}
+{% block bottom_nav %}
     {% include "_bottom-nav.html" %}
 {% endblock %}
 
-{%block extra_scripts %}
-    <script src="{% static 'users/js/auth_helper.js' %}"></script>
-    <script src="{%static 'users/js/homepage.js'%}"></script>
+{% block extra_scripts %}
+<script src="{% static 'users/js/auth_helper.js' %}"></script>
+<script src="{% static 'users/js/homepage.js' %}"></script>
 {% endblock %}

@@ -1,78 +1,83 @@
-{%extends "base.html"%}
-{%load static%}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}마이페이지{% endblock %}
 
-{%block extra_css %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/mypage.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
-{%block extra_js %}{% endblock %}
+
+{% block extra_js %}{% endblock %}
 
 {% block content %}
-<header class="profile-card">
-            <div class="header-top">
-                <span>마이페이지</span>
-                <img src="{% static 'users/img/settings.svg' %}" alt="설정" class="settings-icon">
+<div class="mobile-container has-nav">
+    
+    <header class="profile-card">
+        <div class="header-top">
+            <span>마이페이지</span>
+            <img src="{% static 'users/img/settings.svg' %}" alt="설정" class="settings-icon">
+        </div>
+        
+        <div class="user-info-section">
+            <div class="profile-circle">연</div>
+            <div class="text-info">
+                <h2 id="user-nickname"></h2>
+                <p id="user-univ"></p>
             </div>
-            
-            <div class="user-info-section">
-                <div class="profile-circle">연</div>
-                <div class="text-info">
-                    <h2 id="user-nickname"></h2>
-                    <p id="user-univ"></p>
-                </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-header">
+                <span>유니퀘스트 점수</span>
+                <span id="user-score">85점</span>
             </div>
-
-            <div class="score-section">
-                <div class="score-header">
-                    <span>🌡️ 신뢰 온도</span>
-                    <span id="user-score">36.9°C</span>
-                </div>
-                <div class="score-bar-bg">
-                    <div class="score-bar-fill" style="width: 36.9%;"></div>
-                </div>
-                <p class="score-desc">신뢰 온도는 미션 완료와 평가에 따라 변동됩니다</p>
+            <div class="score-bar-bg">
+                <div class="score-bar-fill" style="width: 85%;"></div>
             </div>
-        </header>
+            <p class="score-desc">유니퀘스트 점수는 미션 완료와 평가에 따라 변동됩니다</p>
+        </div>
+    </header>
 
-        <main class="menu-section">
-            <div class="menu-item" onclick="location.href='/api/users/mypage_modify/'">
-                <div class="menu-left">📝 프로필 수정</div>
-                <div class="menu-arrow">→</div>
+    <main class="menu-section">
+        <div class="menu-item" onclick="location.href='/api/users/mypage_modify/'">
+            <div class="menu-left">📝 프로필 수정</div>
+            <div class="menu-arrow">→</div>
+        </div>
+        <a href="/api/users/blocked_users/" class="menu-item">
+            <div class="menu-left">🛡️ 차단 관리</div>
+            <div class="menu-arrow">→</div>
+        </a>
+
+        <section class="mission-list-group">
+            <h3>내가 등록한 미션</h3>
+            <div id="my-registered-missions" class="empty-box">
+                등록한 미션이 없습니다
             </div>
-            <a href="/api/users/blocked_users/" class="menu-item">
-                <div class="menu-left">🛡️ 차단 관리</div>
-                <div class="menu-arrow">→</div>
-            </a>
+        </section>
 
-            <section class="mission-list-group">
-                <h3>내가 등록한 미션</h3>
-                <div id="my-registered-missions" class="empty-box">
-                    등록한 미션이 없습니다
-                </div>
-            </section>
+        <section class="mission-list-group">
+            <h3>내가 수행한 미션</h3>
+            <div id="my-performed-missions" class="empty-box">
+                수행한 미션이 없습니다
+            </div>
+        </section>
 
-            <section class="mission-list-group">
-                <h3>내가 수행한 미션</h3>
-                <div id="my-performed-missions" class="empty-box">
-                    수행한 미션이 없습니다
-                </div>
-            </section>
+        <button class="logout-btn" onclick="logout()">
+            <p>로그아웃</p>
+        </button>
+        <button class="signout-btn" onclick="signout()">
+            <p>회원탈퇴</p>
+        </button>
+    </main>
 
-            <button class="logout-btn" onclick="logout()">
-                <p>로그아웃</p>
-            </button>
-            <button class="signout-btn" onclick="signout()">
-                <p>회원탈퇴</p>
-            </button>
-        </main>
-{% endblock %}
-
-{%block bottom_nav %}
     {% include "_bottom-nav.html" %}
+
+</div>
 {% endblock %}
 
-{%block extra_scripts %}
+{% block extra_scripts %}
     <script src="{% static 'users/js/auth_helper.js' %}"></script>
     <script src="{% static 'users/js/mypage.js' %}"></script>
 {% endblock %}

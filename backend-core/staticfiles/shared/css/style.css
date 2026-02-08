@@ -1,75 +1,157 @@
+@charset "UTF-8";
+
+/* 1. 기본 초기화 및 폰트 설정 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Pretendard', sans-serif;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 
-a{
-    color:white;
+a {
     text-decoration: none;
+    color: inherit; /* 링크 색상이 튀지 않도록 부모색 추종 */
 }
 
+/* 2. 배경 설정 및 화면 중앙 배치 */
 body {
-    background-color: #f5f5f5;
+    background-color: #f8f9fa; /* 화면 바깥쪽 연회색 */
+    margin: 0;
     display: flex;
     justify-content: center;
+    align-items: center; /* 세로 중앙 정렬 */
+    min-height: 100vh;
+    color: #1D2939;
 }
 
-
-.mobile-container {
+/* 3. 전체 모바일 화면 (Wrapper) 
+   - 홈화면의 mobile-container와 로그인 wrapper를 통합 */
+.signup-wrapper, .mobile-container {
     width: 100%;
-    max-width: 450px;
-    background-color: #fcfcfc;
+    max-width: 450px; /* 시안 표준 폭 */
     min-height: 100vh;
-    padding-bottom: 80px;
-    position: relative;
+    background-color: #ffffff; /* 모바일 영역 내부 흰색 */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    position: relative; /* 하단 네비게이션 고정 기준점 */
     box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
+/* 4. 내부 컨텐츠 영역 (Container) */
+.signup-container, .content-container {
+    padding: 20px 25px; /* 시안 표준 좌우 여백 */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1; /* 하단 네비게이션이 밀리지 않게 공간 확보 */
+}
 
+/* 하단 네비게이션이 있는 페이지 전용 여백 */
+.has-nav {
+    padding-bottom: 90px; 
+}
 
-/* Bottom Nav */
+/* ----------------------------------------------------------------
+    하단 네비게이션 바 (아이콘 규격 통일 및 상태별 색상 반영)
+------------------------------------------------------------------- */
 .bottom-nav {
-    position: absolute;
-    bottom: 0; width: 100%;
-    height: 70px;
-    background: var(--white);
+    /* [포지션] 바닥 밀착 및 중앙 정렬 */
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* [규격] 모바일 표준 가로폭 */
+    width: 100%;
+    max-width: 450px;
+    height: 70px; /* 시안 표준 높이 */
+    
+    /* [디자인] */
+    background: #ffffff;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #F2F4F7;
+    z-index: 1000;
 }
 
+/* 1. 기본 아이콘 스타일 (비활성: #99A1AF) */
 .nav-item {
-    text-align: center;
-    color: #bbb;
-    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    flex: 1;
+    color: #99A1AF; /* 요청하신 기본 회색 */
+    transition: color 0.2s ease;
+    height: 100%;
 }
 
-.nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
-.nav-item.active { color: var(--primary-blue); }
+/* [핵심] 모든 아이콘 크기 24px로 통일 */
+.nav-item i {
+    font-size: 24px; 
+    display: block;
+}
 
-.nav-fab .fab-button {
-    width: 55px; height: 55px;
-    background: var(--primary-blue);
+/* 2. 활성화된 상태 스타일 (파란색: #4DA6FF) */
+.nav-item.active {
+    color: #4DA6FF !important; /* 요청하신 활성 파란색 */
+}
+
+/* 3. 중앙 + 버튼 (FAB) - 입체감 및 규격 조정 */
+.nav-fab {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.fab-button {
+    width: 50px;
+    height: 50px;
+    background-color: #4DA6FF;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 24px;
-    margin-top: -30px;
-    box-shadow: 0 4px 10px rgba(112, 161, 255, 0.4);
+    box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3); /* 은은한 그림자 추가 */
+    transition: transform 0.2s ease;
 }
 
-.icon-wrapper { position: relative; display: inline-block; }
+.fab-button i {
+    font-size: 24px; /* 중앙 버튼 아이콘도 동일 규격 */
+}
+
+.fab-button:active {
+    transform: scale(0.95); /* 클릭 시 피드백 효과 */
+}
+
+/* 4. 알림 배지 (필요 시 사용, 위치 최적화) */
+.icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .nav-badge {
     position: absolute;
-    top: -5px; right: -8px;
-    background: #ff4757;
+    top: -5px;
+    right: -8px;
+    background: #FF4757;
     color: white;
-    font-size: 9px;
-    padding: 1px 4px;
-    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff; /* 가독성을 위한 흰색 테두리 */
 }
