@@ -20,7 +20,8 @@ from .serializers import MissionSerializer
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
 from common.utils import publish_chat_event
-from common.utils import publish_mission_update  # ✨ 추가
+from common.utils import publish_mission_update  
+from common.utils import acquire_lock, release_lock 
 
 
 logger = logging.getLogger(__name__)
@@ -249,34 +250,48 @@ def mission_delete(request, mission_id):
 @permission_classes([IsAuthenticated])
 @transaction.atomic
 def mission_accept(request, mission_id):
-    """미션 수락 로직. 채팅방 안에서 호출. room_id는 body로 전달해 해당 채팅방에 알림."""
-    mission = get_object_or_404(Mission, id=mission_id)
-    
-    if mission.status != "WAITING":
-        return Response({"error": "이미 매칭된 미션입니다."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    if mission.author == request.user:
-        return Response({"error": "자신의 미션은 수락할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    mission.status = "MATCHED"
-    mission.helper = request.user
-    mission.save()
+    """
+    미션 수락 로직, 채팅방 안에서 호출
+    """
+    lock_key = f"lock:mission_accept:{mission_id}"
+    lock_value = acquire_lock(lock_key, ttl_seconds=5)
 
-    # 채팅방 ID(room_id)가 있으면 그 방에 알림, 없으면 mission_id로(하위 호환)
-    room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
-    rid = str(room_id) if room_id is not None else str(mission.id)
-
-    publish_chat_event(
-        room_id=rid,
-        event_type="SYSTEM",
-        data={"content": "매칭이 성사되었습니다! 대화를 시작해보세요."}
-    )
+    if lock_value is None:
+        return Response(
+            {"error": "다른 사용자가 수락중입니다. 잠시 후 다시 시도해주세요."},
+            status=status.HTTP_409_CONFLICT
+        )
     
-    return JsonResponse({
-        "success": True,
-        "message": "미션 수락이 완료되었습니다.",
-        "mission_id": mission.id
-    })
+    try:
+        mission = get_object_or_404(Mission, id=mission_id)
+
+        if mission.status != "WAITING":
+            return Response({"error":"이미 매칭된 미션입니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if mission.author == request.user:
+            return Response({"error":"자신의 미션은 수락할 수 없습니다."},  status=status.HTTP_400_BAD_REQUEST)
+        
+        mission.status = "MATCHED"
+        mission.helper = request.user
+        mission.save()
+
+        room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
+        rid = str(room_id) if room_id is not None else str(mission.id)
+
+        publish_chat_event(
+            room_id=rid,
+            event_type="SYSTEM",
+            data={"content": "매칭이 성사되었습니다! 대화를 시작해보세요"}
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "미션이 수락이 완료되었습니다",
+            "mission_id": mission.id,
+        })
+    finally:
+        release_lock(lock_key, lock_value)
+        
 
 
 @login_required
