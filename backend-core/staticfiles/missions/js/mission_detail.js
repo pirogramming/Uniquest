@@ -6,6 +6,7 @@
  * 역할:
  * - 미션 상세 정보 로드
  * - 지도에 미션 위치 표시
+ * - 이미지 갤러리 렌더링 및 모달
  * - 작성자 여부에 따른 버튼 렌더링
  * - 삭제 기능
  * 
@@ -24,15 +25,11 @@
 
     // ==================== 지도 초기화 ====================
     
-    /**
-     * 미션 위치를 지도에 표시
-     */
     async function initMap(lat, lng) {
         const container = document.getElementById('map');
         if (!container) return;
 
         try {
-            // 1. 지도 초기화
             mapManager = new KakaoMapManager('map', {
                 center: { lat, lng },
                 level: 3
@@ -40,24 +37,80 @@
 
             await mapManager.init();
 
-            // 2. 커스텀 마커 (별 모양) 추가
             const marker = mapManager.addCustomMarker(lat, lng, {
                 title: "거래 희망 장소"
             });
 
-            // 3. 인포윈도우 표시
             mapManager.openInfoWindow(
                 marker,
                 '<div style="padding:5px; font-size:12px; font-weight:bold;">거래 장소</div>'
             );
 
-            // 4. 지도 범위 조정
             mapManager.fitBoundsToLocations([{ lat, lng }]);
-            mapManager.setLevel(3); // 너무 확대되는 것 방지
+            mapManager.setLevel(3);
 
             console.log("✅ 지도 초기화 완료");
         } catch (err) {
             console.error("지도 초기화 실패:", err);
+        }
+    }
+
+    // ==================== 이미지 갤러리 ====================
+    
+/**
+     * 이미지 갤러리 렌더링
+     */function renderImages(images) {
+    const section = document.getElementById('mission-images-section');
+    if (!section) return;
+
+    if (!images || images.length === 0) {
+        section.innerHTML = '<div class="no-images">등록된 이미지가 없습니다.</div>';
+        return;
+    }
+
+    const imagesHTML = images.map(img => {
+        // [수정] 이미지 경로가 상대경로인 경우를 대비해 처리
+        let src = img.image;
+        if (src && !src.startsWith('http') && !src.startsWith('/')) {
+            src = '/' + src; 
+        }
+
+        return `
+            <div class="image-item" onclick="window.openImageModal('${src}')">
+                <img src="${src}" alt="미션 이미지" 
+                     onerror="this.src='/static/shared/img/default_image.png'; this.onerror=null;" 
+                     loading="lazy">
+            </div>
+        `;
+    }).join('');
+
+    section.innerHTML = `
+        <div class="mission-images-container">
+            ${imagesHTML}
+        </div>
+    `;
+}
+
+    /**
+     * 이미지 모달 열기
+     */
+    function openImageModal(imgSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        
+        if (modal && modalImg) {
+            modal.style.display = 'block';
+            modalImg.src = imgSrc;
+        }
+    }
+
+    /**
+     * 이미지 모달 닫기
+     */
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        if (modal) {
+            modal.style.display = 'none';
         }
     }
 
@@ -76,7 +129,6 @@
             if (response && response.ok) {
                 const data = await response.json();
                 alert(data.message || '미션이 삭제되었습니다.');
-                // 미션 목록 페이지로 이동
                 window.location.href = '/api/missions/';
             } else {
                 const error = response ? await response.json() : {};
@@ -90,64 +142,33 @@
 
     // ==================== 데이터 로드 ====================
     
-    /**
-     * 미션 상세 정보 로드 및 렌더링
-     */
     async function loadMissionDetail() {
         try {
             const mission = await Auth.authFetchJson(API_DETAIL_URL);
 
-            if (mission) {
-                // 1. 지도 표시 (좌표가 있을 때만)
-                if (mission.location_lat && mission.location_lng) {
-                    initMap(mission.location_lat, mission.location_lng);
-                }
-
-                // 2. 작성자 정보 업데이트
-                const authorEl = document.getElementById('mission-author');
-                if (authorEl && mission.author_username) {
-                    authorEl.textContent = mission.author_username;
-                }
-
-                // 3. 버튼 렌더링 (작성자는 채팅하기 없음, 다른 사람이 채팅 시작 시 채팅 목록에 표시됨)
-                const actionArea = document.getElementById('action-area');
-                if (actionArea) {
-                    if (mission.is_author) {
-                        actionArea.innerHTML = `
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                                <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다. 다른 사람이 채팅을 시작하면 채팅 목록에 표시됩니다.</p>
-                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <button onclick="location.href='/api/missions/${mission.id}/edit/'" class="btn btn-secondary" style="flex: 1; min-width: 120px;">
-                                        수정하기
-                                    </button>
-                                    <button onclick="window.deleteMission()" class="btn btn-danger" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                                        삭제하기
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        actionArea.innerHTML = `
-                            <a href="/api/missions/${mission.id}/chat/start/" class="btn btn-primary" style="display: inline-block; width: 100%; max-width: 500px; height: 50px; font-size: 16px; line-height: 50px; text-align: center; text-decoration: none; color: white; border-radius: 8px;">
-                                채팅하기
-                            </a>
-                        `;
-                    }
-                }
+            if (!mission) {
+                console.error("미션 데이터를 가져올 수 없습니다.");
+                document.getElementById('action-area').innerHTML = 
+                    `<p class="muted">로그인이 필요하거나 삭제된 미션입니다.</p>`;
+                return;
             }
 
-            // 1. 지도 표시 (좌표가 있을 때만)
+            // 1. 이미지 표시
+            if(mission.images) console.log("이미지 있음");
+            renderImages(mission.images);
+
+            // 2. 지도 표시 (좌표가 있을 때만)
             if (mission.location_lat && mission.location_lng) {
                 initMap(mission.location_lat, mission.location_lng);
             }
 
-            // 2. 작성자 정보 업데이트
+            // 3. 작성자 정보 업데이트
             const authorEl = document.getElementById('mission-author');
             if (authorEl && mission.author_username) {
                 authorEl.textContent = mission.author_username;
             }
 
-            // 3. 버튼 렌더링
+            // 4. 버튼 렌더링
             renderActionButtons(mission);
 
         } catch (err) {
@@ -200,10 +221,50 @@
         }
     }
 
+    // ==================== 이벤트 핸들러 ====================
+    
+    /**
+     * 키보드 이벤트 (ESC로 모달 닫기)
+     */
+    function initKeyboardEvents() {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+    }
+
+    /**
+     * 모달 배경 클릭으로 닫기
+     */
+    function initModalEvents() {
+        const modal = document.getElementById('imageModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageModal();
+                }
+            });
+        }
+    }
+
     // ==================== 초기화 ====================
     
-    // deleteMission을 전역으로 노출 (인라인 onclick에서 호출 가능하도록)
-    window.deleteMission = deleteMission;
+    function init() {
+        // 전역 함수 노출
+        window.deleteMission = deleteMission;
+        window.openImageModal = openImageModal;
+        window.closeImageModal = closeImageModal;
 
-    document.addEventListener("DOMContentLoaded", loadMissionDetail);
+        // 이벤트 리스너 등록
+        initKeyboardEvents();
+        initModalEvents();
+
+        // 데이터 로드
+        loadMissionDetail();
+
+        console.log("✅ mission_detail.js 초기화 완료");
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
 })();
