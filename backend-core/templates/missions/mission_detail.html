@@ -8,9 +8,8 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script src="/static/shared/js/auth.js"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
-    <script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
+    <script src="/static/shared/js/auth.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -96,4 +95,10 @@
             {% endif %}
         </div>
 </div>
+{% endblock %}
+
+
+{%block extra_scripts %}
+<script src="{% static 'missions/js/map_manager.js' %}"></script>
+<script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
 {% endblock %}
