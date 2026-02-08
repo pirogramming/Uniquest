@@ -18,21 +18,25 @@ async function renderHomepage() {
     const token = localStorage.getItem('access_token');
 
     if (!token) {
-        console.warn('로그인 토큰이 없어용');
-        window.location.href = '/api/users/login/';
-        return null;
+        window.location.href = '/api/users/homepage_guest/';
+        return;
     }
 
     try {
-        const response = await fetch('/api/users/api/homepage');
+        const response = await fetch('/api/users/api/homepage', {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
 
         const userData = await response.json();
-        console.log(userData)
         if (!response.ok) {
             throw new Error(`서버 응답 오류: ${response.status}`);
         }
 
-        // 데이터 렌더링 로직을 try 블록 안으로 이동
+        const quick_menu = document.getElementById('quick-menu');
+        const mission_status_card = document.getElementById('mission-status-card');
+        if (quick_menu) quick_menu.style.display = 'block';
+        if (mission_status_card) mission_status_card.style.display = 'block';
+
         if (userData && userData.id) {
             const nicknameElement = document.getElementById('nickname');
             const missionElement = document.getElementById('mission_cards');
@@ -40,9 +44,7 @@ async function renderHomepage() {
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
 
-            if (nicknameElement) {
-                nicknameElement.innerText = userData.nickname;
-            }
+            if (nicknameElement) nicknameElement.innerText = userData.nickname;
             if (missionElement) {
                 console.log('yeah')
                 userMission = userData.missions
@@ -81,7 +83,7 @@ async function renderHomepage() {
                             </div>
                             <span class="price">${Number(reward).toLocaleString()}원</span>
                         </div>
-                    </div>`
+                    </div>`;
                 });
             }
             if (matched && waiting && completed) {
