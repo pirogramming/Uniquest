@@ -8,12 +8,7 @@ logger = logging.getLogger(__name__)
 # Redis 연결 (Docker: REDIS_URL=redis://redis:6379, 로컬: 기본값)
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=0,
-    decode_responses=True
-)
+redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 def publish_mission_update(data: dict):
     """미션 변경사항을 Redis로 발행"""
