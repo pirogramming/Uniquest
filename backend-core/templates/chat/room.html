@@ -1,66 +1,85 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅 - Uniquest</title>
     <link rel="stylesheet" href="{% static 'chat/css/room.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="chat-wrapper">
         <div class="chat-container">
-            <!-- 헤더 -->
-            <div class="chat-header">
-                <a href="{% url 'missions:mission_list' %}" class="back-btn">←</a>
-                <div class="header-info">
-                    <h2>{{ mission.title|default:"채팅방" }}</h2>
-                    <span class="status">연결 중...</span>
+            <header class="chat-header">
+                <div class="header-left">
+                    <a href="{% url 'missions:chat_list' %}" class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                    <div class="header-user-info">
+                        <h2 class="user-nickname">{{ other_user.nickname|default:mission.author.nickname }}</h2>
+                        <span class="status">연결 중...</span>
+                    </div>
                 </div>
+                
+                <div class="header-right">
+                    <div class="more-menu-container">
+                        <button class="more-btn" id="moreMenuBtn">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <div class="more-dropdown" id="moreDropdown">
+                            <button class="dropdown-item">프로필 보기</button>
+                            <button class="dropdown-item btn-block-text" data-target-id="{{ other_user.id }}">사용자 차단</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="mission-banner">
+                <span class="banner-label">진행 중인 미션</span>
+                <p class="banner-title">{{ mission.title }}</p>
             </div>
 
-            <!-- 액션 버튼: 미션 수락 / 차단 -->
-            <div class="chat-actions" id="chatActions">
-                {% if can_accept %}
-                <button type="button" class="btn-accept" id="acceptMissionBtn">미션 수락</button>
-                {% endif %}
-                {% if blockable_user %}
-                <button type="button" class="btn-block" data-target-id="{{ blockable_user.id }}"
-                    data-nickname="{{ blockable_user.nickname|escapejs }}">차단: {{ blockable_user.nickname }}</button>
-                {% endif %}
-            </div>
-
-            <!-- 메시지 영역 -->
             <div class="chat-messages" id="chatMessages">
-                <!-- 메시지가 여기에 추가됩니다 -->
             </div>
 
-            <!-- 입력 영역 -->
-            <div class="chat-input-area">
-                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" disabled>
-                <button id="sendBtn" disabled>전송</button>
-            </div>
+            <footer class="chat-footer">
+                <div class="chat-actions" id="chatActions">
+                    {% if is_author %}
+                        <button type="button" class="btn-action-outline" id="confirmPerformerBtn">
+                            <i class="fa-regular fa-circle-check"></i> 수행자 확정
+                        </button>
+                        <button type="button" class="btn-action-gray" id="completeMissionBtn">미션 완료</button>
+                    {% else %}
+                        {% if can_accept %}
+                        <button type="button" class="btn-action-blue" id="acceptMissionBtn">미션 수락하기</button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="messageInput" placeholder="메시지를 입력하세요" autocomplete="off" disabled>
+                    <button id="sendBtn" class="circle-send-btn" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </footer>
         </div>
     </div>
 
-    <!-- 채팅 설정 (Django에서 전달): room_id=채팅방 ID, mission_id=미션 ID(수락/차단 API용) -->
     <script>
         const CHAT_CONFIG = {
             roomId: "{{ room_id }}",
             missionId: {{ mission_id }},
-        userId: {{ request.user.id }},
-        userNickname: "{{ request.user.nickname|escapejs }}",
+            userId: {{ request.user.id }},
+            userNickname: "{{ request.user.nickname|escapejs }}",
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
-                canAccept: {{ can_accept | yesno:"true,false" }},
-        isAuthor: {{ is_author | yesno:"true,false" }},
-        kickableUsers: [],
+            canAccept: {{ can_accept|yesno:"true,false" }},
+            isAuthor: {{ is_author|yesno:"true,false" }},
             csrfToken: "{{ csrf_token }}"
         };
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>
 </body>
-
 </html>
