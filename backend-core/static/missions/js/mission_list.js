@@ -222,7 +222,7 @@
             bounds.extend(position);
         });
 
-        map.setBounds(bounds);
+        //map.setBounds(bounds);
     }
 
     // 단일 마커 추가 (SSE로 새 미션 생성 시)
@@ -265,31 +265,50 @@
         kakao.maps.event.addListener(marker, 'click', () => infowindow.open(map, marker));
     }
 
-    function initApp() {
+function initApp() {
         const container = document.getElementById('map');
         if (!container) return;
 
-        // autoload=false일 때 명시적으로 load 호출
         kakao.maps.load(function () {
             console.log("카카오 지도 로드 완료");
+            
+            // 1. 초기값은 임시로 서울시청 설정
             const options = {
                 center: new kakao.maps.LatLng(37.5665, 126.9780),
                 level: 3
             };
             map = new kakao.maps.Map(container, options);
 
-            loadMissions();
-            initUserLocation();
-            connectSSE(); // ✨ SSE 연결 시작
+            // 2. [중요] 위치를 먼저 잡고, 성공하든 실패하든 미션을 불러오도록 체이닝
+            initUserLocation(() => {
+                loadMissions();
+                connectSSE();
+            });
         });
     }
 
-    function initUserLocation() {
+    function initUserLocation(callback) {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const loc = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                displayMarker(loc, '<div style="padding:5px; font-size:12px;">내 위치</div>');
-            });
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const loc = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                    console.log("내 실제 위치 확인:", loc.getLat(), loc.getLng());
+                    
+                    // 지도의 중심을 현위치로 이동
+                    map.setCenter(loc);
+                    displayMarker(loc, '<div style="padding:5px; font-size:12px;">내 위치</div>');
+                    
+                    if (callback) callback(); // 위치 잡기 성공 후 다음 작업 진행
+                },
+                (err) => {
+                    console.warn("위치 정보를 가져오지 못했습니다. 기본 위치를 사용합니다.", err);
+                    if (callback) callback(); // 위치 잡기 실패해도 미션은 불러옴
+                },
+                { enableHighAccuracy: true, timeout: 5000 } // GPS 옵션 추가
+            );
+        } else {
+            console.warn("Geolocation 미지원 브라우저입니다.");
+            if (callback) callback();
         }
     }
 
