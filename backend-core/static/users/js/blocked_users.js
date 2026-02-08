@@ -24,17 +24,25 @@ async function getuserData() {
     }
 
     try {
-        // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/api/users/api/blocked_users/');
+        const response = await fetch('/api/users/api/blocked_users/', {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+            },
+        });
 
         if (response.ok) {
             const userData = await response.json();
             console.log("유저 정보 로드 성공:", userData);
             return userData;
         } else {
-            console.error("토큰이 만료되었거나 유효하지 않습니다.");
-            alert('노 토큰')
-            // window.location.href = '/users/login/';
+            const text = await response.text();
+            try {
+                const err = JSON.parse(text);
+                console.error("API 오류:", err);
+            } catch (_) {
+                console.error("응답이 JSON이 아님 (로그인 필요할 수 있음)");
+            }
             return null;
         }
     } catch (error) {
@@ -46,26 +54,36 @@ async function getuserData() {
 async function renderBlockUser() {
     const user = await getuserData();
     const blocked_user_box = document.getElementById('blocked-user-list');
-    console.log(user)
+    const countEl = document.getElementById('block-count');
 
+    if (!user || !blocked_user_box) {
+        if (countEl) countEl.textContent = '0';
+        if (blocked_user_box) blocked_user_box.innerHTML = '<p class="empty-message">로그인이 필요합니다.</p>';
+        return;
+    }
 
-    if(user.blocked_users && user){
+    const list = user.blocked_users || [];
+    if (countEl) countEl.textContent = String(list.length);
+
+    if (list.length > 0) {
         blocked_user_box.innerHTML = "" // 내부 HTML비우기
 
-        user.blocked_users.forEach(({id,nickname}) => {
+        list.forEach(({ id, nickname }) => {
             blocked_user_box.innerHTML += `
             <div class="user-card">
                 <div class="user-info">
                     <div class="avatar"></div>
                     <div class="user-text">
-                        <p class="nickname">${nickname}</p>
-                        <p class="date">차단일: 2026-01-20</p>
+                        <p class="nickname">${nickname || '(알 수 없음)'}</p>
+                        <p class="date">차단 해제 버튼을 누르면 목록에서 제거됩니다.</p>
                     </div>
                 </div>
                 <button class="unblock-btn" onclick="transmit_user_id(${id})">차단 해제</button>
             </div>
-            `
+            `;
         });
+    } else {
+        blocked_user_box.innerHTML = '<p class="empty-message">차단한 사용자가 없습니다.</p>';
     }
 }
 
@@ -79,13 +97,14 @@ async function transmit_user_id(target_id){
     }
     try {
         // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/api/users/api/blocked_users/', { // 팀장님의 API 주소
+        const response = await fetch('/api/users/api/blocked_users/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({ "target_id": target_id })
+            body: JSON.stringify({ target_id: target_id })
         });
 
         if (response.ok) {

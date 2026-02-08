@@ -1,0 +1,131 @@
+/* 기본 배경 설정 */
+:root {
+    --primary-blue: #74a9f9;
+    --light-bg: #ffffff;
+    --card-border: #f0f0f0;
+    --text-main: #333333;
+    --text-gray: #999999;
+    --tag-pink: #ffb1c1;
+    --tag-green: #92d8b5;
+}
+
+body {
+    background-color: var(--light-bg);
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+}
+
+/* 상단 블루 헤더 */
+.header {
+    background-color: var(--primary-blue);
+    padding: 40px 20px 30px;
+    border-radius: 0 0 40px 40px; /* 아래쪽만 둥글게 */
+    color: white;
+    text-align: center;
+}
+
+.logo-circle {
+    width: 75px;
+    height: 75px;
+    background: white;
+    border-radius: 20px; /* 이미지처럼 약간 각진 둥근 사각형 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.brand-name { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.brand-subtitle { font-size: 14px; opacity: 0.9; font-weight: 400; }
+
+/* 미션 섹션 */
+.mission-list-section {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-title h2 { font-size: 18px; font-weight: 700; color: var(--text-main); }
+.view-all { font-size: 13px; color: var(--text-gray); text-decoration: none; }
+
+/* 미션 카드 스타일 (JS에서 생성될 카드 대응) */
+.mission-card {
+    background: white;
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.card-header .title { font-size: 15px; font-weight: 600; color: #444; }
+.tag-status { 
+    font-size: 11px; color: var(--primary-blue); 
+    background: #f0f7ff; padding: 2px 8px; border-radius: 10px; 
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 10px;
+}
+
+.tag-category {
+    font-size: 11px; color: white; padding: 2px 8px; border-radius: 6px; margin-right: 5px;
+}
+.category-delivery { background-color: var(--tag-pink); }
+.category-task { background-color: var(--tag-green); }
+
+.location { font-size: 12px; color: var(--text-gray); }
+.price { font-size: 16px; font-weight: 700; color: var(--primary-blue); }
+
+/* 로그인/회원가입 버튼 */
+.cta-container {
+    padding: 0 20px 100px; /* 하단 네비게이션 공간 확보 */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guest-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-login {
+    background-color: var(--primary-blue);
+    color: white !important;
+}
+
+.btn-signup {
+    background-color: white;
+    color: var(--primary-blue) !important;
+    border: 1.5px solid var(--primary-blue);
+}
+
+.guest-cta:hover { opacity: 0.9; transform: translateY(-1px); }

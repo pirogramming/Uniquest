@@ -24,9 +24,8 @@ async function send_number() {
         return
     }
 
-    // 전송중 버튼 띄우기
-    send.style.display = 'none'
-    transmitting.style.display = 'block'
+    if (send) send.style.display = 'none';
+    if (transmitting) transmitting.style.display = 'block';
 
     const response = await fetch('/api/users/verify-email-check/', {
         method: 'POST',
@@ -42,15 +41,13 @@ async function send_number() {
 
     if (response.ok) {
         const data = await response.json();
-        if (data.token) {
-            sessionStorage.setItem('password_reset_token', data.token);
-        }
-        document.getElementById('check_number_box').style.display = 'block';
+        if (data.token) sessionStorage.setItem('password_reset_token', data.token);
+        const box = document.getElementById('check_number_box');
+        if (box) box.style.display = 'block';
         startTimer(300);
-        alert(data.message + ' ' + (data.university || ''));
-        send.style.display = 'block';
-        send.innerText = '인증번호 재발송';
-        transmitting.style.display = 'none';
+        alert((data.message || '') + ' ' + (data.university || ''));
+        if (send) { send.style.display = 'block'; send.innerText = '인증번호 재발송'; }
+        if (transmitting) transmitting.style.display = 'none';
     } else {
         const data = await response.json();
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
@@ -84,19 +81,19 @@ async function check_number() {
     });
     if (response.ok) {
         const data = await response.json();
-        const check_box = document.getElementById('check_number_box')
-        const check_box_certified = document.getElementById('check_number_box_certified')
-        const complete = document.getElementById('complete')
-        const send = document.getElementById('send-btn')
+        const check_box = document.getElementById('check_number_box');
+        const check_box_certified = document.getElementById('check_number_box_certified');
+        const complete = document.getElementById('complete');
+        const next_btn = document.getElementById('next-btn');
+        const send = document.getElementById('send-btn');
         if (data.is_varified) {
-            check_box.style.display = 'none';
-            check_box_certified.style.display = 'block';
-            send.style.display = 'none';
-            complete.style.display = 'block';
-            document.getElementById('next-btn').style.display = 'block';
+            if (check_box) check_box.style.display = 'none';
+            if (check_box_certified) check_box_certified.style.display = 'block';
+            if (send) send.style.display = 'none';
+            if (complete) complete.style.display = 'block';
+            if (next_btn) next_btn.style.display = 'block';
             alert('메일 인증 성공! 아래 "다음" 버튼을 눌러 비밀번호를 재설정하세요.');
         }
-
     } else {
         const data = await response.json();
         alert("확인 실패: " + (data.message || "오류가 발생했습니다."));

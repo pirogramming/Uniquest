@@ -45,6 +45,69 @@ async function renderProfile() {
         // 1. 기본 정보 반영
         if (nicknameElement) nicknameElement.innerText = user.nickname;
         if (univElement) univElement.innerText = user.university;
+        if (mannerScore) mannerScore.innerText = user.manner_score;
+        blockers.forEach(({id,nickname}) => {
+            console.log(`${id} : ${nickname}`)
+            if (register_missions) register_missions.innerHTML += `${id} : ${nickname}`;
+        });
+
+        if (user.missions.length > 0) {
+            register_missions.innerHTML = "";
+            
+            // 1. Django가 미리 주소의 '틀'을 만듭니다. (id=0은 임시값)
+            // 이 코드는 반드시 .html 파일 내 <script> 태그 안에 있어야 작동합니다.
+            const urlTemplate = "{% url 'missions:mission_detail' 0 %}";
+
+            user.missions.forEach(({id, title, reward, status, descriptions}) => {
+                // 2. 임시값 '0'을 실제 미션의 'id'로 갈아끼웁니다.
+                const targetUrl = urlTemplate.replace('0', id);
+
+                register_missions.innerHTML += `
+                    <a class="mission-card" href="${targetUrl}" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="card-header">
+                            <span class="status-badge waiting">${status}</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h3 class="mission-title">${title}</h3>
+                            <p class="mission-content">${descriptions}</p>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="reward-info">
+                                <span class="label">보상</span>
+                                <span class="reward-amount">${reward.toLocaleString()}</span>
+                            </div>
+                            <span class="menu-arrow">〉</span>
+                        </div>
+                    </a>`;
+            });
+        }
+
+        if (user.accepted_missions.length > 0){
+            performed_missions.innerHTML = ""
+            user.accepted_missions.forEach(({id,title,reward,status,descriptions}) => {
+                performed_missions.innerHTML += `<div class="mission-card">
+                                                    <div class="card-header">
+                                                        <span class="status-badge waiting">${status}</span>
+                                                    </div>
+                                                    
+                                                    <div class="card-body">
+                                                        <h3 class="mission-title">${title}</h3>
+                                                        <p class="mission-content">${descriptions}</p>
+                                                    </div>
+                                                    
+                                                    <div class="card-footer">
+                                                        <div class="reward-info">
+                                                            <span class="label">보상</span>
+                                                            <span class="reward-amount">${reward}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>`
+            });
+        }
+        // console.log('나의 미션들',my_missions)
+        // console.log('블락 인원들',blockers)
 
         // 2. 점수 텍스트 및 막대 그래프 업데이트 [핵심 수정 부분]
         if (mannerScore) {
@@ -76,6 +139,7 @@ function logout() {
     window.location.href = "/api/users/login/";
 }
 
+
 async function signout() {
     const token = localStorage.getItem('access_token');
     if (!token) return;
@@ -90,9 +154,16 @@ async function signout() {
         });
 
         if (res.ok) {
-            localStorage.clear();
-            alert("회원 탈퇴 완료");
-            window.location.href = "/api/users/login/";
+            const data = await res.json();
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            console.error("회원 탈퇴 완료");
+            window.location.href = "/api/users/login/"
+            return
+        } else {
+            console.error("탈퇴 중 에러발생");
+            alert('에러')
+            return null;
         }
     } catch (error) {
         console.error("오류 발생:", error);

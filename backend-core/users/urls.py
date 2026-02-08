@@ -38,8 +38,10 @@ urlpatterns = [
     path('api/block_user/', views.block_user, name="block_user"),
 
     #홈페이지
-    path('homepage/',views.get_home_page,name="homepage"),
-    path('api/homepage/',views.get_homepage_info,name="homepage_info"),
+    path('homepage/', views.get_home_page, name="homepage"),
+    path('homepage_guest/', views.get_home_page_guest, name="homepage_guest"),
+    path('api/homepage/', views.get_homepage_info, name="homepage_info"),
+    path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 
     #회원탈퇴 페이지
     path('api/signout/',views.signout,name="signout"),
