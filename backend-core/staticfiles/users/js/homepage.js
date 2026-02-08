@@ -34,7 +34,7 @@ async function renderHomepage() {
 
         const quick_menu = document.getElementById('quick-menu');
         const mission_status_card = document.getElementById('mission-status-card');
-        if (quick_menu) quick_menu.style.display = 'flex';
+        if (quick_menu) quick_menu.style.display = 'block';
         if (mission_status_card) mission_status_card.style.display = 'block';
 
         if (userData && userData.id) {
@@ -44,9 +44,7 @@ async function renderHomepage() {
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
 
-            if (nicknameElement) {
-                nicknameElement.innerText = userData.nickname;
-            }
+            if (nicknameElement) nicknameElement.innerText = userData.nickname;
             if (missionElement) {
                 console.log('yeah')
                 userMission = userData.missions
