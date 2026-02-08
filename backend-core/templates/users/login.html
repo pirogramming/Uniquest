@@ -1,18 +1,18 @@
+{%extends "base.html"%}
 {%load static%}
-<!DOCTYPE html>
-<html lang="ko">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 - Uniquest</title>
+{% block title %}로그인{% endblock %}
+
+{%block extra_css %}
     <link rel="stylesheet" href="{%static 'users/css/login.css'%}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
+{% endblock %}
 
-<body>
-    <div class="signup-wrapper">
-        <div class="signup-container">
+{% block content %}
+<div class="signup-wrapper">
+
+
+<div class="signup-container">
             <div class="header">
                 <h2>로그인</h2>
                 <p>Uniquest에 오신 것을 환영합니다</p>
@@ -36,12 +36,13 @@
             </form>
 
             <div class="footer">
-                <a href="#" id="search_key">비밀번호 찾기</a>
+                <a href="users:check_password" id="search_key">비밀번호 찾기</a>
                 <a href="{%url 'users:signup_view'%}" id="signup">회원가입하기</a>
             </div>
         </div>
-    </div>
-    <script src="{%static 'users/js/login.js'%}"></script>
-</body>
+</div>
+{% endblock %}
 
-</html>
+{%block extra_scripts %}
+    <script src="{%static 'users/js/login.js'%}"></script>
+{% endblock %}

@@ -13,43 +13,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function handleSignup() {
-    if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)) {
-        return
-    }
-
-    const csrftoken = getCookie('csrftoken');
-
-    const signupData = {
-        username: document.getElementById('username').value,
-        nickname: document.getElementById('nickname').value,
-        password: document.getElementById('password').value,
-        univ_email: document.getElementById('email').value,
-        password_check: document.getElementById('password_check').value,
-    }
-
-    const response = await fetch('/api/users/signup/submit/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify(signupData)
-    });
-
-    if (response.ok) {
-        alert("회원가입 성공!");
-        const data = await response.json();
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        window.location.href = "/api/users/homepage/"; // 가입 후 로그인 페이지로 이동
-    } else {
-        const errorData = await response.json();
-        console.error("에러 발생:", errorData);
-        alert("가입 실패: " + JSON.stringify(errorData));
-    }
-}
-
 async function send_number() {
     const send = document.getElementById('send-btn')
     const email = document.getElementById('email').value
@@ -65,7 +28,7 @@ async function send_number() {
     send.style.display = 'none'
     transmitting.style.display = 'block'
 
-    const response = await fetch('/api/users/verify-email/', {
+    const response = await fetch('/api/users/verify-email-check/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -79,12 +42,15 @@ async function send_number() {
 
     if (response.ok) {
         const data = await response.json();
-        document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
+        if (data.token) {
+            sessionStorage.setItem('password_reset_token', data.token);
+        }
+        document.getElementById('check_number_box').style.display = 'block';
         startTimer(300);
-        alert(data.message + data.university);
-        send.style.display = 'block'
-        send.innerText = '인증번호 재발송'
-        transmitting.style.display = 'none'
+        alert(data.message + ' ' + (data.university || ''));
+        send.style.display = 'block';
+        send.innerText = '인증번호 재발송';
+        transmitting.style.display = 'none';
     } else {
         const data = await response.json();
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
@@ -104,7 +70,7 @@ async function check_number() {
         return;
     }
 
-    const response = await fetch('/api/users/verify-email/', {
+    const response = await fetch('/api/users/verify-email-check/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -123,16 +89,26 @@ async function check_number() {
         const complete = document.getElementById('complete')
         const send = document.getElementById('send-btn')
         if (data.is_varified) {
-            check_box.style.display = 'none'
-            check_box_certified.style.display = 'block'
-            send.style.display = 'none'
-            complete.style.display = 'block'
-            alert('메일 인증 성공!')
+            check_box.style.display = 'none';
+            check_box_certified.style.display = 'block';
+            send.style.display = 'none';
+            complete.style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+            alert('메일 인증 성공! 아래 "다음" 버튼을 눌러 비밀번호를 재설정하세요.');
         }
 
     } else {
         const data = await response.json();
         alert("확인 실패: " + (data.message || "오류가 발생했습니다."));
+    }
+}
+
+function goToChangePassword() {
+    const token = sessionStorage.getItem('password_reset_token');
+    if (token) {
+        window.location.href = '/api/users/change_password/?token=' + encodeURIComponent(token);
+    } else {
+        alert('인증번호 발송부터 다시 진행해주세요.');
     }
 }
 
@@ -155,20 +131,4 @@ function startTimer(seconds) {
             display.style.color = "red";
         }
     }, 1000);
-}
-
-function checkPassword(password,confirmPassword){
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-    alert("비밀번호는 8자 이상이며, 영문과 숫자를 포함해야 합니다.");
-    return false
-    }
-
-    if (password !== confirmPassword) {
-    alert("비밀번호가 일치하지 않습니다.");
-    return false
-    }
-
-    return true
 }

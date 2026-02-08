@@ -5,6 +5,7 @@ from .serializers import UserRegisterSerializer, UserProfileSerializer
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
+import uuid
 from django.http import JsonResponse
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
@@ -74,6 +75,58 @@ def verify_email(request):
                     return JsonResponse({'is_varified': True,'email':email}, status=200)
                 else:
                     print('False')
+                    return JsonResponse({'is_varified': False}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'message': '잘못된 데이터 형식입니다.'}, status=400)
+
+    return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
+
+def verify_email_check(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+
+            if not (User.objects.filter(univ_email=data.get('email'))).exists():
+                return JsonResponse({'message': '회원정보에 없는 이메일입니다'}, status=400)
+
+            if action == "send_email": # 인증번호 보내기 버튼
+                email = data.get('email')
+                if not email:
+                    return JsonResponse({'message': '이메일 주소를 입력해주세요.'}, status=400)
+
+                # 1. 대학 도메인 검증
+                university = extract_univ(email)
+                if not university:
+                    return JsonResponse({'message': '학사 이메일(@.ac.kr) 형식이 아닙니다.'}, status=400)
+
+                # 2. 메일 발송
+                try:
+                    send_verification_email(email)
+                except Exception as e:
+                    return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
+
+                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 email 저장, URL에는 토큰만 노출)
+                reset_token = str(uuid.uuid4())
+                cache.set(f"reset_token_{reset_token}", email, timeout=600)
+
+                return JsonResponse({
+                    'message': f'{university} 메일로 인증번호를 보냈습니다.',
+                    'university': university,
+                    'token': reset_token,
+                }, status=200)
+
+            elif action == "check_number": #인증하기 버튼
+                email = data.get('email')
+                number = data.get('number')
+                university = extract_univ(email)
+
+                if verify_code(email, number):
+                    cache.set(f"university_info_{email}", university, timeout=600)
+                    cache.set(f"varified_info_{email}", True, timeout=600)
+                    return JsonResponse({'is_varified': True, 'email': email}, status=200)
+                else:
                     return JsonResponse({'is_varified': False}, status=200)
 
         except json.JSONDecodeError:
@@ -235,37 +288,33 @@ def mypage_modify_view(request):
 
 #차단 유저들
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def get_blocked_users_info(request):
     user = request.user
-    target_user_id = request.data.get('target_id')
+    if request.method == 'GET':
+        try:
+            # 차단한 유저 목록 가져오기 (id와 nickname만)
+            blocked_users = list(user.blocked_people.all().values('id', 'nickname'))
+            
+            return Response({
+                "blocked_users": blocked_users,
+                "count": len(blocked_users) # 개수도 같이 주면 프론트가 좋아해요!
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # 예상치 못한 에러(DB 연결 등) 처리
+            print(f"Error: {e}") 
+            return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)
     
-    try:
-        target_user = User.objects.get(id=target_user_id)
-        # 1. DB에서 차단 관계 설정
-        user.blocked_people.add(target_user) 
-        
-        # 2. [핵심] 두 유저가 연관된 '진행 중인' 미션방들을 모두 찾음
-        related_missions = Mission.objects.filter(
-            models.Q(author=user, helper=target_user) | 
-            models.Q(author=target_user, helper=user)
-        ).filter(status__in=['WAITING', 'MATCHED']) # 대기나 매칭 중인 방만
-
-        # 3. 찾은 모든 방에 대해 각각 강퇴 이벤트 발행
-        for mission in related_missions:
-            publish_chat_event(
-                room_id=str(mission.id), # 실제 미션 ID를 동적으로 넣음
-                event_type="KICK", 
-                data={"target_id": target_user_id}
-            )
-            
-        return Response({"message": "차단 및 실시간 강퇴 완료"}, status=status.HTTP_200_OK)
-
-    except User.DoesNotExist:
-        return Response({"error": "유저를 찾을 수 없습니다."}, status=404)
-            
-
+    elif request.method == 'POST':
+        target_id = request.data.get('target_id')
+        try:
+            target_user = User.objects.get(id=target_id)
+            user.blocked_people.remove(target_user)
+            return Response({"message":f"{target_user.nickname}님을 차단 해제했습니다."}, status=200)
+        except User.DoesNotExist:
+            return Response({"message":"대상유저가 없습니다"},status=404) 
 
 
 def get_blocked_users(request):
@@ -338,3 +387,56 @@ def block_user(request):
 
     return Response({'message': '차단되었습니다'}, status=200)
     
+#회원 탈퇴
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def signout(request):
+    user = request.user
+    try:
+        user.delete()
+        return Response({
+            "message":"회원탈퇴 완료"
+        },status=200)
+    except Exception as e:
+        # 예상치 못한 에러(DB 연결 등) 처리
+        print(f"Error: {e}") 
+        return Response({"error": "목록을 불러오는 중 오류가 발생했습니다."}, status=500)
+    
+def check_password(request):
+    return render(request,'users/check_password.html')
+
+# 비밀번호 갱신
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def change_password(request):
+    """비밀번호 찾기 후 재설정. 토큰은 check_password 인증 성공 시 캐시에 저장된 일회용 값."""
+    token = request.data.get('token')
+    password = request.data.get('password')
+
+    if not token or not password:
+        return Response(
+            {"error": "토큰과 새 비밀번호를 모두 입력해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    email = cache.get(f"reset_token_{token}")
+    if not email:
+        return Response(
+            {"error": "링크가 만료되었거나 유효하지 않습니다. 비밀번호 찾기를 다시 진행해주세요."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        target_user = User.objects.get(univ_email=email)
+        target_user.set_password(password)
+        target_user.save()
+        cache.delete(f"reset_token_{token}")
+        cache.delete(f"auth_{email}")
+        return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
+    
+def change_password_render(request):
+    return render(request,'users/change_password.html')

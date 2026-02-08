@@ -40,7 +40,7 @@ KAKAO_KEY = env('KAKAO_MAP_API_KEY')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-h0@$u*thum6_lais86qqijq)lvwl8q8c7c&2yrnx66+opx0j3k')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
