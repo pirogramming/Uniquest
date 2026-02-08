@@ -1,15 +1,19 @@
+/* 기본 레이아웃 및 폰트 */
 body {
     margin: 0;
     padding: 0;
     background-color: #f8f9fa;
     font-family: 'Pretendard', sans-serif;
     color: #333;
-    display:flex; justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .mypage-container {
-    padding-bottom: 80px; /* 하단 네비게이션 바 공간 */
-    width:450px;
+    padding-bottom: 100px;
+    width: 450px;
+    min-height: 100vh;
+    background-color: #f8f9fa;
 }
 
 /* 상단 프로필 카드 */
@@ -86,7 +90,7 @@ body {
     opacity: 0.8;
 }
 
-/* 메뉴 아이템 */
+/* 메뉴 및 리스트 공통 */
 .menu-section { padding: 20px; }
 
 .menu-item {
@@ -103,22 +107,86 @@ body {
 .menu-left { font-weight: 600; }
 .menu-arrow { color: #ccc; }
 
-/* 미션 리스트 그룹 */
 .mission-list-group h3 {
     font-size: 16px;
     margin: 25px 0 12px 5px;
 }
 
-.empty-box {
-    background: #fff;
-    padding: 40px;
-    text-align: center;
-    border-radius: 15px;
-    color: #aaa;
-    font-size: 14px;
+/* 미션 카드 스타일 */
+.mission-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f3f5;
+    cursor: pointer;
 }
 
-/* 로그아웃 버튼 */
+.card-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.status-badge.waiting {
+    background-color: #fff4e6;
+    color: #fd7e14;
+}
+
+.mission-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.mission-content {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f8f9fa;
+}
+
+.reward-info .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    margin-right: 4px;
+}
+
+.reward-amount {
+    font-size: 18px;
+    font-weight: 800;
+    color: #7fb5ff;
+}
+
+.reward-amount::after {
+    content: "원";
+    font-size: 13px;
+    margin-left: 1px;
+}
+
+/* 버튼 및 네비게이션 */
 .logout-btn {
     width: 100%;
     padding: 15px;
@@ -128,25 +196,14 @@ body {
     border-radius: 15px;
     font-weight: 700;
     margin-top: 30px;
+    cursor: pointer;
 }
 
-.logout-btn p{
-    margin:0;
-}
-
-.withdraw-text {
-    text-align: center;
-    color: #aaa;
-    font-size: 12px;
-    margin-top: 15px;
-}
-
-/* 하단 네비게이션 */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     width: 100%;
-    max-width: 450px; /* 모바일 폭 제한 */
+    max-width: 450px;
     background: white;
     display: flex;
     justify-content: space-around;

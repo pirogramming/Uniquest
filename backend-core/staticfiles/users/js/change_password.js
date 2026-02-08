@@ -36,7 +36,7 @@ async function handleSignup() {
 
     if (response.ok) {
         alert("비밀번호 변경 성공!");
-        window.location.href = "/api/users/homepage/"; // 가입 후 로그인 페이지로 이동
+        window.location.href = "/api/users/login/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);

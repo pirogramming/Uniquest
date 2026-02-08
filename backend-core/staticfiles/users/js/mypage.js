@@ -54,10 +54,64 @@ async function renderProfile() {
             console.log(`${id} : ${nickname}`)
             if (register_missions) register_missions.innerHTML += `${id} : ${nickname}`;
         });
-        // if (register_missions) register_missions.innerHTML = ;
-        // if (performed_missions) performed_missions.innerHTML = ;
-        console.log('나의 미션들',my_missions)
-        console.log('블락 인원들',blockers)
+
+        if (user.missions.length > 0) {
+            register_missions.innerHTML = "";
+            
+            // 1. Django가 미리 주소의 '틀'을 만듭니다. (id=0은 임시값)
+            // 이 코드는 반드시 .html 파일 내 <script> 태그 안에 있어야 작동합니다.
+            const urlTemplate = "{% url 'missions:mission_detail' 0 %}";
+
+            user.missions.forEach(({id, title, reward, status, descriptions}) => {
+                // 2. 임시값 '0'을 실제 미션의 'id'로 갈아끼웁니다.
+                const targetUrl = urlTemplate.replace('0', id);
+
+                register_missions.innerHTML += `
+                    <a class="mission-card" href="${targetUrl}" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="card-header">
+                            <span class="status-badge waiting">${status}</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h3 class="mission-title">${title}</h3>
+                            <p class="mission-content">${descriptions}</p>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="reward-info">
+                                <span class="label">보상</span>
+                                <span class="reward-amount">${reward.toLocaleString()}</span>
+                            </div>
+                            <span class="menu-arrow">〉</span>
+                        </div>
+                    </a>`;
+            });
+        }
+
+        if (user.accepted_missions.length > 0){
+            performed_missions.innerHTML = ""
+            user.accepted_missions.forEach(({id,title,reward,status,descriptions}) => {
+                performed_missions.innerHTML += `<div class="mission-card">
+                                                    <div class="card-header">
+                                                        <span class="status-badge waiting">${status}</span>
+                                                    </div>
+                                                    
+                                                    <div class="card-body">
+                                                        <h3 class="mission-title">${title}</h3>
+                                                        <p class="mission-content">${descriptions}</p>
+                                                    </div>
+                                                    
+                                                    <div class="card-footer">
+                                                        <div class="reward-info">
+                                                            <span class="label">보상</span>
+                                                            <span class="reward-amount">${reward}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>`
+            });
+        }
+        // console.log('나의 미션들',my_missions)
+        // console.log('블락 인원들',blockers)
 
     } else {
         // 토큰이 없거나 문제가 있다면 로그인 페이지로 보낼 수도 있습니다.
@@ -112,3 +166,4 @@ async function signout() {
 
 // 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);
+//ㅗㅑ
