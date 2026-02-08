@@ -86,7 +86,6 @@ async function check_number() {
         const complete = document.getElementById('complete');
         const next_btn = document.getElementById('next-btn');
         const send = document.getElementById('send-btn');
-
         if (data.is_varified) {
             if (check_box) check_box.style.display = 'none';
             if (check_box_certified) check_box_certified.style.display = 'block';

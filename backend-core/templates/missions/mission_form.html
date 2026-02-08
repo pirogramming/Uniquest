@@ -11,27 +11,42 @@
 {% endblock %}
 
 {% block content %}
-    <h2>
+    <h2><span id="back-btn"></span>
         {% if is_update %} 미션 수정 {% else %} 미션 등록 {% endif %}
     </h2>
 
     <form id="mission-form" enctype="multipart/form-data" data-mission-id="{{ mission.id|default:'' }}">
         {% csrf_token %}
-        
         <div class="field">
-            <label>사진 (0/5)</label>
-            <div class="photo-upload-placeholder" onclick="document.getElementById('id_images').click()">
-                <div class="plus-icon">+</div>
-                <span>추가</span>
-            </div>
-            <input type="file" 
-                   name="images" 
-                   id="id_images" 
-                   accept="image/*" 
-                   multiple 
-                   style="display:none;">
-            <p class="muted">미션을 더 자세히 설명할 수 있는 사진을 추가하세요. (최대 5장)</p>
+    <label id="photo-count">사진 (0/5)</label>
+    <div class="image-preview-wrapper" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div class="photo-upload-placeholder" onclick="document.getElementById('id_images').click()" style="cursor:pointer;">
+            <div class="plus-icon">+</div>
+            <span>추가</span>
         </div>
+        
+        <div id="image-preview-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+    </div>
+    
+    <input type="file" 
+           name="images" 
+           id="id_images" 
+           accept="image/*" 
+           multiple 
+           style="display:none;">
+    <p class="muted">미션을 더 자세히 설명할 수 있는 사진을 추가하세요. (최대 5장)</p>
+    {% if is_update %}
+    <script id="existing-images-data" type="application/json">
+        [
+            {% for img in mission.images.all %}
+                {"id": {{ img.id }}, "image": "{{ img.image.url }}"}
+                {% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+{% endif %}
+
+</div>
 
         <div class="field">
             <label>제목</label>
@@ -96,4 +111,17 @@
     
     <script src="/static/shared/js/auth.js"></script>
     <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const backBtn = document.getElementById("back-btn");
+    if (backBtn) {
+        backBtn.addEventListener("click", function() {
+            // 작성 중인 내용이 있다면 확인창을 띄울 수도 있습니다.
+            if (confirm("작성 중인 내용은 저장되지 않습니다. 돌아가시겠습니까?")) {
+                window.history.back();
+            }
+        });
+    }
+});
+    </script>
     {% endblock %}
