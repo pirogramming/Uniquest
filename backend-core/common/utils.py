@@ -3,7 +3,6 @@ import json
 import logging
 import os
 from django.conf import settings
-
 logger = logging.getLogger(__name__)
 
 # Redis 연결 (Docker: REDIS_URL=redis://redis:6379, 로컬: 기본값)
