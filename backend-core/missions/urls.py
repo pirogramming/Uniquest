@@ -13,7 +13,7 @@ urlpatterns = [
     path("<int:mission_id>/chat/<int:room_id>/", views.chat_room, name="chat_room"),
     path("<int:mission_id>/edit/", views.mission_update_view, name="mission_update_view"),
     path("location/pick/", views.location_picker, name="location_picker"),
-
+    path("chat/", views.chat_list, name="chat_list"),
     # --- 2. 실제 데이터 처리 API (POST/PATCH) ---
     # JS에서 호출할 주소들입니다.
     path("api/create/", views.mission_create, name="mission_create_api"),
