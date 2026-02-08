@@ -82,6 +82,7 @@ def verify_email(request):
 
     return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
 
+# 비번 변경에서 이메일 확인 로직
 def verify_email_check(request):
     if request.method == "POST":
         try:
@@ -107,7 +108,7 @@ def verify_email_check(request):
                 except Exception as e:
                     return JsonResponse({'message': '메일 발송 서버에 문제가 발생했습니다.'}, status=500)
 
-                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 email 저장, URL에는 토큰만 노출)
+                # 3. 비밀번호 재설정용 일회용 토큰 생성 (캐시에 저장 후 프론트에 전달)
                 reset_token = str(uuid.uuid4())
                 cache.set(f"reset_token_{reset_token}", email, timeout=600)
 
@@ -123,8 +124,7 @@ def verify_email_check(request):
                 university = extract_univ(email)
 
                 if verify_code(email, number):
-                    cache.set(f"university_info_{email}", university, timeout=600)
-                    cache.set(f"varified_info_{email}", True, timeout=600)
+                    cache.set(f"my_email",email,timeout=600)
                     return JsonResponse({'is_varified': True, 'email': email}, status=200)
                 else:
                     return JsonResponse({'is_varified': False}, status=200)
@@ -230,7 +230,8 @@ def logout(request):
 @permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
 def get_my_info(request):
     user = request.user
-    missions = list(user.missions.all().values('id','title','reward','status'))
+    missions = list(user.missions.all().values('id','title','reward','status','descriptions'))
+    accepted_missions = list(user.accepted_missions.all().values('id','title','reward','status','descriptions'))
     blocked_Queryset = user.blocked_people.all()
     return Response({
         "id": user.id,
@@ -241,7 +242,8 @@ def get_my_info(request):
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
         "missions" : missions,
-        "blocked_people" : list(blocked_Queryset.values('id','nickname'))
+        "blocked_people" : list(blocked_Queryset.values('id','nickname')),
+        "accepted_missions":accepted_missions,
     })
 
 def mypage_view(request):
@@ -325,6 +327,11 @@ def get_blocked_users(request):
 def get_home_page(request):
     return render(request,'users/homepage.html')
 
+
+def get_home_page_guest(request):
+    """비로그인 사용자 전용 홈 페이지 (별도 URL/템플릿)."""
+    return render(request, 'users/homepage_guest.html')
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_homepage_info(request):
@@ -334,6 +341,7 @@ def get_homepage_info(request):
     waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
     matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
     completed_count = len([m for m in mission_lst if m['status'] == 'COMPLETED'])
+    
     return Response({
         "id":user.id,
         "nickname":user.nickname,
@@ -347,6 +355,15 @@ def get_homepage_info(request):
         "matched_count":matched_count,
         "completed_count":completed_count
     })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_homepage_info_unlogin(request):
+    missions = Mission.objects.all().values('id','title','descriptions','category','status','reward','location_name')
+    return Response({
+        "missions":missions
+    })
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -411,30 +428,16 @@ def check_password(request):
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def change_password(request):
-    """비밀번호 찾기 후 재설정. 토큰은 check_password 인증 성공 시 캐시에 저장된 일회용 값."""
-    token = request.data.get('token')
     password = request.data.get('password')
-
-    if not token or not password:
-        return Response(
-            {"error": "토큰과 새 비밀번호를 모두 입력해주세요."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    email = cache.get(f"reset_token_{token}")
-    if not email:
-        return Response(
-            {"error": "링크가 만료되었거나 유효하지 않습니다. 비밀번호 찾기를 다시 진행해주세요."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    email = cache.get(f"my_email")
 
     try:
         target_user = User.objects.get(univ_email=email)
         target_user.set_password(password)
+        print(target_user.password)
         target_user.save()
-        cache.delete(f"reset_token_{token}")
-        cache.delete(f"auth_{email}")
         return Response({"message": "비밀번호가 성공적으로 변경되었습니다."}, status=200)
+    
     except User.DoesNotExist:
         return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
     

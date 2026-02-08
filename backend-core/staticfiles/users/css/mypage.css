@@ -160,6 +160,7 @@ body {
 
 .mission-list-group {
     margin-top: 30px;
+    cursor: pointer;
 }
 
 .mission-list-group h3 {
