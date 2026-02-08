@@ -202,6 +202,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 #로그인 후 발급받은 토큰 해독
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 브라우저에서 세션으로 들어온 경우(채팅방 차단 등) API 호출 시 쿠키로 인증
+        'rest_framework.authentication.SessionAuthentication',
         # 💡 이 설정이 있으면 장고가 API 호출 시마다 자동으로 토큰을 해독합니다.
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
