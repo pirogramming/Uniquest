@@ -44,12 +44,22 @@ class ChatClient {
     }
 
     init() {
-        // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
-        document.querySelectorAll('.btn-block').forEach(btn => {
+        // 더보기 메뉴(점 세개) 토글 로직 추가
+        const moreBtn = document.getElementById('moreMenuBtn');
+        const dropdown = document.getElementById('moreDropdown');
+        if (moreBtn && dropdown) {
+            moreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+            });
+            document.addEventListener('click', () => dropdown.classList.remove('active'));
+        }
+
+        // 차단 버튼 로직
+        document.querySelectorAll('.btn-block-text').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const targetId = e.currentTarget.dataset.targetId;
-                const nickname = e.currentTarget.dataset.nickname || '';
-                if (targetId) this.blockUser(parseInt(targetId, 10), nickname, e.currentTarget);
+                if (targetId) this.blockUser(parseInt(targetId, 10), '사용자', e.currentTarget);
             });
         });
 
@@ -59,7 +69,7 @@ class ChatClient {
             acceptBtn.addEventListener('click', () => this.acceptMission());
         }
 
-        // 메시지 전송 (null이면 리스너 생략)
+        // 메시지 전송 버튼 제어
         if (this.sendBtn) {
             this.sendBtn.addEventListener('click', () => this.sendMessage());
         }
@@ -70,9 +80,16 @@ class ChatClient {
                     this.sendMessage();
                 }
             });
+            // 입력창에 글자가 있을 때만 전송 버튼 활성화 시각화
+            this.messageInput.addEventListener('input', () => {
+                if (this.messageInput.value.trim().length > 0) {
+                    this.sendBtn.style.background = "#4DA6FF";
+                } else {
+                    this.sendBtn.style.background = "#D0D5DD";
+                }
+            });
         }
 
-        // 채팅 히스토리 로드 후 WebSocket 연결
         this.loadHistory().then(() => {
             this.connect();
         });
@@ -100,37 +117,25 @@ class ChatClient {
             }
         } catch (err) {
             console.error(err);
-            alert('요청 중 오류가 발생했습니다.');
             acceptBtn.disabled = false;
         }
     }
 
     async blockUser(targetId, nickname, btnEl) {
-        if (!btnEl) return;
-        if (!confirm(`${nickname || '해당 유저'}를 차단하시겠습니까?`)) return;
-        btnEl.disabled = true;
+        if (!confirm(`사용자를 차단하시겠습니까?`)) return;
         try {
-            // 차단 = 1) 차단 목록 추가 2) 채팅방에서 강퇴 (room_id 필요)
             const res = await fetch('/api/users/api/block_user/', {
                 method: 'POST',
                 credentials: 'include',
                 headers: this.getAuthHeaders(),
                 body: JSON.stringify({ target_id: targetId, room_id: this.roomId }),
             });
-            const data = await res.json().catch(() => ({}));
             if (res.ok) {
-                alert(data.message || '차단되었습니다.');
-                btnEl.textContent = '차단됨';
-            } else {
-                const msg = data.error || data.detail || (typeof data === 'object' ? JSON.stringify(data) : String(data)) || `차단 실패 (${res.status})`;
-                console.warn('block_user 실패:', res.status, data);
-                alert(msg);
-                btnEl.disabled = false;
+                alert('차단되었습니다.');
+                window.location.href = '/api/users/homepage/';
             }
         } catch (err) {
             console.error(err);
-            alert('요청 중 오류가 발생했습니다.');
-            btnEl.disabled = false;
         }
     }
 
@@ -138,17 +143,13 @@ class ChatClient {
         try {
             const response = await fetch(`/ws/history/${this.roomId}`);
             const history = await response.json();
-
             history.forEach(msg => {
                 this.displayMessage({
-                    type: msg.type || 'TALK',
                     sender_id: msg.sender_id,
-                    sender_nickname: msg.sender_nickname,
                     content: msg.content,
                     time: msg.time
                 });
             });
-
             this.scrollToBottom();
         } catch (error) {
             console.error('히스토리 로드 실패:', error);
@@ -157,27 +158,15 @@ class ChatClient {
 
     connect() {
         this.updateStatus('연결 중...', '');
-
         this.ws = new WebSocket(this.wsUrl);
 
         this.ws.onopen = () => {
-            console.log('WebSocket 연결됨, 인증 시도...');
-            this.updateStatus('인증 중...', '');
-
-            // ✅ 첫 메시지로 AUTH 전송
-            const token = localStorage.getItem('access_token') || localStorage.getItem('access');
-
+            const token = this.getToken();
             if (!token) {
-                this.updateStatus('토큰 없음', 'error');
-                alert('로그인이 필요합니다.');
-                window.location.href = '/api/users/login/';
+                this.updateStatus('인증 필요', 'error');
                 return;
             }
-
-            this.ws.send(JSON.stringify({
-                type: 'AUTH',
-                token: token
-            }));
+            this.ws.send(JSON.stringify({ type: 'AUTH', token: token }));
         };
 
         this.ws.onmessage = (event) => {
@@ -186,123 +175,84 @@ class ChatClient {
         };
 
         this.ws.onclose = (event) => {
-            console.log('WebSocket 종료:', event.code);
             this.isAuthenticated = false;
             this.setInputEnabled(false);
-
-            if (event.code === 4001) {
-                this.updateStatus('인증 실패', 'error');
-            } else if (event.code === 4000) {
-                // 강퇴됨: 알림 후 다른 페이지로 이동
-                this.updateStatus('연결 종료됨', 'error');
+            if (event.code === 4000) {
                 alert('차단되어 채팅방에서 나가셨습니다.');
                 window.location.href = '/api/users/homepage/';
             } else {
                 this.updateStatus('연결 끊김', 'error');
-                // 5초 후 재연결 시도
                 setTimeout(() => this.connect(), 5000);
             }
-        };
-
-        this.ws.onerror = (error) => {
-            console.error('WebSocket 에러:', error);
-            this.updateStatus('연결 오류', 'error');
         };
     }
 
     handleMessage(msg) {
         switch (msg.type) {
             case 'AUTH_SUCCESS':
-                console.log('✅ 인증 성공:', msg.user_id);
                 this.isAuthenticated = true;
                 this.setInputEnabled(true);
                 this.updateStatus('연결됨', 'connected');
                 break;
-
-            case 'ERROR':
-                console.error('❌ 에러:', msg.content);
-                this.displaySystemMessage(msg.content);
-                break;
-
             case 'TALK':
                 this.displayMessage(msg);
                 break;
-
             case 'SYSTEM':
                 this.displaySystemMessage(msg.content);
                 break;
-
             case 'KICK':
-                alert(msg.content || '방장에 의해 강퇴되었습니다.');
                 window.location.href = '/api/users/homepage/';
                 break;
-
-            default:
-                console.log('알 수 없는 메시지 타입:', msg);
         }
     }
 
     sendMessage() {
         if (!this.messageInput) return;
         const content = this.messageInput.value.trim();
-
         if (!content || !this.isAuthenticated) return;
-
         this.ws.send(content);
         this.messageInput.value = '';
-        this.messageInput.focus();
+        this.sendBtn.style.background = "#D0D5DD"; // 초기화
     }
 
+    // ✅ 시안 디자인(ChatScreen (1).png)에 맞게 렌더링 구조 수정
     displayMessage(msg) {
         if (!this.messagesContainer) return;
-        const messageEl = document.createElement('div');
-        messageEl.classList.add('message');
-
         const isMine = msg.sender_id === this.userId;
-        messageEl.classList.add(isMine ? 'mine' : 'other');
+        
+        const msgGroup = document.createElement('div');
+        msgGroup.classList.add('msg-group', isMine ? 'mine' : 'other');
 
-        let html = '';
+        // 시간을 HH:MM 형식으로 변환 (서버 데이터에 따라 조정 필요)
+        const displayTime = msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        if (!isMine && msg.sender_nickname) {
-            html += `<div class="sender">${this.escapeHtml(msg.sender_nickname)}</div>`;
-        }
+        msgGroup.innerHTML = `
+            <div class="bubble">${this.escapeHtml(msg.content)}</div>
+            <span class="time">${displayTime}</span>
+        `;
 
-        html += `<div class="content">${this.escapeHtml(msg.content)}</div>`;
-
-        if (msg.time) {
-            html += `<div class="time">${msg.time}</div>`;
-        }
-
-        messageEl.innerHTML = html;
-        this.messagesContainer.appendChild(messageEl);
+        this.messagesContainer.appendChild(msgGroup);
         this.scrollToBottom();
     }
 
     displaySystemMessage(content) {
         if (!this.messagesContainer) return;
-        const messageEl = document.createElement('div');
-        messageEl.classList.add('message', 'system');
-        messageEl.textContent = content;
-        this.messagesContainer.appendChild(messageEl);
+        const sysMsg = document.createElement('div');
+        sysMsg.style.cssText = "text-align: center; font-size: 12px; color: #98A2B3; margin: 10px 0; width: 100%;";
+        sysMsg.textContent = content;
+        this.messagesContainer.appendChild(sysMsg);
         this.scrollToBottom();
     }
 
     updateStatus(text, className) {
         if (!this.statusEl) return;
         this.statusEl.textContent = text;
-        this.statusEl.className = 'status';
-        if (className) {
-            this.statusEl.classList.add(className);
-        }
+        this.statusEl.style.color = className === 'connected' ? '#4DA6FF' : '#98A2B3';
     }
 
     setInputEnabled(enabled) {
         if (this.messageInput) this.messageInput.disabled = !enabled;
         if (this.sendBtn) this.sendBtn.disabled = !enabled;
-
-        if (enabled && this.messageInput) {
-            this.messageInput.focus();
-        }
     }
 
     scrollToBottom() {
@@ -318,12 +268,10 @@ class ChatClient {
     }
 }
 
-// 페이지 로드 시 채팅 클라이언트 초기화
+// 초기화 로직 유지
 function initChatClient() {
     if (typeof CHAT_CONFIG !== 'undefined') {
         window.chatClient = new ChatClient(CHAT_CONFIG);
-    } else {
-        console.error('CHAT_CONFIG가 정의되지 않았습니다.');
     }
 }
 if (document.readyState === 'loading') {
