@@ -53,22 +53,23 @@ body {
     padding-bottom: 90px; 
 }
 
+/* Bottom Nav */
 /* ----------------------------------------------------------------
-    하단 네비게이션 바 (아이콘 규격 통일 및 상태별 색상 반영)
+    하단 네비게이션 바 (밀착형 & 상태별 색상 변경)
 ------------------------------------------------------------------- */
 .bottom-nav {
-    /* [포지션] 바닥 밀착 및 중앙 정렬 */
+    /* [포지션] 바닥에 완전히 밀착 */
     position: fixed;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     
-    /* [규격] 모바일 표준 가로폭 */
+    /* [규격] 모바일 가로폭 450px에 맞춤 */
     width: 100%;
     max-width: 450px;
-    height: 70px; /* 시안 표준 높이 */
+    height: 75px;
     
-    /* [디자인] */
+    /* [디자인] 순백색 배경과 상단 경계선 */
     background: #ffffff;
     display: flex;
     justify-content: space-around;
@@ -77,7 +78,7 @@ body {
     z-index: 1000;
 }
 
-/* 1. 기본 아이콘 스타일 (비활성: #99A1AF) */
+/* 1. 기본 아이콘 및 텍스트 스타일 (회색) */
 .nav-item {
     display: flex;
     flex-direction: column;
@@ -85,73 +86,77 @@ body {
     justify-content: center;
     text-decoration: none;
     flex: 1;
-    color: #99A1AF; /* 요청하신 기본 회색 */
+    /* [기본 색상] #99A1AF */
+    color: #99A1AF; 
+    gap: 4px;
     transition: color 0.2s ease;
-    height: 100%;
 }
 
-/* [핵심] 모든 아이콘 크기 24px로 통일 */
 .nav-item i {
-    font-size: 24px; 
-    display: block;
+    font-size: 22px;
 }
 
-/* 2. 활성화된 상태 스타일 (파란색: #4DA6FF) */
+.nav-item span {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* 2. 활성화된 상태 스타일 (아이콘+텍스트 파란색) */
 .nav-item.active {
-    color: #4DA6FF !important; /* 요청하신 활성 파란색 */
+    /* [활성 색상] #4DA6FF */
+    color: #4DA6FF !important;
 }
 
-/* 3. 중앙 + 버튼 (FAB) - 입체감 및 규격 조정 */
+/* 3. 중앙 + 버튼 (FAB) - 동일 선상 배치 및 효과 제거 */
 .nav-fab {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-decoration: none;
 }
 
 .fab-button {
-    width: 50px;
-    height: 50px;
-    background-color: #4DA6FF;
+    width: 48px;
+    height: 48px;
+    background-color: #4DA6FF; /* 항상 파란색 고정 */
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3); /* 은은한 그림자 추가 */
-    transition: transform 0.2s ease;
+    font-size: 24px;
+    
+    /* [수정] 동일 선상 배치를 위해 여백/효과 삭제 */
+    margin-top: 0; 
+    border: none; 
+    box-shadow: none; 
 }
 
-.fab-button i {
-    font-size: 24px; /* 중앙 버튼 아이콘도 동일 규격 */
-}
-
-.fab-button:active {
-    transform: scale(0.95); /* 클릭 시 피드백 효과 */
-}
-
-/* 4. 알림 배지 (필요 시 사용, 위치 최적화) */
+/* 4. 알림 배지 스타일 (원형 강조 & 위치 상단 이동) */
 .icon-wrapper {
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
 }
 
 .nav-badge {
     position: absolute;
-    top: -5px;
-    right: -8px;
+    /* [수정] 위치를 더 오른쪽 상단으로 이동 */
+    top: -8px;
+    right: -10px;
     background: #FF4757;
     color: white;
     font-size: 10px;
     font-weight: bold;
+    
+    /* [수정] 완벽한 원형을 위해 가로세로 고정 및 테두리 삭제 */
     width: 16px;
     height: 16px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #ffffff; /* 가독성을 위한 흰색 테두리 */
+    border: none; 
+    padding: 0; /* 원형 유지를 위해 패딩 제거 */
 }

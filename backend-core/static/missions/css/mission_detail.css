@@ -325,3 +325,24 @@ body {
     background-repeat: no-repeat;
     margin-right: 8px;
 }
+
+/* mission_detail.css */
+#mission-images-section {
+    display: block !important;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.mission-images-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.image-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
