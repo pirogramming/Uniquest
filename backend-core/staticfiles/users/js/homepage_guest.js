@@ -33,7 +33,7 @@ async function loadGuestHomepage() {
             const status = m.status || '';
             const id = m.id || '';
             return (
-                '<div class="mission-card" onclick="location.href=\'/api/missions/' + id + '/\'">' +
+                '<div class="mission-card">' +
                 '  <div class="card-header">' +
                 '    <h3 class="title">' + title + '</h3>' +
                 '    <span class="tag-status">' + status + '</span>' +

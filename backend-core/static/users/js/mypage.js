@@ -3,6 +3,7 @@ async function getUserData() {
     
     if (!token) {
         console.warn("로그인 토큰이 없습니다.");
+        window.location.href = "/api/users/login/"
         return null;
     }
 
@@ -24,7 +25,8 @@ async function getUserData() {
             return null;
         }
     } catch (error) {
-        console.error("네트워크 오류 발생:", error);
+        alert("네트워크 오류 발생:");
+        window.location,href = "/api/users/login/"
         return null;
     }
 }
