@@ -1,0 +1,5 @@
+Collecting redis[asyncio]
+  Using cached redis-7.1.0-py3-none-any.whl.metadata (12 kB)
+Using cached redis-7.1.0-py3-none-any.whl (354 kB)
+Installing collected packages: redis
+Successfully installed redis-7.1.0

@@ -200,6 +200,10 @@ SIMPLE_JWT = {
 
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_DB = int(os.getenv('REDIS_DB', 0))
+
 # 개발 중에만 True로 설정
 CORS_ALLOW_ALL_ORIGINS = True
 #로그인 후 발급받은 토큰 해독

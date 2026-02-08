@@ -20,6 +20,8 @@ from .serializers import MissionSerializer
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
 from common.utils import publish_chat_event
+from common.utils import publish_mission_update  # ✨ 추가
+
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +103,12 @@ def mission_create(request):
             images = request.FILES.getlist("images")
             for f in images:
                 if f: MissionImage.objects.create(mission=mission, image=f)
+
+            publish_mission_update({
+                "action": "CREATE",
+                "mission_id": mission.id,
+                "data": MissionSerializer(mission).data
+            })
 
             return Response({"success": True, "mission_id": mission.id}, status=status.HTTP_201_CREATED)
         except Exception:
@@ -201,6 +209,41 @@ def tag_suggest(request):
 
     data = [{"id": t.id, "name": t.name, "display": f"#{t.name}", "slug": t.slug} for t in qs]
     return Response({"results": data})
+
+# views.py에 추가할 부분 (mission_accept 함수 바로 위에 추가하세요)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def mission_delete(request, mission_id):
+    """미션 삭제 API - 작성자만 삭제 가능"""
+    mission = get_object_or_404(Mission, id=mission_id)
+    
+    # 작성자만 삭제 가능
+    if mission.author != request.user:
+        return Response({"error": "작성자만 삭제할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        # SSE로 삭제 알림 (삭제 전에 먼저 발행)
+        publish_mission_update({
+            "action": "DELETE",
+            "mission_id": mission.id
+        })
+        
+        # 미션 삭제 (연관된 MissionImage, MissionTag도 CASCADE로 자동 삭제됨)
+        mission.delete()
+        
+        return Response({
+            "success": True,
+            "message": "미션이 삭제되었습니다."
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.exception("미션 삭제 중 오류 발생")
+        return Response({
+            "error": "미션 삭제 중 오류가 발생했습니다."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
