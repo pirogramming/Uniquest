@@ -27,10 +27,27 @@
         'LIFE': '생활',
         'OTHER': '기타'
     };
-
-    // ==================== 미션 목록 로딩 ====================
+// ==================== 미션 목록 로딩 수정 ====================
     
     async function loadMissions() {
+        const scriptData = document.getElementById('mission-data');
+        
+        if (scriptData) {
+            // 1. HTML에 포함된 초기 데이터(DB 데이터) 사용
+            try {
+                const initialMissions = JSON.parse(scriptData.textContent);
+                console.log("📍 초기 DB 데이터 로드:", initialMissions);
+                
+                // 마커와 리스트 렌더링 (SSE와 동일한 데이터 구조여야 함)
+                addMissionMarkers(initialMissions);
+                renderMissionList(initialMissions);
+                return; // API 호출 생략
+            } catch (e) {
+                console.error("초기 데이터 파싱 실패, API 호출로 전환:", e);
+            }
+        }
+
+        // 2. 만약 데이터가 없으면 기존처럼 API 호출
         try {
             const response = await Auth.getData(API_LIST_URL);
             if (response && response.results) {

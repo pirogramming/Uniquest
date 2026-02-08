@@ -62,11 +62,20 @@
 [
     {% for m in missions %}
     {
-        "id": "{{ m.id }}",
+        "id": {{ m.id }},
         "title": "{{ m.title|escapejs }}",
-        "lat": {% if m.location_lat %}{{ m.location_lat }}{% else %}null{% endif %},
-        "lng": {% if m.location_lng %}{{ m.location_lng }}{% else %}null{% endif %},
-        "url": "{% url 'missions:mission_detail' m.id %}"
+        "location_lat": {% if m.location_lat %}{{ m.location_lat }}{% else %}null{% endif %},
+        "location_lng": {% if m.location_lng %}{{ m.location_lng }}{% else %}null{% endif %},
+        "location_name": "{{ m.location_name|escapejs }}",
+        "reward": {{ m.reward|default:0 }},
+        "category": "{{ m.category }}",
+        "status": "{{ m.status }}",
+        "created_at": "{{ m.created_at|date:'c' }}",
+        "tags": [
+            {% for t in m.tags.all %}
+                {"name": "{{ t.name|escapejs }}"}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
 ]
