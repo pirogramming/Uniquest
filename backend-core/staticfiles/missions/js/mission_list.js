@@ -11,7 +11,7 @@
             const response = await Auth.authFetchJson(API_LIST_URL);
             if (response && response.results) {
                 addMissionMarkers(response.results); // 지도에 표시
-                renderMissionList(response.results); // 👈 하단 목록에 표시
+                renderMissionList(response.results); // 👈 하단 목록에 표시 (추가)
             }
         } catch (err) {
             console.error("API 요청 실패:", err);
