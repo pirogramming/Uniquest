@@ -39,6 +39,7 @@ urlpatterns = [
     #홈페이지
     path('homepage/',views.get_home_page,name="homepage"),
     path('api/homepage/',views.get_homepage_info,name="homepage_info"),
+    path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 
     #회원탈퇴 페이지
     path('api/signout/',views.signout,name="signout"),

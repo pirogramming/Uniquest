@@ -12,7 +12,7 @@
 
 {% block content %}
 <header class="header">
-            <div class="header-top">
+            <div class="header-top" id="header-top">
                 <div class="user-greeting">
                     <h1>안녕하세요,</h1>
                     <p id="nickname"></p>
@@ -23,7 +23,7 @@
                 </div>
             </div>
 
-            <div class="quick-menu">
+            <div class="quick-menu" id="quick-menu">
                 <a href={%url 'missions:mission_list' %}>
                     <div class="menu-item">
                         <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
@@ -43,7 +43,7 @@
             </div>
         </header>
 
-        <section class="mission-status-card">
+        <section class="mission-status-card" id="mission-status-card">
             <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
             <div class="status-grid">
                 <div class="status-item">
@@ -61,7 +61,7 @@
             </div>
         </section>
 
-        <section class="mission-list-section">
+        <section class="mission-list-section" id="mission-list-section">
             <div class="section-title">
                 <h2>진행 중인 미션</h2>
                 <a href="{% url 'missions:mission_list'%}" class="view-all">전체보기</a>

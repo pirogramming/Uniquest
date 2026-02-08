@@ -82,6 +82,7 @@ def verify_email(request):
 
     return JsonResponse({'error': '잘못된 접근입니다.'}, status=405)
 
+# 비번 변경에서 이메일 확인 로직
 def verify_email_check(request):
     if request.method == "POST":
         try:
@@ -123,8 +124,7 @@ def verify_email_check(request):
                 university = extract_univ(email)
 
                 if verify_code(email, number):
-                    cache.set(f"university_info_{email}", university, timeout=600)
-                    cache.set(f"varified_info_{email}", True, timeout=600)
+                    cache.set(f"my_email",email,timeout=600)
                     return JsonResponse({'is_varified': True, 'email': email}, status=200)
                 else:
                     return JsonResponse({'is_varified': False}, status=200)
@@ -230,7 +230,8 @@ def logout(request):
 @permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
 def get_my_info(request):
     user = request.user
-    missions = list(user.missions.all().values('id','title','reward','status'))
+    missions = list(user.missions.all().values('id','title','reward','status','descriptions'))
+    accepted_missions = list(user.accepted_missions.all().values('id','title','reward','status','descriptions'))
     blocked_Queryset = user.blocked_people.all()
     return Response({
         "id": user.id,
@@ -241,7 +242,8 @@ def get_my_info(request):
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
         "missions" : missions,
-        "blocked_people" : list(blocked_Queryset.values('id','nickname'))
+        "blocked_people" : list(blocked_Queryset.values('id','nickname')),
+        "accepted_missions":accepted_missions,
     })
 
 def mypage_view(request):
@@ -334,6 +336,7 @@ def get_homepage_info(request):
     waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
     matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
     completed_count = len([m for m in mission_lst if m['status'] == 'COMPLETED'])
+    
     return Response({
         "id":user.id,
         "nickname":user.nickname,
@@ -347,6 +350,15 @@ def get_homepage_info(request):
         "matched_count":matched_count,
         "completed_count":completed_count
     })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_homepage_info_unlogin(request):
+    missions = Mission.objects.all().values('id','title','descriptions','category','status','reward','location_name')
+    return Response({
+        "missions":missions
+    })
+
 
 #회원 탈퇴
 
@@ -373,7 +385,7 @@ def check_password(request):
 @permission_classes([AllowAny])
 def change_password(request):
     password = request.data.get('password')
-    email = "2022132036@yonsei.ac.kr" # 특정 사용자를 지정하신 이유가 있겠지만, 보통은 request.user를 사용합니다.
+    email = cache.get(f"my_email")
 
     try:
         target_user = User.objects.get(univ_email=email)
