@@ -9,6 +9,7 @@
     const missionId = pathParts[pathParts.length - 1];
 
     const API_DETAIL_URL = `/api/missions/api/${missionId}/detail/`;
+    const API_DELETE_URL = `/api/missions/api/${missionId}/delete/`;
 
     // --- [1] 지도 마커 표시 (커스텀 별 마커 적용) ---
     function initMap(lat, lng) {
@@ -53,7 +54,33 @@
         });
     }
 
-    // --- [2] 데이터 로드 및 버튼 처리 ---
+    // --- [2] 미션 삭제 함수 ---
+    async function deleteMission() {
+        if (!confirm('정말로 이 미션을 삭제하시겠습니까?\n삭제된 미션은 복구할 수 없습니다.')) {
+            return;
+        }
+
+        try {
+            const response = await Auth.authFetch(API_DELETE_URL, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert(data.message || '미션이 삭제되었습니다.');
+                // 미션 목록 페이지로 이동
+                window.location.href = '/api/missions/';
+            } else {
+                const error = await response.json();
+                alert(error.error || '삭제에 실패했습니다.');
+            }
+        } catch (err) {
+            console.error('미션 삭제 오류:', err);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+
+    // --- [3] 데이터 로드 및 버튼 처리 ---
     async function loadMissionDetail() {
         try {
             const mission = await Auth.authFetchJson(API_DETAIL_URL);
@@ -77,10 +104,15 @@
                         actionArea.innerHTML = `
                             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
                                 <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다.</p>
-                                <a href="/api/missions/${mission.id}/chat/start/" class="btn btn-primary" style="display: inline-block; margin-right: 8px; margin-bottom: 8px; padding: 10px 20px; text-decoration: none; color: white; border-radius: 8px;">채팅하기</a>
-                                <button onclick="location.href='/api/missions/${mission.id}/edit/'" class="btn btn-secondary">
-                                    미션 정보 수정하기
-                                </button>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <a href="/api/missions/${mission.id}/chat/start/" class="btn btn-primary" style="flex: 1; min-width: 120px; padding: 10px 20px; text-decoration: none; color: white; border-radius: 8px; text-align: center;">채팅하기</a>
+                                    <button onclick="location.href='/api/missions/${mission.id}/edit/'" class="btn btn-secondary" style="flex: 1; min-width: 120px;">
+                                        수정하기
+                                    </button>
+                                    <button onclick="window.deleteMission()" class="btn btn-danger" style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                        삭제하기
+                                    </button>
+                                </div>
                             </div>
                         `;
                     } else {
@@ -97,6 +129,9 @@
             document.getElementById('action-area').innerHTML = `<p class="muted">로그인이 필요하거나 삭제된 미션입니다.</p>`;
         }
     }
+
+    // deleteMission을 전역으로 노출 (인라인 onclick에서 호출 가능하도록)
+    window.deleteMission = deleteMission;
 
     document.addEventListener("DOMContentLoaded", loadMissionDetail);
 })();

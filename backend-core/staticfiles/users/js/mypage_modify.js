@@ -9,13 +9,7 @@ async function getUserData() {
 
     try {
         // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const response = await fetch('/api/users/api/profile_modify/', { // 팀장님의 API 주소
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await fetch('/api/users/api/profile_modify/');
 
         if (response.ok) {
             const userData = await response.json();
@@ -80,7 +74,6 @@ async function patchProfile() {
         const response = await fetch('/api/users/api/profile_modify/', {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(updatedData)
