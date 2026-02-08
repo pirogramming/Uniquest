@@ -413,3 +413,28 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "blockable_user": blockable_user,
         },
     )
+
+@login_required
+def chat_list(request: HttpRequest) -> HttpResponse:
+    """내가 참여한 채팅방 목록 (차단된 유저 제외)"""
+    rooms = (
+        ChatRoom.objects
+        .filter(models.Q(user1=request.user) | models.Q(user2=request.user))
+        .select_related("mission", "mission__author", "user1", "user2")
+        .order_by("-created_at")
+    )
+    room_list = []
+    for room in rooms:
+        other = room.user2 if room.user1 == request.user else room.user1
+        if _is_blocked_between(request.user, other):
+            continue
+        room_list.append({
+            "room": room,
+            "other_user": other,
+            "mission": room.mission,
+        })
+    return render(
+        request,
+        "chat/list.html",
+        {"room_list": room_list},
+    )

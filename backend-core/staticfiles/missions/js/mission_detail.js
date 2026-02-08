@@ -97,15 +97,14 @@
                     authorEl.textContent = mission.author_username;
                 }
 
-                // 3. 버튼 렌더링
+                // 3. 버튼 렌더링 (작성자는 채팅하기 없음, 다른 사람이 채팅 시작 시 채팅 목록에 표시됨)
                 const actionArea = document.getElementById('action-area');
                 if (actionArea) {
                     if (mission.is_author) {
                         actionArea.innerHTML = `
                             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                                <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다.</p>
+                                <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다. 다른 사람이 채팅을 시작하면 채팅 목록에 표시됩니다.</p>
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                    <a href="/api/missions/${mission.id}/chat/start/" class="btn btn-primary" style="flex: 1; min-width: 120px; padding: 10px 20px; text-decoration: none; color: white; border-radius: 8px; text-align: center;">채팅하기</a>
                                     <button onclick="location.href='/api/missions/${mission.id}/edit/'" class="btn btn-secondary" style="flex: 1; min-width: 120px;">
                                         수정하기
                                     </button>

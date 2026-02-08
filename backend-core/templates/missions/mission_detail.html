@@ -4,13 +4,13 @@
 {% block title %}{{ mission.title }}{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'missions/css/mission_detail.css' %}">
+<link rel="stylesheet" href="{% static 'missions/css/mission_detail.css' %}">
 {% endblock %}
 
 {% block extra_js %}
-    <script src="/static/shared/js/auth.js"></script>
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
-    <script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
+<script src="/static/shared/js/auth.js"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
+<script src="{% static 'missions/js/mission_detail.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -23,11 +23,11 @@
 
     <div class="visual-section">
         {% if mission.location_name %}
-            <div id="map"></div>
-            <div class="map-overlay-info">
-                <span class="pin-icon">📍</span>
-                <span class="loc-name">{{ mission.location_name }}</span>
-            </div>
+        <div id="map"></div>
+        <div class="map-overlay-info">
+            <span class="pin-icon">📍</span>
+            <span class="loc-name">{{ mission.location_name }}</span>
+        </div>
         {% endif %}
     </div>
 
@@ -59,7 +59,7 @@
 
         <div class="tag-container">
             {% for t in mission.tags.all %}
-                <span class="tag-pill">#{{ t.name }}</span>
+            <span class="tag-pill">#{{ t.name }}</span>
             {% endfor %}
         </div>
 
@@ -71,7 +71,8 @@
                 </div>
                 <div class="author-text">
                     <div class="author-name">{{ mission.author.nickname|default:mission.author.username }}</div>
-                    <div class="author-score">🌡️ 점수 <span>{{ mission.author.manner_score|default:"36.5" }}점</span></div>
+                    <div class="author-score">🌡️ 점수 <span>{{ mission.author.manner_score|default:"36.5" }}점</span>
+                    </div>
                 </div>
                 <a href="#" class="view-profile">프로필 보기</a>
             </div>
@@ -79,21 +80,21 @@
     </main>
 
     <div class="bottom-action">
-            {% if user.is_authenticated %}
-                {% if user == mission.author %}
-                    <a href="#" class="btn btn-edit-style">
-                        미션 수정하기
-                    </a>
-                {% else %}
-                    <a href="#" class="btn btn-chat-style">
-                        채팅하기
-                    </a>
-                {% endif %}
-            {% else %}
-                <a href="/api/users/login/" class="btn btn-chat-style">
-                    로그인 후 채팅하기
-                </a>
-            {% endif %}
-        </div>
+        {% if user.is_authenticated %}
+        {% if user == mission.author %}
+        <a href="{% url 'missions:mission_update_view' mission.id %}" class="btn btn-edit-style">
+            미션 수정하기
+        </a>
+        {% else %}
+        <a href="{% url 'missions:start_chat' mission.id %}" class="btn btn-chat-style">
+            채팅하기
+        </a>
+        {% endif %}
+        {% else %}
+        <a href="{% url 'users:login' %}" class="btn btn-chat-style">
+            로그인 후 채팅하기
+        </a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
