@@ -37,8 +37,9 @@ urlpatterns = [
     path('api/blocked_users/',views.get_blocked_users_info,name="blocked_user_info"),
 
     #홈페이지
-    path('homepage/',views.get_home_page,name="homepage"),
-    path('api/homepage/',views.get_homepage_info,name="homepage_info"),
+    path('homepage/', views.get_home_page, name="homepage"),
+    path('homepage_guest/', views.get_home_page_guest, name="homepage_guest"),
+    path('api/homepage/', views.get_homepage_info, name="homepage_info"),
     path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 
     #회원탈퇴 페이지

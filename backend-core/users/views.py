@@ -327,6 +327,11 @@ def get_blocked_users(request):
 def get_home_page(request):
     return render(request,'users/homepage.html')
 
+
+def get_home_page_guest(request):
+    """비로그인 사용자 전용 홈 페이지 (별도 URL/템플릿)."""
+    return render(request, 'users/homepage_guest.html')
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_homepage_info(request):
