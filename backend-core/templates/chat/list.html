@@ -8,26 +8,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="header" style="padding: 16px;">
-    <a href="{% url 'users:homepage' %}" style="text-decoration: none; color: inherit; font-size: 20px;">←</a>
-    <h2 style="margin: 16px 0;">채팅 목록</h2>
-</div>
-
-<section style="padding: 0 16px 80px;">
-    {% for item in room_list %}
-    <a href="{% url 'missions:chat_room' item.mission.id item.room.id %}"
-        style="display: block; padding: 14px; margin-bottom: 8px; background: #fff; border: 1px solid #eee; border-radius: 12px; text-decoration: none; color: inherit; cursor: pointer;">
-        <strong style="font-size: 16px;">{{ item.mission.title }}</strong>
-        <span style="color: #666; font-size: 14px;"> · {{ item.other_user.nickname }}</span>
-        <span style="float: right; color: #999;">→</span>
-    </a>
-    {% empty %}
-    <div style="text-align: center; padding: 60px 20px; color: #98A2B3;">
-        <p>채팅방이 없습니다.</p>
-        <a href="{% url 'missions:mission_list' %}" style="color: #007bff; text-decoration: none;">미션 찾기</a>
+<div class="has-nav">
+    <div class="header" style="padding: 16px;">
+        <a href="{% url 'users:homepage' %}" style="text-decoration: none; color: inherit; font-size: 20px;">←</a>
+        <h2 style="margin: 16px 0;">채팅 목록</h2>
     </div>
-    {% endfor %}
-</section>
+
+    <section style="padding: 0 16px 80px;">
+        {% for item in room_list %}
+        <a href="{% url 'missions:chat_room' item.mission.id item.room.id %}"
+            style="display: block; padding: 14px; margin-bottom: 8px; background: #fff; border: 1px solid #eee; border-radius: 12px; text-decoration: none; color: inherit; cursor: pointer;">
+            <strong style="font-size: 16px;">{{ item.mission.title }}</strong>
+            <span style="color: #666; font-size: 14px;"> · {{ item.other_user.get_display_name }}</span>
+            <span style="float: right; color: #999;">→</span>
+        </a>
+        {% empty %}
+        <div style="text-align: center; padding: 60px 20px; color: #98A2B3;">
+            <p>채팅방이 없습니다.</p>
+            <a href="{% url 'missions:mission_list' %}" style="color: #007bff; text-decoration: none;">미션 찾기</a>
+        </div>
+        {% endfor %}
+    </section>
+</div>
 {% endblock %}
 
 {% block bottom_nav %}
