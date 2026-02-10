@@ -199,3 +199,30 @@ input {
     line-height: 1.6;
     text-align: left;
 }
+
+/* 로딩 스피너 커스텀 스타일 */
+#transmitting {
+    display: none; /* 기본은 숨김 */
+    pointer-events: none; /* 로딩 중 클릭 방지 */
+    background-color: #f2f4f7; /* 로딩 중임을 나타내는 연한 배경 */
+    color: #57A6FF; /* 찬웅님의 테마 색상 */
+}
+
+/* Font Awesome 아이콘 크기 조절 */
+#transmitting i {
+    font-size: 18px;
+}
+
+/* (옵션) 만약 아이콘 없이 CSS로만 만들고 싶다면 아래 클래스를 활용하세요 */
+.loading-wheel {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(87, 166, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: #57A6FF;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
