@@ -139,6 +139,7 @@ function logout() {
     window.location.href = "/api/users/login/";
 }
 
+
 async function signout() {
     const token = localStorage.getItem('access_token');
     if (!token) return;
@@ -148,35 +149,6 @@ async function signout() {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (res.ok) {
-            localStorage.clear();
-            alert("회원 탈퇴 완료");
-            window.location.href = "/api/users/login/";
-        }
-    } catch (error) {
-        console.error("오류 발생:", error);
-    }
-}
-
-
-async function signout() {
-    const token = localStorage.getItem('access_token');
-    
-    if (!token) {
-        console.warn("로그인 토큰이 없습니다.");
-        return null;
-    }
-
-    try {
-        // 2. 백엔드 API에 토큰을 담아서 던지기 (fetch)
-        const res = await fetch('/api/users/api/signout/', { // 팀장님의 API 주소
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`, // 👈 이게 제일 중요!
                 'Content-Type': 'application/json'
             }
         });
@@ -194,12 +166,8 @@ async function signout() {
             return null;
         }
     } catch (error) {
-        console.error("네트워크 오류 발생:", error);
-        return null;
+        console.error("오류 발생:", error);
     }
-
 }
 
-// 페이지가 로드되면 자동으로 실행
 window.addEventListener('DOMContentLoaded', renderProfile);
-//ㅗㅑ

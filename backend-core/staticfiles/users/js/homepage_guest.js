@@ -24,24 +24,38 @@ async function loadGuestHomepage() {
             return;
         }
 
-        container.innerHTML = missions.map(function (m) {
+        // [수정] 최신 미션 2개만 추출
+        const latestMissions = missions.slice(0, 2);
+
+        // 카테고리 색상 매핑 객체
+        const categoryClassMap = {
+            '심부름': 'category-errand',
+            '학업': 'category-study',
+            '대여': 'category-rent',
+            '구인': 'category-job',
+            '생활': 'category-life'
+        };
+
+        container.innerHTML = latestMissions.map(function (m) {
             const title = (m.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            const descriptions = (m.descriptions || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            const category = m.category || '';
-            const location_name = m.location_name || '';
-            const reward = m.reward != null ? m.reward : '';
-            const status = m.status || '';
+            const category = m.category || '기타';
+            const location_name = m.location_name || '장소 미지정';
+            const reward = m.reward != null ? m.reward.toLocaleString() + '원' : '가격 미정';
+            const status = m.status || '진행중';
             const id = m.id || '';
+
+            // 카테고리에 맞는 클래스 선택
+            const categoryColorClass = categoryClassMap[category] || 'category-etc';
+
             return (
                 '<div class="mission-card" onclick="location.href=\'/api/missions/' + id + '/\'">' +
                 '  <div class="card-header">' +
                 '    <h3 class="title">' + title + '</h3>' +
                 '    <span class="tag-status">' + status + '</span>' +
                 '  </div>' +
-                '  <p class="description">' + descriptions + '</p>' +
                 '  <div class="card-footer">' +
                 '    <div class="info">' +
-                '      <span class="tag-category category-delivery">' + category + '</span>' +
+                '      <span class="tag-category ' + categoryColorClass + '">' + category + '</span>' +
                 '      <span class="location">' + location_name + '</span>' +
                 '    </div>' +
                 '    <span class="price">' + reward + '</span>' +

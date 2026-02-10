@@ -102,6 +102,7 @@
 }
 
 /* 6. 개별 채팅 링크 */
+
 .individual-chat-link {
     display: flex;
     align-items: center;
