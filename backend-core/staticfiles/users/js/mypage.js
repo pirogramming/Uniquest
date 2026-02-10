@@ -43,6 +43,9 @@ async function renderProfile() {
         const mannerScore = document.getElementById('user-score'); // 점수 텍스트
         const register_missions = document.getElementById('my-registered-missions');
         const performed_missions = document.getElementById('my-performed-missions');
+        const score_bar_fill = document.getElementById('score_bar_fill');
+
+        score_bar_fill.style = `width : ${user.manner_score}%;`
 
         // 1. 기본 정보 반영
         if (nicknameElement) nicknameElement.innerText = user.nickname;
