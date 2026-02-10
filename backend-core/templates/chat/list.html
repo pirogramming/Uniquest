@@ -4,13 +4,11 @@
 {% block title %}채팅 목록 - Uniquest{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
 <link rel="stylesheet" href="{% static 'chat/css/list.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="mobile-container has-nav">
+<div class="has-nav">
     <div class="chat-header-area">
         <h1 class="page-title">채팅 목록</h1>
     </div>
@@ -53,7 +51,7 @@
     </section>
 
     {% block bottom_nav_internal %}
-        {% include "_bottom-nav.html" %}
+    {% include "_bottom-nav.html" %}
     {% endblock %}
 </div>
 {% endblock %}
