@@ -2,7 +2,8 @@
 
 /* 1. 상단 헤더 영역 */
 .chat-header-area {
-    padding: 30px 20px 15px; /* 화살표가 빠진 만큼 상단 여백 조정 */
+    padding: 30px 20px 15px;
+    /* 화살표가 빠진 만큼 상단 여백 조정 */
     background: #ffffff;
 }
 
@@ -102,7 +103,6 @@
 }
 
 /* 6. 개별 채팅 링크 */
-
 .individual-chat-link {
     display: flex;
     align-items: center;
@@ -153,7 +153,8 @@
     margin-top: 4px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* 긴 대화 생략 */
+    text-overflow: ellipsis;
+    /* 긴 대화 생략 */
 }
 
 .empty-state {
