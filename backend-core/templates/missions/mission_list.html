@@ -20,6 +20,11 @@
         <!-- 헤더 -->
         <div class="mission-header">
             <h2>미션 목록</h2>
+            <button class="filter-btn" onclick="window.openFilterPanel()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
         </div>
 
         <!-- 툴바 -->
@@ -46,18 +51,29 @@
                     </svg>
                     리스트만
                 </button>
+                
             </div>
-
-            <!-- 필터 버튼 -->
-            <button class="filter-btn" onclick="window.openFilterPanel()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                </svg>
-            </button>
+            
+            
         </div>
 
         <!-- 지도 -->
-        <div id="map"></div>
+        <div id="map">
+            <!-- 플로팅 전체화면 지도 버튼 -->
+            <button class="floating-map-btn" onclick="window.openFullscreenMap()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
+                </svg>
+            </button>
+            <!-- 전체화면으로 표시 -->
+            <div id="fullscreen-map-container" style="display:none;">
+                <div class="top-header">
+                    <h2 class="header-title">지도</h2>
+                    <button id="close-fullscreen-map" onclick="window.closeFullscreenMap()">←</button>
+                </div>
+                <div id="fullscreen-map"></div>
+            </div>
+        </div>
 
         <!-- 미션 목록 -->
         <div id="mission-list-container">
@@ -67,13 +83,7 @@
 
     {% include "_bottom-nav.html" %}
 
-    <!-- 플로팅 전체화면 지도 버튼 -->
-    <button class="floating-map-btn" onclick="window.openFullscreenMap()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-    </button>
+    
 </div>
 
 <!-- 필터 패널 include -->

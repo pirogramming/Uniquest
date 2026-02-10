@@ -161,6 +161,8 @@
     function openFilterPanel() {
         const backdrop = document.getElementById('filter-backdrop');
         const panel = document.getElementById('filter-panel');
+        const filterBtn = document.querySelector('.filter-btn');
+        if (filterBtn) filterBtn.classList.add('active');
         
         if (backdrop) backdrop.style.display = 'block';
         if (panel) panel.style.display = 'block';
@@ -170,13 +172,15 @@
             backdrop.onclick = closeFilterPanel;
         }
     }
-
+    
     function closeFilterPanel() {
         const backdrop = document.getElementById('filter-backdrop');
         const panel = document.getElementById('filter-panel');
+        const filterBtn = document.querySelector('.filter-btn');
         
         if (backdrop) backdrop.style.display = 'none';
         if (panel) panel.style.display = 'none';
+        if (filterBtn) filterBtn.classList.remove('active');
     }
 
     // ==================== 뷰 전환 ====================

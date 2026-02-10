@@ -14,23 +14,24 @@
         height: 300px;
         border-radius: 16px; 
         margin-bottom: 20px; 
-        transition: height 0.3s ease;
+        position: relative; /* 자식인 버튼의 기준점이 됩니다 */
+        overflow: hidden;    /* 버튼이 지도의 둥근 모서리 밖으로 나가지 않게 함 */
     }
+    
     #map.hidden {
         display: none;
     }
     .mission-header { 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
         padding: 20px 0 10px; 
+        box-sizing: border-box;
     }
     .mission-header h2 { 
         font-size: 20px; 
         font-weight: 700; 
-        margin-bottom: 8px; 
-    }
-    .create-link { 
-        font-size: 14px; 
-        text-decoration: none; 
-        font-weight: 600; 
     }
     
     /* 애니메이션 */
@@ -48,6 +49,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        width: 100%;
         padding: 12px 0;
         margin-bottom: 16px;
     }
@@ -84,14 +86,16 @@
     .filter-btn {
         width: 40px;
         height: 40px;
-        border-radius: 8px;
+        border-radius: 999px;
         border: 1px solid #E5E7EB;
-        background: white;
+        color:#333333;
+        background: none;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
+        padding:0;
     }
 
     .filter-btn:hover {
@@ -100,35 +104,37 @@
     }
 
     .filter-btn.active {
-        background: #4DA6FF;
         border-color: #4DA6FF;
+        background: #4DA6FF;
+        
     }
-
+    
     .filter-btn.active svg {
-        color: white;
+        color: white;        
     }
 
     /* 플로팅 버튼 */
     .floating-map-btn {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 56px;
-        height: 56px;
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
         border-radius: 50%;
-        background: #4DA6FF;
+        background: #f3f4f6;
         border: none;
-        box-shadow: 0 4px 12px rgba(77, 166, 255, 0.4);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 100;
+        z-index: 10;
         transition: all 0.3s;
+        color:#333333;
     }
 
     .floating-map-btn:hover {
-        transform: scale(1.05);
+        transform: scale(1.03);
+        background: #4DA6FF;
         box-shadow: 0 6px 16px rgba(77, 166, 255, 0.5);
     }
 
@@ -137,7 +143,73 @@
     }
 
     .floating-map-btn svg {
-        color: white;
-        width: 24px;
-        height: 24px;
+        color: #333333;
+        width: 20px;
+        height: 20px;
+        
     }
+    
+
+.top-header {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #F2F4F7;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 12px; 
+}
+.back-btn {
+    font-size: 24px;
+    text-decoration: none;
+    color: #344054;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+/* 전체화면 지도 */
+#fullscreen-map-container {
+    position: fixed;
+    width:100%; height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: white;
+    display:flex; flex-direction: column;
+}
+
+#fullscreen-map {
+    width: 100%;
+    height: 100%;
+}
+
+#close-fullscreen-map {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2001;
+}
+
+#close-fullscreen-map:hover {
+    background: #F3F4F6;
+}
+
+#close-fullscreen-map svg {
+    color: #374151;
+}
