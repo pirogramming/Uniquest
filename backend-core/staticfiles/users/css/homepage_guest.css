@@ -1,131 +1,155 @@
-/* 기본 배경 설정 */
+@charset "UTF-8";
+
+/* 1. 기본 설정 및 변수 */
 :root {
-    --primary-blue: #74a9f9;
-    --light-bg: #ffffff;
-    --card-border: #f0f0f0;
-    --text-main: #333333;
-    --text-gray: #999999;
-    --tag-pink: #ffb1c1;
-    --tag-green: #92d8b5;
+    --primary-blue: #4DA6FF;
+    --text-black: #1D2939;
+    --text-gray: #667085;
+    --border-color: #F2F4F7;
+    --white: #ffffff;
 }
 
 body {
-    background-color: var(--light-bg);
+    background-color: var(--white);
     margin: 0;
-    font-family: 'Pretendard', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* 상단 블루 헤더 */
+/* 2. 헤더 섹션 (WelcomeScreen 상단 블루 영역) */
 .header {
-    background-color: var(--primary-blue);
-    padding: 40px 20px 30px;
-    border-radius: 0 0 40px 40px; /* 아래쪽만 둥글게 */
-    color: white;
+    background: linear-gradient(180deg, var(--primary-blue) 0%, #6BB6FF 100%);
+    padding: 60px 20px 60px;
     text-align: center;
+    color: var(--white);
 }
 
 .logo-circle {
-    width: 75px;
-    height: 75px;
-    background: white;
-    border-radius: 20px; /* 이미지처럼 약간 각진 둥근 사각형 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 38px;
-    font-weight: 800;
-    color: var(--primary-blue);
-    margin: 0 auto 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 60px; height: 60px;
+    background: var(--white); color: var(--primary-blue);
+    border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 800; margin: 0 auto 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.brand-name { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
-.brand-subtitle { font-size: 14px; opacity: 0.9; font-weight: 400; }
+.brand-name { font-size: 30px; font-weight: 700; margin-bottom: 5px; }
+.brand-subtitle { font-size: 14px; opacity: 0.9; }
 
-/* 미션 섹션 */
+/* 3. 미션 리스트 섹션 (문구 위치 및 굵기 설정) */
 .mission-list-section {
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 30px 25px 0;
+    background: var(--white);
+    margin-top: -30px !important;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 메인 타이틀: 굵기 700 적용 */
+.mission-list-section::before {
+    content: "캠퍼스 라이프를 더 쉽게";
+    order: -2;
+    display: block; font-size: 24px; font-weight: 700;
+    color: var(--text-black); margin-bottom: 8px;
+}
+
+/* 설명 문구: 도움까지, 뒤에 줄바꿈(\A) 및 글자 크기 16px 적용 */
+.mission-list-section::after {
+    content: "작은 부탁부터 과제 도움까지,\A학생들이 서로 돕는 미션 플랫폼";
+    order: -1;
+    display: block; 
+    font-size: 16px; 
+    color: var(--text-gray); 
+    line-height: 1.6;
+    margin-bottom: 30px; 
+    white-space: pre-wrap; /* \A 줄바꿈 인식을 위해 필수 */
 }
 
 .section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+    order: 0;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
 }
 
-.section-title h2 { font-size: 18px; font-weight: 700; color: var(--text-main); }
-.view-all { font-size: 13px; color: var(--text-gray); text-decoration: none; }
+.section-title h2 {
+    font-size: 18px; font-weight: 700; color: var(--text-black);
+    display: flex; align-items: center; gap: 8px;
+}
+.section-title h2::after {
+    content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+    font-size: 14px; color: #D0D5DD;
+}
 
-/* 미션 카드 스타일 (JS에서 생성될 카드 대응) */
+/* 4. 미션 카드 디자인 */
+#mission_cards { order: 1; display: flex; flex-direction: column; gap: 12px; }
+
 .mission-card {
-    background: white;
-    border: 1px solid var(--card-border);
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    background: var(--white); border: 1px solid var(--border-color);
+    border-radius: 20px; padding: 20px; text-decoration: none; color: inherit;
+    display: block; cursor: pointer; transition: transform 0.2s;
 }
 
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
 }
 
-.card-header .title { font-size: 15px; font-weight: 600; color: #444; }
-.tag-status { 
-    font-size: 11px; color: var(--primary-blue); 
-    background: #f0f7ff; padding: 2px 8px; border-radius: 10px; 
+.card-header .title {
+    font-size: 16px; font-weight: 700; color: #1D2939; margin: 0;
+}
+
+.tag-status {
+    font-size: 11px; font-weight: 600; padding: 4px 10px;
+    background: #EFF8FF; color: var(--primary-blue); border-radius: 12px;
 }
 
 .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: 10px;
+    display: flex; justify-content: space-between; align-items: center;
 }
 
+.info { display: flex; align-items: center; gap: 8px; }
+
+/* 카테고리별 태그 색상 */
 .tag-category {
-    font-size: 11px; color: white; padding: 2px 8px; border-radius: 6px; margin-right: 5px;
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; color: white;
 }
-.category-delivery { background-color: var(--tag-pink); }
-.category-task { background-color: var(--tag-green); }
+.category-errand { background-color: #3679E3 !important; }
+.category-study   { background-color: #27C27B !important; }
+.category-rent    { background-color: #FFB800 !important; }
+.category-job     { background-color: #8B5CF6 !important; }
+.category-life    { background-color: #FF6B9A !important; }
+.category-etc     { background-color: #94A3B8 !important; }
 
-.location { font-size: 12px; color: var(--text-gray); }
-.price { font-size: 16px; font-weight: 700; color: var(--primary-blue); }
+.location { font-size: 12px; color: #98A2B3; }
+.price { font-size: 18px; font-weight: 700; color: var(--primary-blue); }
 
-/* 로그인/회원가입 버튼 */
-.cta-container {
-    padding: 0 20px 100px; /* 하단 네비게이션 공간 확보 */
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+/* 5. 하단 버튼 영역 (로그인/회원가입) */
+.guest-footer-area { padding: 30px 20px 100px; background: var(--white); }
+
+/* 안내 문구와 미션 카드 사이 간격 확보 */
+.guest-footer-text { 
+    text-align: center; 
+    font-size: 14px; 
+    color: #98A2B3; 
+    margin: 60px 0 20px; 
 }
 
+/* [수정] 로그인/회원가입 버튼 규격: 로그인 페이지의 .btn-main과 일치시킴 */
 .guest-cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 54px;
-    border-radius: 14px;
-    font-weight: 600;
-    font-size: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: calc(100% - 40px); 
+    height: 56px;           /* 높이 56px 적용 */
+    margin: 0 20px 12px; 
+    border-radius: 12px;    /* 테두리 반경 12px 적용 */
+    font-size: 18px;        /* 글자 크기 18px 적용 */
+    font-weight: 700;       /* 글자 굵기 700 적용 */
     text-decoration: none;
-    transition: 0.2s;
+    box-sizing: border-box;
 }
 
-.btn-login {
-    background-color: var(--primary-blue);
-    color: white !important;
-}
+/* 로그인 버튼 색상 */
+.guest-cta:nth-of-type(1) { background: var(--primary-blue); color: var(--white); }
 
-.btn-signup {
-    background-color: white;
-    color: var(--primary-blue) !important;
-    border: 1.5px solid var(--primary-blue);
+/* 회원가입 버튼 색상 */
+.guest-cta:nth-of-type(2) { 
+    background: var(--white); 
+    color: var(--primary-blue); 
+    border: 1px solid var(--primary-blue); 
 }
-
-.guest-cta:hover { opacity: 0.9; transform: translateY(-1px); }

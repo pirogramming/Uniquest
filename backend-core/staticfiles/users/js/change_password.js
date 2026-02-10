@@ -17,14 +17,21 @@ async function handleSignup() {
     if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)) {
         return
     }
+    console.log('uyyy')
 
     const csrftoken = getCookie('csrftoken');
+<<<<<<< HEAD
     
     const password_reset_token = sessionStorage.getItem('password_reset_token')
 
     const changeData = {
         password: document.getElementById('password').value,
         password_reset_token : password_reset_token,
+=======
+
+    const changeData = {
+        password: document.getElementById('password').value,
+>>>>>>> develop
     }
 
     const response = await fetch('/api/users/change_password/info/', {
@@ -37,12 +44,21 @@ async function handleSignup() {
     });
 
     if (response.ok) {
+<<<<<<< HEAD
         sessionStorage.removeItem('password_reset_token')
         window.location.href = "/api/users/login/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);
         alert("변경 실패: " + JSON.stringify(errorData));
+=======
+        alert("비밀번호 변경 성공!");
+        window.location.href = "/api/users/homepage/"; // 가입 후 로그인 페이지로 이동
+    } else {
+        const errorData = await response.json();
+        console.error("에러 발생:", errorData);
+        alert("변경 실패 ㅠㅠ: " + JSON.stringify(errorData));
+>>>>>>> develop
     }
 }
 
