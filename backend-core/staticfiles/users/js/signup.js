@@ -63,7 +63,7 @@ async function send_number() {
 
     // 전송중 버튼 띄우기
     send.style.display = 'none'
-    transmitting.style.display = 'block'
+    transmitting.style.display = 'flex'
 
     const response = await fetch('/api/users/verify-email/', {
         method: 'POST',
