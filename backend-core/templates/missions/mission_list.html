@@ -3,26 +3,8 @@
 
 {% block title %}미션 목록{% endblock %}
 
-{%block extra_css %}
-    <style>
-  .card { border:1px solid #eee; border-radius:12px; padding:12px; margin:10px 0; }
-  .muted { color:#666; font-size: 13px; }
-  #map { 
-        width: 100%; 
-        height: 300px;  /* ✨ 고정 높이로 변경! */
-        border-radius: 12px; 
-        margin-bottom: 20px; 
-    }
-    .card { border: 1px solid #F2F4F7; border-radius: 12px; padding: 16px; margin: 12px 0; background: #fff; }
-    .muted { color: #667085; font-size: 13px; }
-    .mission-header { padding: 20px 0 10px; }
-    .mission-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .create-link { font-size: 14px; text-decoration: none; font-weight: 600; }
-    
-</style>
-    <link rel="stylesheet" href="{% static 'missions/css/mission_list.css' %}">
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'missions/css/mission_list.css' %}">
 {% endblock %}
 
 {% block extra_js %}
@@ -34,19 +16,50 @@
 
 {% block content %}
 <div class="mobile-container has-nav">
-    
     <div class="content-container">
+        <!-- 헤더 -->
         <div class="mission-header">
             <h2>미션 목록</h2>
-            <p>
-                <a href="{% url 'missions:mission_create_view' %}" class="create-link" style="color:#4DA6FF">+ 새 미션 등록</a>
-                <span style="color:#D0D5DD; margin: 0 8px;">|</span>
-                <a href="/missions/?urgent=1" class="create-link" style="color:#667085">#급해요만 보기</a>
-            </p>
         </div>
 
-        <div id="map" style="width:100%; height:250px; border-radius: 16px; margin-bottom: 20px;"></div>
+        <!-- 툴바 -->
+        <div class="mission-toolbar">
+            <!-- 뷰 전환 -->
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="both" onclick="window.switchView('both')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    지도+미션
+                </button>
+                <button class="view-btn" data-view="list" onclick="window.switchView('list')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    리스트만
+                </button>
+            </div>
 
+            <!-- 필터 버튼 -->
+            <button class="filter-btn" onclick="window.openFilterPanel()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 지도 -->
+        <div id="map"></div>
+
+        <!-- 미션 목록 -->
         <div id="mission-list-container">
             <p class="muted">미션을 불러오는 중...</p>
         </div>
@@ -54,21 +67,15 @@
 
     {% include "_bottom-nav.html" %}
 
+    <!-- 플로팅 전체화면 지도 버튼 -->
+    <button class="floating-map-btn" onclick="window.openFullscreenMap()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+    </button>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<script id="mission-data" type="application/json">
-[
-    {% for m in missions %}
-    {
-        "id": "{{ m.id }}",
-        "title": "{{ m.title|escapejs }}",
-        "lat": {% if m.location_lat %}{{ m.location_lat }}{% else %}null{% endif %},
-        "lng": {% if m.location_lng %}{{ m.location_lng }}{% else %}null{% endif %},
-        "url": "{% url 'missions:mission_detail' m.id %}"
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-]
-</script>
+<!-- 필터 패널 include -->
+{% include "missions/_filter_panel.html" %}
 {% endblock %}

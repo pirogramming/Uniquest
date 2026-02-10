@@ -1,0 +1,285 @@
+<!-- templates/missions/_filter_panel.html -->
+<!-- 필터 백드롭 -->
+<div id="filter-backdrop" style="display:none;"></div>
+
+<!-- 필터 패널 -->
+<div id="filter-panel" style="display:none;">
+    <div class="filter-header">
+        <h3>필터</h3>
+        <button type="button" class="filter-close" onclick="window.closeFilterPanel()">×</button>
+    </div>
+
+    <div class="filter-content">
+        <!-- 정렬 -->
+        <div class="filter-section">
+            <h4>정렬</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="latest" checked>
+                    <span>최신순</span>
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="distance">
+                    <span>거리순</span>
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="reward">
+                    <span>높은 보상순</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 카테고리 -->
+        <div class="filter-section">
+            <h4>카테고리</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="ERRAND">
+                    <span>심부름</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="STUDY">
+                    <span>학업</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="RENTAL">
+                    <span>대여</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="RECRUIT">
+                    <span>구인</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="LIFE">
+                    <span>생활</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="OTHER">
+                    <span>기타</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 상태 -->
+        <div class="filter-section">
+            <h4>상태</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" name="status" value="WAITING" checked>
+                    <span>대기중</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="status" value="MATCHED">
+                    <span>매칭됨</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-footer">
+        <button type="button" class="btn-reset" onclick="window.resetFilters()">초기화</button>
+        <button type="button" class="btn-apply" onclick="window.applyFilters()">적용</button>
+    </div>
+</div>
+
+<!-- 전체화면 지도 -->
+<div id="fullscreen-map-container" style="display:none;">
+    <div id="fullscreen-map"></div>
+    <button id="close-fullscreen-map" onclick="window.closeFullscreenMap()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+</div>
+
+<style>
+/* 필터 백드롭 */
+#filter-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* 필터 패널 */
+#filter-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #E5E7EB;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
+.filter-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.filter-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #9CA3AF;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-content {
+    padding: 20px;
+}
+
+.filter-section {
+    margin-bottom: 24px;
+}
+
+.filter-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.filter-option:hover {
+    background: #F3F4F6;
+}
+
+.filter-option input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.filter-option span {
+    font-size: 15px;
+    color: #1F2937;
+}
+
+.filter-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #E5E7EB;
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+.btn-reset, .btn-apply {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-reset {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.btn-reset:hover {
+    background: #E5E7EB;
+}
+
+.btn-apply {
+    background: #4DA6FF;
+    color: white;
+}
+
+.btn-apply:hover {
+    background: #3B8FE6;
+}
+
+/* 전체화면 지도 */
+#fullscreen-map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: white;
+}
+
+#fullscreen-map {
+    width: 100%;
+    height: 100%;
+}
+
+#close-fullscreen-map {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2001;
+}
+
+#close-fullscreen-map:hover {
+    background: #F3F4F6;
+}
+
+#close-fullscreen-map svg {
+    color: #374151;
+}
+</style>

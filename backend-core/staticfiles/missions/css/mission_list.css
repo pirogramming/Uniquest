@@ -1,0 +1,143 @@
+.card { 
+        border: 1px solid #F2F4F7; 
+        border-radius: 12px; 
+        padding: 16px; 
+        margin: 12px 0; 
+        background: #fff; 
+    }
+    .muted { 
+        color: #667085; 
+        font-size: 13px; 
+    }
+    #map { 
+        width: 100%; 
+        height: 300px;
+        border-radius: 16px; 
+        margin-bottom: 20px; 
+        transition: height 0.3s ease;
+    }
+    #map.hidden {
+        display: none;
+    }
+    .mission-header { 
+        padding: 20px 0 10px; 
+    }
+    .mission-header h2 { 
+        font-size: 20px; 
+        font-weight: 700; 
+        margin-bottom: 8px; 
+    }
+    .create-link { 
+        font-size: 14px; 
+        text-decoration: none; 
+        font-weight: 600; 
+    }
+    
+    /* 애니메이션 */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    /* 툴바 */
+    .mission-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        margin-bottom: 16px;
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 8px;
+        background: #F3F4F6;
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    .view-toggle button {
+        padding: 8px 16px;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #6B7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .view-toggle button.active {
+        background: white;
+        color: #4DA6FF;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid #E5E7EB;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+        background: #F9FAFB;
+        border-color: #D1D5DB;
+    }
+
+    .filter-btn.active {
+        background: #4DA6FF;
+        border-color: #4DA6FF;
+    }
+
+    .filter-btn.active svg {
+        color: white;
+    }
+
+    /* 플로팅 버튼 */
+    .floating-map-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #4DA6FF;
+        border: none;
+        box-shadow: 0 4px 12px rgba(77, 166, 255, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: all 0.3s;
+    }
+
+    .floating-map-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(77, 166, 255, 0.5);
+    }
+
+    .floating-map-btn.hidden {
+        display: none;
+    }
+
+    .floating-map-btn svg {
+        color: white;
+        width: 24px;
+        height: 24px;
+    }
