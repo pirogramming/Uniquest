@@ -4,7 +4,7 @@
 {% block title %}마이페이지{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/mypage.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
@@ -31,10 +31,10 @@
         <div class="score-section">
             <div class="score-header">
                 <span>유니퀘스트 점수</span>
-                <span id="user-score">85점</span>
+                <span id="user-score"></span>
             </div>
             <div class="score-bar-bg">
-                <div class="score-bar-fill" style="width: 85%;"></div>
+                <div class="score-bar-fill" id="score_bar_fill"></div>
             </div>
             <p class="score-desc">유니퀘스트 점수는 미션 완료와 평가에 따라 변동됩니다</p>
         </div>

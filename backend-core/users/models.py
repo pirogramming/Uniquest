@@ -31,8 +31,8 @@ class User(AbstractUser):
     is_student_verified = models.BooleanField(default=False, verbose_name="학생 인증 여부")
     univ_email = models.EmailField(blank=True, null=True, verbose_name="학교 이메일")
     
-    # 매너 온도 (기본 36.5도)
-    manner_score = models.FloatField(default=36.5, verbose_name="매너 온도")
+    # 매너 온도 (기본 80도)
+    manner_score = models.FloatField(default=80, verbose_name="매너 온도")
     blocked_people = models.ManyToManyField(
         'self',
         symmetrical=False,

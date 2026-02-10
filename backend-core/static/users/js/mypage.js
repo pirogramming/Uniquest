@@ -3,6 +3,7 @@ async function getUserData() {
     
     if (!token) {
         console.warn("로그인 토큰이 없습니다.");
+        window.location.href = "/api/users/login/"
         return null;
     }
 
@@ -24,7 +25,8 @@ async function getUserData() {
             return null;
         }
     } catch (error) {
-        console.error("네트워크 오류 발생:", error);
+        alert("네트워크 오류 발생:");
+        window.location,href = "/api/users/login/"
         return null;
     }
 }
@@ -41,47 +43,45 @@ async function renderProfile() {
         const mannerScore = document.getElementById('user-score'); // 점수 텍스트
         const register_missions = document.getElementById('my-registered-missions');
         const performed_missions = document.getElementById('my-performed-missions');
+        const score_bar_fill = document.getElementById('score_bar_fill');
+
+        score_bar_fill.style = `width : ${user.manner_score}%;`
 
         // 1. 기본 정보 반영
         if (nicknameElement) nicknameElement.innerText = user.nickname;
         if (univElement) univElement.innerText = user.university;
         if (mannerScore) mannerScore.innerText = user.manner_score;
-        blockers.forEach(({id,nickname}) => {
-            console.log(`${id} : ${nickname}`)
-            if (register_missions) register_missions.innerHTML += `${id} : ${nickname}`;
-        });
 
         if (user.missions.length > 0) {
-            register_missions.innerHTML = "";
-            
-            // 1. Django가 미리 주소의 '틀'을 만듭니다. (id=0은 임시값)
-            // 이 코드는 반드시 .html 파일 내 <script> 태그 안에 있어야 작동합니다.
-            const urlTemplate = "{% url 'missions:mission_detail' 0 %}";
+            const missionHTML = user.missions.map(({id, title, reward, status, descriptions,category,location_name}) => {
+                
+                // reward가 숫자인지 확인 후 포맷팅
+                const formattedReward = typeof reward === 'number' ? reward.toLocaleString() : reward;
 
-            user.missions.forEach(({id, title, reward, status, descriptions}) => {
-                // 2. 임시값 '0'을 실제 미션의 'id'로 갈아끼웁니다.
-                const targetUrl = urlTemplate.replace('0', id);
-
-                register_missions.innerHTML += `
-                    <a class="mission-card" href="${targetUrl}" style="text-decoration: none; color: inherit; display: block;">
+                return `
+                    <a class="mission-card" href="/api/missions/${id}" style="text-decoration: none; color: inherit; display: block;">
                         <div class="card-header">
+                            <h3 class="title">${title}</h3>
                             <span class="status-badge waiting">${status}</span>
                         </div>
-                        
-                        <div class="card-body">
-                            <h3 class="mission-title">${title}</h3>
+                        <div class="description-box">
                             <p class="mission-content">${descriptions}</p>
                         </div>
                         
+
                         <div class="card-footer">
-                            <div class="reward-info">
-                                <span class="label">보상</span>
-                                <span class="reward-amount">${reward.toLocaleString()}</span>
+                            <div class="info">
+                                <span class="tag-category category-etc">${category}</span>
+                                <span class="location">${location_name}</span>
                             </div>
-                            <span class="menu-arrow">〉</span>
+                            <span class="price">${reward}원</span>
                         </div>
                     </a>`;
-            });
+            }).join(''); // 배열을 하나의 문자열로 합침
+
+            console.log(missionHTML)
+
+            register_missions.innerHTML = missionHTML;
         }
 
         if (user.accepted_missions.length > 0){
@@ -122,12 +122,12 @@ async function renderProfile() {
         }
 
         // 차단 관리/미션 리스트 로직 (필요 시 수정)
-        if (register_missions) {
-            register_missions.innerHTML = ""; // 초기화
-            blockers.forEach(({id, nickname}) => {
-                register_missions.innerHTML += `<div>${id} : ${nickname}</div>`;
-            });
-        }
+        // if (register_missions) {
+        //     register_missions.innerHTML = ""; // 초기화
+        //     blockers.forEach(({id, nickname}) => {
+        //         register_missions.innerHTML += `<div>${id} : ${nickname}</div>`;
+        //     });
+        // }
 
     }
 }
