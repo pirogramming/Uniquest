@@ -37,7 +37,9 @@
             <div class="email-section">
                 <input type="email" name="email" id="email" placeholder="school@ac.kr" required>
                 <button type="button" class="btn-sub" id="send-btn" onclick="send_number()" action="verify-email">인증번호 발송</button>
-                <div class="btn-sub" id="transmitting" style="display:none;">전송중</div>
+                <div class="btn-sub" id="transmitting" style="display:none;">
+                    <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+                </div>
                 <div class="btn-sub" id="complete" style="display:none;">완료</div>
             </div>
 

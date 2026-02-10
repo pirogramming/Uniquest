@@ -444,3 +444,8 @@ def change_password(request):
     
 def change_password_render(request):
     return render(request,'users/change_password.html')
+
+#리뷰 페이지
+
+def render_review_page(request):
+    return render(request,'users/review.html')

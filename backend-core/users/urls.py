@@ -50,5 +50,8 @@ urlpatterns = [
     path('check_password/',views.check_password,name="check_password"),
     path('verify-email-check/', views.verify_email_check, name='verify-email-check'),
     path('change_password/',views.change_password_render,name="change_password"),
-    path('change_password/info/',views.change_password,name="change_password_info")
+    path('change_password/info/',views.change_password,name="change_password_info"),
+
+    #리뷰 페이지
+    path('review_page/',views.render_review_page,name="review_page"),
 ]

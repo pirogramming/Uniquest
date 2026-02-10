@@ -206,6 +206,7 @@ input {
     pointer-events: none; /* 로딩 중 클릭 방지 */
     background-color: #f2f4f7; /* 로딩 중임을 나타내는 연한 배경 */
     color: #57A6FF; /* 찬웅님의 테마 색상 */
+    align-items: center;
 }
 
 /* Font Awesome 아이콘 크기 조절 */
