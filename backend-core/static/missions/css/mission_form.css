@@ -21,15 +21,23 @@ body {
 
 /* 2. 상단 헤더 디자인 */
 h2 {
+    position: fixed;
+    top:0;  
+    width:100%;
+    max-width: 450px;
+    box-sizing: border-box;
+    height: 70px; /* 헤더 높이 고정 */
     font-size: 20px;
     font-weight: 700;
     color: #1D2939;
+    background-color: #ffffff;
     padding: 20px 25px;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 12px;
     border-bottom: 1px solid #F2F4F7;
+    z-index: 1100; /* 하단 버튼(1000)보다 높게 설정 */
 }
 
 #back-btn::before {
@@ -43,7 +51,7 @@ h2 {
 
 /* 3. 폼 필드 디자인 */
 #mission-form {
-    padding: 20px 25px 120px 25px;
+    padding: 90px 25px 120px 25px;
 }
 
 .field {
