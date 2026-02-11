@@ -45,7 +45,14 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
+env_allowed_hosts = os.environ.get("ALLOWED_HOSTS","")
+
+if env_allowed_hosts:
+    # 쉼표로 구분된 문자열을 리스트로 변환합니다. (예: "127.0.0.1,13.125.181.165")
+    ALLOWED_HOSTS = [host.strip() for host in env_allowed_hosts.split(",")]
+else:
+    # 개발 환경을 위해 기본값 설정
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # @login_required 리다이렉트 경로
 LOGIN_URL = '/api/users/login/'
