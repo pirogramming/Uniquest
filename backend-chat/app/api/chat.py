@@ -51,6 +51,9 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await websocket.close(code=4001)
             return
 
+        # 표시 이름 (username 사용, 클라이언트가 AUTH에 담아 보냄)
+        username = auth_msg.get("username") or auth_msg.get("nickname") or "알 수 없음"
+
     except asyncio.TimeoutError:
         await websocket.send_text(json.dumps({
             "type": "ERROR",
@@ -85,15 +88,21 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            
-            msg_obj = ChatMessage(room_id=room_id, sender_id=user_id, content=data)
+
+            msg_obj = ChatMessage(
+                room_id=room_id,
+                sender_id=user_id,
+                sender_nickname=username,
+                content=data,
+            )
             await chat_manager.save_message(msg_obj)
-            
+
             await chat_manager.publish_message({
-                "type": "TALK", 
-                "sender_id": user_id, 
+                "type": "TALK",
+                "sender_id": user_id,
+                "sender_nickname": username,
                 "content": data,
-                "time": msg_obj.created_at.strftime("%H:%M")
+                "time": msg_obj.created_at.strftime("%H:%M"),
             }, room_id)
 
     except WebSocketDisconnect:

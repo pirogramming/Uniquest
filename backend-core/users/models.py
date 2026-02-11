@@ -15,8 +15,6 @@ class User(AbstractUser):
     """
     사용자 모델 (AbstractUser 상속)
     """
-    nickname = models.CharField(max_length=20, unique=True, verbose_name="닉네임")
-    
     # 대학 정보 (FK)
     university = models.ForeignKey(
         University, 
@@ -41,8 +39,8 @@ class User(AbstractUser):
     )
 
     def get_display_name(self):
-        """템플릿 등에서 표시할 이름 (닉네임 우선, 없으면 username)"""
-        return self.nickname if self.nickname else self.username
+        """템플릿 등에서 표시할 이름 (username 사용)"""
+        return self.username
 
     def __str__(self):
-        return self.get_display_name()
+        return self.username

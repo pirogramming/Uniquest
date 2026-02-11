@@ -22,7 +22,6 @@ async function handleSignup() {
 
     const signupData = {
         username: document.getElementById('username').value,
-        nickname: document.getElementById('nickname').value,
         password: document.getElementById('password').value,
         univ_email: document.getElementById('email').value,
         password_check: document.getElementById('password_check').value,
@@ -42,7 +41,7 @@ async function handleSignup() {
         const data = await response.json();
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        window.location.href = "/api/users/homepage/"; // 가입 후 로그인 페이지로 이동
+        window.location.href = "/api/users/login/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);

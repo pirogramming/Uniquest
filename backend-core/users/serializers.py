@@ -14,7 +14,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'password', 'nickname', 'university', 'univ_email', 'is_student_verified', 'university_name']
+        fields = ['username', 'password', 'university', 'univ_email', 'is_student_verified', 'university_name']
         extra_kwargs = {
             'password': {'write_only': True}  # 비밀번호는 응답에 노출되지 않도록 설정
         }
@@ -32,7 +32,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
-            nickname=validated_data['nickname'],
             univ_email=univ_email,
             is_student_verified=is_student_verified,
         )
@@ -57,4 +56,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'nickname', 'university', 'is_student_verified', 'manner_score', 'is_student_verified']
+        fields = ['id', 'username', 'university', 'is_student_verified', 'manner_score']

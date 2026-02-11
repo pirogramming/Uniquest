@@ -68,13 +68,13 @@ async function renderBlockUser() {
     if (list.length > 0) {
         blocked_user_box.innerHTML = "" // 내부 HTML비우기
 
-        list.forEach(({ id, nickname }) => {
+        list.forEach(({ id, username }) => {
             blocked_user_box.innerHTML += `
             <div class="user-card">
                 <div class="user-info">
                     <div class="avatar"></div>
                     <div class="user-text">
-                        <p class="nickname">${nickname || '(알 수 없음)'}</p>
+                        <p class="nickname">${username || '(알 수 없음)'}</p>
                         <p class="date">차단 해제 버튼을 누르면 목록에서 제거됩니다.</p>
                     </div>
                 </div>

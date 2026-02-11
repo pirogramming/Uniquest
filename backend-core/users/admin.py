@@ -18,8 +18,8 @@ class AuthoredMissionInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     # 1. 관리자 목록 화면 설정
     list_display = (
-        'username', 'email', 'nickname', 'university', 
-        'is_student_verified', 'is_staff', 
+        'username', 'email', 'university',
+        'is_student_verified', 'is_staff',
         'get_mission_count', 'get_blocked_count'
     )
     
@@ -32,18 +32,17 @@ class CustomUserAdmin(UserAdmin):
     # 4. 상세 수정 페이지 구성
     fieldsets = UserAdmin.fieldsets + (
         ('Uniquest 정보', {'fields': (
-            'nickname', 
-            'university', 
-            'is_student_verified', 
-            'univ_email', 
+            'university',
+            'is_student_verified',
+            'univ_email',
             'manner_score',
             'blocked_people'
         )}),
     )
-    
+
     # 5. 유저 생성 시 필드 구성
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('추가 정보', {'fields': ('nickname', 'university', 'univ_email')}),
+        ('추가 정보', {'fields': ('university', 'univ_email')}),
     )
 
     # --- 계산 필드 정의 ---
