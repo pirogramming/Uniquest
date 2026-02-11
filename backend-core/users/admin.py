@@ -30,6 +30,8 @@ class CustomUserAdmin(UserAdmin):
     inlines = [AuthoredMissionInline]
 
     # 4. 상세 수정 페이지 구성
+    readonly_fields = UserAdmin.readonly_fields + ('review_datas_preview',)
+
     fieldsets = UserAdmin.fieldsets + (
         ('Uniquest 정보', {'fields': (
             'university',
@@ -38,6 +40,10 @@ class CustomUserAdmin(UserAdmin):
             'manner_score',
             'blocked_people'
         )}),
+        ('리뷰 데이터', {
+            'fields': ('review_datas_preview',),
+            'description': '이 유저가 받은 평가 목록 (review_datas)',
+        }),
     )
 
     # 5. 유저 생성 시 필드 구성
@@ -54,3 +60,17 @@ class CustomUserAdmin(UserAdmin):
     def get_mission_count(self, obj):
         return obj.missions.count()  # related_name='missions' 기반
     get_mission_count.short_description = "등록 미션수"
+
+    def review_datas_preview(self, obj):
+        """리뷰 데이터를 읽기 쉬운 형태로 표시"""
+        if not obj.pk:
+            return "-"
+        data = obj.review_datas
+        if not data:
+            return "받은 리뷰 없음"
+        import json
+        try:
+            return json.dumps(data, indent=2, ensure_ascii=False)
+        except (TypeError, ValueError):
+            return str(data)
+    review_datas_preview.short_description = "받은 리뷰 (review_datas)"

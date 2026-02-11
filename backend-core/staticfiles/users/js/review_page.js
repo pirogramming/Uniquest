@@ -2,6 +2,23 @@ const pathSegments = window.location.pathname.split('/')
 const pk = pathSegments.pop() || pathSegments.pop();
 let star_score = 0
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
 //페이지 랜더링
 async function renderReviewpage() {
     const token = localStorage.getItem('access_token');
@@ -97,16 +114,40 @@ function getSelectedChips() {
     return Array.from(activeChips).map(chip => chip.textContent);
 }
 
-function send_info(){
+async function send_info(){
+    const token = localStorage.getItem('access_token');
     const personal_key = pk;
     const my_score = star_score;
     const quick_comment = getSelectedChips();
     const comment = document.getElementById('comment-input').value;
 
-    console.log("personal_key",personal_key)
-    console.log("my_score",my_score)
-    console.log("comment",comment)
-    console.log("quick_comment",quick_comment)
+    review_data = {
+        "personal_key":personal_key,
+        "my_score":my_score,
+        "quick_comment":quick_comment,
+        "comment":comment,
+    }
+
+    try{
+        const response = await fetch('/api/users/review_json/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'Authorization':`Bearer ${token}`
+            },
+            body: JSON.stringify(review_data)
+        });
+
+        if (response.ok){
+            const data = await response.json()
+            console.log(data)
+        } else {
+            console.log('실패')
+        }
+    } catch(error){
+        console.log('네트워크 에러',error)
+    }
 
 }
 

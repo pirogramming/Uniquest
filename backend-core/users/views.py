@@ -456,3 +456,13 @@ def render_review_page_info(request,mission_id):
 
     return JsonResponse({'mission_name':mission_name,'username':username},status=200)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def review_json(request):
+    review_json = json.loads(request.body)
+    target_mission = Mission.objects.get(id=review_json['personal_key'])
+    target_user = target_mission.author
+    target_user.review_datas.append(review_json)
+    target_user.save()
+    return Response({"status": "success", "message": target_user.username}, status=200)
