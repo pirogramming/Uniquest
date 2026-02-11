@@ -40,7 +40,7 @@ class User(AbstractUser):
 
     #유저 프로필 사진
     userphoto = models.ImageField(
-        upload_to='user/',
+        upload_to='user/%Y/%m/%d/',
         null=True,
         blank=True,
     )

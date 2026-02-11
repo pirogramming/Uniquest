@@ -141,6 +141,7 @@ class RegisterView(generics.CreateAPIView):
         email = request.data.get('univ_email')
         is_student_verified = cache.get(f"varified_info_{email}")
         university = cache.get(f"university_info_{email}")
+        user_photo = request.FILES.get('user_photo')
 
         # 2. 보안 검증: 인증 정보가 없거나 False면 가입 차단
         if not is_student_verified or not university:
@@ -159,7 +160,8 @@ class RegisterView(generics.CreateAPIView):
         user = serializer.save(
             university=university,
             is_student_verified=True,
-            univ_email=email
+            univ_email=email,
+            userphoto=user_photo
         )
 
         # 4. 가입 완료 후 보안을 위해 캐시 즉시 삭제

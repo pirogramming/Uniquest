@@ -14,9 +14,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'password', 'university', 'univ_email', 'is_student_verified', 'university_name']
+        fields = ['username', 'password', 'university', 'univ_email', 'is_student_verified', 'university_name', 'userphoto']
         extra_kwargs = {
-            'password': {'write_only': True}  # 비밀번호는 응답에 노출되지 않도록 설정
+            'password': {'write_only': True},
+            'userphoto': {'required': False, 'allow_null': True},
         }
 
     def create(self, validated_data):
@@ -24,6 +25,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         univ_name = validated_data.pop('university_name', None)
         univ_from_view = validated_data.pop('university', None)  # View의 save(university=대학명) 값
         univ_name = univ_name or univ_from_view  # 둘 중 하나로 University 조회
+        user_photo = validated_data.pop('userphoto', None)
 
         # 2. university FK는 create_user에 넣지 않음 (문자열이라서). 나중에 인스턴스로 연결
         univ_email = validated_data.get('univ_email', '')
@@ -44,6 +46,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             )
             user.university = university
             user.save(update_fields=['university'])
+
+        # 4. 프로필 사진 저장
+        if user_photo:
+            user.userphoto = user_photo
+            user.save(update_fields=['userphoto'])
 
         return user
 

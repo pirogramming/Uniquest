@@ -12,8 +12,14 @@
 <div class="signup-container">
         <h2>회원가입</h2>
 
-         <div class="input-group">
-            <input type="file" name="userphoto" id="userphoto" required>
+        <div class="profile-upload-group">
+            <div class="profile-image-container">
+                <img id="profile-preview" src="{% static 'users/images/plus.webp' %}" alt="프로필 이미지 추가">
+                
+                <input type="file" name="userphoto" id="userphoto" accept="image/*" onchange="previewImage(this)">
+                
+                <label for="userphoto" class="upload-label"></label>
+            </div>
         </div>
 
         <div class="input-group">

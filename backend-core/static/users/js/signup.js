@@ -18,22 +18,28 @@ async function handleSignup() {
         return
     }
 
-    const csrftoken = getCookie('csrftoken');
+    const fileInput = document.getElementById('userphoto');
 
-    const signupData = {
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-        univ_email: document.getElementById('email').value,
-        password_check: document.getElementById('password_check').value,
+    const csrftoken = getCookie('csrftoken');
+    const formData = new FormData();
+
+    const password = document.getElementById('password').value;
+    const passwordCheck = document.getElementById('password_check').value;
+
+    formData.append('username', document.getElementById('username').value);
+    formData.append('password', password);
+    formData.append('password_check', passwordCheck);
+    formData.append('univ_email', document.getElementById('email').value);
+
+    if (fileInput.files.length > 0) {
+        formData.append('user_photo', fileInput.files[0]);
     }
 
+    const headers = { 'X-CSRFToken': csrftoken };
     const response = await fetch('/api/users/signup/submit/', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify(signupData)
+        headers: headers,
+        body: formData
     });
 
     if (response.ok) {
@@ -170,4 +176,18 @@ function checkPassword(password,confirmPassword){
     }
 
     return true
+}
+
+// 업로드한 이미지를 프리뷰로 보여주는 함수
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const preview = document.getElementById('profile-preview');
+            preview.src = e.target.result; // 읽은 파일의 데이터 URL을 이미지 src로 설정
+        };
+
+        reader.readAsDataURL(input.files[0]); // 파일을 읽어옵니다.
+    }
 }

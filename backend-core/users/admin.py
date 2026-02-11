@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html
 from .models import User
 from missions.models import Mission  # 미션 모델 임포트
 
@@ -30,7 +31,7 @@ class CustomUserAdmin(UserAdmin):
     inlines = [AuthoredMissionInline]
 
     # 4. 상세 수정 페이지 구성
-    readonly_fields = UserAdmin.readonly_fields + ('review_datas_preview',)
+    readonly_fields = UserAdmin.readonly_fields + ('review_datas_preview', 'userphoto_preview')
 
     fieldsets = UserAdmin.fieldsets + (
         ('Uniquest 정보', {'fields': (
@@ -38,7 +39,9 @@ class CustomUserAdmin(UserAdmin):
             'is_student_verified',
             'univ_email',
             'manner_score',
-            'blocked_people'
+            'blocked_people',
+            'userphoto_preview',
+            'userphoto',
         )}),
         ('리뷰 데이터', {
             'fields': ('review_datas_preview',),
@@ -74,3 +77,13 @@ class CustomUserAdmin(UserAdmin):
         except (TypeError, ValueError):
             return str(data)
     review_datas_preview.short_description = "받은 리뷰 (review_datas)"
+
+    def userphoto_preview(self, obj):
+        """업로드된 프로필 사진 미리보기"""
+        if not obj.pk or not obj.userphoto:
+            return "-"
+        return format_html(
+            '<img src="{}" style="max-width: 120px; max-height: 120px; border-radius: 8px;" />',
+            obj.userphoto.url,
+        )
+    userphoto_preview.short_description = "프로필 사진 미리보기"
