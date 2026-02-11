@@ -156,4 +156,28 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const deadlineButtons = document.querySelectorAll('.deadline-btn');
+
+    deadlineButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 1. 모든 버튼에서 active 클래스를 제거 (초기화)
+            deadlineButtons.forEach(b => b.classList.remove('active'));
+            
+            // 2. 현재 클릭된 버튼에만 active 클래스 추가 (색상 고정)
+            this.classList.add('active');
+
+            // 3. (옵션) 직접 선택 버튼일 때만 날짜 피커 보여주기
+            const pickerWrap = document.getElementById('due_picker_wrap');
+            if (this.id === 'btn_due_pick') {
+                pickerWrap.style.display = 'block';
+            } else {
+                pickerWrap.style.display = 'none';
+                // 여기서 날짜 계산 로직(오늘, 3일 후 등)을 넣어주면 됩니다.
+            }
+        });
+    });
+});
+    </script>
 {% endblock %}

@@ -111,20 +111,20 @@ textarea {
 
 .reward-btn {
     flex: 1;
-    background-color: #F9FAFB;
-    border: 1px solid #EAECF0;
+    background-color: #F2F4F7;
     border-radius: 8px;
     padding: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #344054;
+    color: #475467;
+    border: none;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .reward-btn:hover {
-    background-color: #F3F4F6;
-    border-color: #D0D5DD;
+    background-color: #E5E7EB;
+    border-color:#E5E7EB;
 }
 
 .reward-btn:active {
@@ -186,40 +186,46 @@ textarea {
 
 /* 7. 마감기한 버튼 */
 .deadline-buttons {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    flex-wrap: wrap;
     margin-bottom: 12px;
 }
 
 .deadline-btn {
-    flex: 1;
-    min-width: calc(50% - 4px);
-    background-color: #F9FAFB;
-    border: 1px solid #EAECF0;
+    width: 100%;
+    background-color: #F2F4F7;
     border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
+    padding: 10px 0;
+    font-size: 13px;
     font-weight: 600;
-    color: #344054;
+    color: #475467;
+    text-align: center;
+    border: none;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .deadline-btn:hover {
-    background-color: #F3F4F6;
-    border-color: #D0D5DD;
-}
-
-.deadline-btn:active {
     background-color: #E5E7EB;
+    border-color:#E5E7EB;
+
 }
 
 .deadline-btn.active {
-    background-color: #EFF8FF;
-    border-color: #4DA6FF;
-    color: #175CD3;
+    background-color: #4DA6FF !important;
+    color: #ffffff !important;
+    border:none;
 }
+
+/* 기본 상태: 약간 흐린 회색(muted) */
+#due_preview {
+    color: #475467; /* 원하는 기본 색상 */
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
 
 /* 8. 태그 입력 */
 #tag_chips {

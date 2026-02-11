@@ -386,7 +386,7 @@ function numberToKorean(num) {
         deadlineInput.value = val;
         
         const hours = is24 && dateObj.getHours() === 23 ? "24:00" : `${pad2(dateObj.getHours())}:${pad2(dateObj.getMinutes())}`;
-        duePreview.textContent = `마감기한: ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${hours}`;
+        duePreview.textContent = `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${hours}`;
         
         saveDraft();
     }
@@ -394,7 +394,7 @@ function numberToKorean(num) {
     function initDeadlinePreview() {
         if (deadlineInput?.value && duePreview) {
             const d = new Date(deadlineInput.value);
-            duePreview.textContent = `마감기한: ${d.getMonth() + 1}월 ${d.getDate()}일 ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+            duePreview.textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
         }
     }
 
