@@ -20,7 +20,7 @@
     const MAX_IMAGES = 5;
     let customTags = [];
     let selectedFiles = [];
-    let existingImages = [];  // 수정 시 기존 이미지 관리를 위한 배열
+    let existingImages = [];
 
     // DOM 요소 캐싱
     const form = document.getElementById("mission-form");
@@ -34,13 +34,91 @@
     const fileInput = document.getElementById("id_images");
     const previewContainer = document.getElementById("image-preview-container");
     const photoCount = document.getElementById("photo-count");
+    const rewardInput = document.querySelector("input[name='reward']");
+    const rewardKorean = document.getElementById("reward-korean");
+    const rewardWarning = document.getElementById("reward-warning");
+
+    // ==================== 금액 한글 변환 ====================
+    
+    /**
+     * 숫자를 한글로 변환
+     * 예: 32000 → "3만 2천원"
+     */
+function numberToKorean(num) {
+    if (!num || num === 0) return "";
+    
+    const units = ["", "만", "억", "조"];
+    const numUnits = ["", "십", "백", "천"];
+    let result = "";
+    
+    // 숫자를 4자리씩 끊어서 처리 (한국어 수 체계 기준)
+    let unitCount = 0;
+    while (num > 0) {
+        let chunk = num % 10000; // 4자리 추출
+        if (chunk > 0) {
+            let chunkResult = "";
+            let chunkStr = String(chunk).split("").reverse();
+            
+            for (let i = 0; i < chunkStr.length; i++) {
+                let digit = parseInt(chunkStr[i]);
+                if (digit !== 0) {
+                    // 1이면서 '십, 백, 천' 자리일 때는 숫자 '1'을 생략 (예: 일십 -> 십)
+                    let digitStr = (digit === 1 && i > 0) ? "" : digit;
+                    chunkResult = digitStr + numUnits[i] + chunkResult;
+                }
+            }
+            result = chunkResult + units[unitCount] + " " + result;
+        }
+        num = Math.floor(num / 10000);
+        unitCount++;
+    }
+    
+    return result.trim() + "원";
+}
+
+    /**
+     * 금액 입력 이벤트 핸들러
+     */
+    function handleRewardInput() {
+        if (!rewardInput) return;
+        
+        const value = parseInt(rewardInput.value) || 0;
+        
+        // 한글 표시
+        if (rewardKorean) {
+            rewardKorean.textContent = numberToKorean(value);
+        }
+        
+        // 1천원 단위 검증
+        if (value > 0 && value % 1000 !== 0) {
+            if (rewardWarning) {
+                rewardWarning.style.display = "block";
+            }
+        } else {
+            if (rewardWarning) {
+                rewardWarning.style.display = "none";
+            }
+        }
+        
+        saveDraft();
+    }
+
+    /**
+     * 금액 빠른 입력 버튼
+     */
+    function addRewardAmount(amount) {
+        if (!rewardInput) return;
+        
+        const current = parseInt(rewardInput.value) || 0;
+        const newValue = current + amount;
+        
+        rewardInput.value = newValue;
+        handleRewardInput();
+    }
 
     // ==================== Draft (초안) 기능 ====================
     
-// ==================== Draft (초안) 기능 ====================
-    
     async function saveDraft() {
-        // 이미지를 Base64 배열로 변환
         const imagePromises = selectedFiles.map(file => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -53,18 +131,23 @@
         const data = {
             title: document.querySelector("input[name='title']")?.value || "",
             descriptions: document.querySelector("textarea[name='descriptions']")?.value || "",
-            reward: document.querySelector("input[name='reward']")?.value || "",
+            reward: rewardInput?.value || "",
             category: document.querySelector("select[name='category']")?.value || "",
             deadline: deadlineInput?.value || "",
             tags_input: tagsHidden?.value || "",
-            images_data: base64Images // Base64 데이터 추가
+            images_data: base64Images,
+            // 위치 정보 추가
+            location_name: document.getElementById("location_name")?.value || "",
+            location_lat: document.querySelector("input[name='location_lat']")?.value || "",
+            location_lng: document.querySelector("input[name='location_lng']")?.value || "",
+            location_address: document.querySelector("input[name='location_address']")?.value || ""
         };
 
         try {
             sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+            console.log("✅ Draft 저장 완료");
         } catch (e) {
             console.warn("Draft 저장 실패: 용량 초과일 수 있습니다.", e);
-            // 용량 초과 시 이미지 제외하고 텍스트만이라도 저장
             delete data.images_data;
             sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
         }
@@ -85,15 +168,33 @@
                 }
             });
 
+            // 위치 정보 복원
+            if (data.location_name) {
+                const locNameEl = document.getElementById("location_name");
+                const locDisplayEl = document.getElementById("location_name_display");
+                if (locNameEl) locNameEl.value = data.location_name;
+                if (locDisplayEl) locDisplayEl.value = data.location_name;
+            }
+            if (data.location_lat) {
+                const el = document.querySelector("input[name='location_lat']");
+                if (el) el.value = data.location_lat;
+            }
+            if (data.location_lng) {
+                const el = document.querySelector("input[name='location_lng']");
+                if (el) el.value = data.location_lng;
+            }
+            if (data.location_address) {
+                const el = document.querySelector("input[name='location_address']");
+                if (el) el.value = data.location_address;
+            }
+
             if (tagsHidden && data.tags_input) {
                 tagsHidden.value = data.tags_input;
                 customTags = data.tags_input.split(",").filter(Boolean);
                 renderChips();
             }
 
-            // --- 이미지 복원 로직 추가 ---
             if (data.images_data && data.images_data.length > 0) {
-                // Base64를 다시 File 객체로 변환하여 selectedFiles에 주입
                 const restoredFiles = await Promise.all(data.images_data.map(async (base64, idx) => {
                     const res = await fetch(base64);
                     const blob = await res.blob();
@@ -104,9 +205,14 @@
                 updateFileInput();
                 renderPreviews();
             }
-            // ---------------------------
+            
+            // 금액 한글 표시 업데이트
+            if (data.reward) {
+                handleRewardInput();
+            }
             
             initDeadlinePreview();
+            console.log("✅ Draft 복원 완료");
         } catch (e) {
             console.error("Draft restore error", e);
         }
@@ -159,20 +265,15 @@
 
     // ==================== 이미지 미리보기 ====================
     
-    /**
-     * 파일 선택 시 이벤트 핸들러
-     */
     function handleFileSelect(e) {
         const newFiles = Array.from(e.target.files);
         
-        // 최대 개수 제한
         const remainingSlots = MAX_IMAGES - selectedFiles.length;
         if (newFiles.length > remainingSlots) {
             alert(`이미지는 최대 ${MAX_IMAGES}개까지 업로드할 수 있습니다. (${remainingSlots}개 추가 가능)`);
             return;
         }
 
-        // 이미지 파일만 필터링
         newFiles.forEach(file => {
             if (!file.type.startsWith('image/')) {
                 alert(`"${file.name}"은(는) 이미지 파일이 아닙니다.`);
@@ -183,20 +284,16 @@
 
         updateFileInput();
         renderPreviews();
+        saveDraft();
     }
 
-    /**
-     * 이미지 삭제
-     */
     function removeImage(index) {
         selectedFiles.splice(index, 1);
         updateFileInput();
         renderPreviews();
+        saveDraft();
     }
 
-    /**
-     * FileInput 업데이트
-     */
     function updateFileInput() {
         if (!fileInput) return;
         
@@ -206,30 +303,22 @@
         updatePhotoCount();
     }
 
-    /**
-     * [추가] 페이지 로드 시 기존 이미지 데이터를 가져와 세팅하는 함수
-     */
     function initExistingImages() {
         const missionId = form.dataset.missionId;
-        if (!missionId) return; // 수정 모드가 아니면 중단
+        if (!missionId) return;
 
-        // HTML 어딘가에 기존 이미지 데이터를 JSON으로 박아두거나, API로 가져와야 합니다.
-        // 여기서는 이미 서버에서 mission 객체를 전달받았다고 가정하고 
-        // 전역 변수나 dataset에서 추출하는 방식을 제안합니다.
         const rawImages = document.getElementById('existing-images-data')?.textContent;
         if (rawImages) {
             existingImages = JSON.parse(rawImages);
             renderPreviews();
         }
     }
-/**
-     * 미리보기 렌더링 (기존 이미지 + 새 파일 통합)
-     */
+
     function renderPreviews() {
         if (!previewContainer) return;
         previewContainer.innerHTML = '';
 
-        // 1. 기존 서버 이미지 렌더링
+        // 기존 서버 이미지
         existingImages.forEach((img, index) => {
             const preview = document.createElement('div');
             preview.className = 'image-preview-item';
@@ -237,7 +326,7 @@
                 <div style="position:relative; width:80px; height:80px;">
                     <img src="${img.image}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; opacity: 0.8; border: 2px solid #ddd;">
                     <button type="button" onclick="window.removeExistingImage(${index})" 
-                            style="position:absolute; top:-5px; right:-5px; background:#333; color:white; border-radius:50%; border:none; width:20px; height:20px; cursor:pointer;">
+                            style="position:absolute; top:-5px; right:-5px; background:#333; color:white; border-radius:50%; border:none; width:20px; height:20px; cursor:pointer; font-size:14px; line-height:1;">
                         ×
                     </button>
                 </div>
@@ -245,7 +334,7 @@
             previewContainer.appendChild(preview);
         });
 
-        // 2. 새로 선택한 파일 렌더링
+        // 새로 선택한 파일
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -255,7 +344,7 @@
                     <div style="position:relative; width:80px; height:80px;">
                         <img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
                         <button type="button" onclick="window.removeImagePreview(${index})" 
-                                style="position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; border:none; width:20px; height:20px; cursor:pointer;">
+                                style="position:absolute; top:-5px; right:-5px; background:#dc3545; color:white; border-radius:50%; border:none; width:20px; height:20px; cursor:pointer; font-size:14px; line-height:1;">
                             ×
                         </button>
                     </div>
@@ -273,13 +362,12 @@
             photoCount.textContent = `사진 (${total}/${MAX_IMAGES})`;
         }
     }
-    // 전역 함수 등록
+
     window.removeExistingImage = function(index) {
         existingImages.splice(index, 1);
         renderPreviews();
+        saveDraft();
     };
-    
-
 
     // ==================== 마감기한 로직 ====================
     
@@ -297,8 +385,8 @@
         const val = toDatetimeLocalValue(dateObj);
         deadlineInput.value = val;
         
-        duePreview.textContent = `마감기한: ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ` +
-            (is24 && dateObj.getHours() === 23 ? "24:00" : `${pad2(dateObj.getHours())}:${pad2(d.getMinutes())}`);
+        const hours = is24 && dateObj.getHours() === 23 ? "24:00" : `${pad2(dateObj.getHours())}:${pad2(dateObj.getMinutes())}`;
+        duePreview.textContent = `마감기한: ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${hours}`;
         
         saveDraft();
     }
@@ -323,6 +411,14 @@
         e.preventDefault();
         e.stopPropagation();
 
+        // 금액 검증
+        const rewardValue = parseInt(rewardInput?.value) || 0;
+        if (rewardValue > 0 && rewardValue % 1000 !== 0) {
+            alert("금액은 1천원 단위로 입력해주세요.");
+            rewardInput?.focus();
+            return;
+        }
+
         const formData = new FormData(form);
         const missionId = form.dataset.missionId;
 
@@ -330,13 +426,13 @@
         formData.delete('tags_input');
         customTags.forEach(tag => formData.append('__custom_tag_names', tag));
 
+        // 이미지 처리
         formData.delete('images');
         selectedFiles.forEach(file => formData.append('images', file));
         const keepIds = existingImages.map(img => img.id);
         formData.append('keep_images', JSON.stringify(keepIds));
-        // API URL 결정
-        const apiUrl = getMissionApiUrl(missionId);
 
+        const apiUrl = getMissionApiUrl(missionId);
         console.log("전송 시도:", { url: apiUrl, mode: missionId ? "수정" : "생성", images: selectedFiles.length });
 
         try {
@@ -360,6 +456,21 @@
 
     // ==================== 이벤트 바인딩 ====================
     
+    function initRewardInput() {
+        if (!rewardInput) return;
+        
+        // 입력 이벤트
+        rewardInput.addEventListener('input', handleRewardInput);
+        
+        // 빠른 입력 버튼들
+        document.querySelectorAll('.reward-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amount = parseInt(btn.dataset.amount);
+                addRewardAmount(amount);
+            });
+        });
+    }
+
     function initDeadlineButtons() {
         const btnToday = document.getElementById("btn_due_today");
         const btn3d = document.getElementById("btn_due_3d");
@@ -378,6 +489,7 @@
         if (btn3d) {
             btn3d.onclick = () => {
                 const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                d.setHours(23, 59, 0, 0);
                 updateDeadline(d);
                 if (duePickerWrap) duePickerWrap.style.display = "none";
             };
@@ -386,6 +498,7 @@
         if (btn7d) {
             btn7d.onclick = () => {
                 const d = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                d.setHours(23, 59, 0, 0);
                 updateDeadline(d);
                 if (duePickerWrap) duePickerWrap.style.display = "none";
             };
@@ -393,8 +506,26 @@
 
         if (btnPick) {
             btnPick.onclick = () => {
-                if (duePickerWrap) duePickerWrap.style.display = "block";
-                if (duePicker) duePicker.focus();
+                if (duePickerWrap) {
+                    duePickerWrap.style.display = "block";
+                    
+                    // datetime-local input 생성
+                    if (!document.getElementById('due_picker_visible')) {
+                        const input = document.createElement('input');
+                        input.type = 'datetime-local';
+                        input.id = 'due_picker_visible';
+                        input.style.cssText = 'width:100%; padding:12px; border:1px solid #D0D5DD; border-radius:8px; font-size:14px;';
+                        duePickerWrap.appendChild(input);
+                        
+                        input.addEventListener('change', () => {
+                            if (input.value) {
+                                const d = new Date(input.value);
+                                updateDeadline(d);
+                                deadlineInput.value = input.value;
+                            }
+                        });
+                    }
+                }
             };
         }
 
@@ -445,6 +576,7 @@
         restoreDraft();
 
         // 이벤트 리스너 등록
+        initRewardInput();
         initTagInput();
         initDeadlineButtons();
         initImagePreview();
@@ -462,9 +594,7 @@
         window.location.href = "/api/missions/location/pick/?return=" + encodeURIComponent(returnUrl);
     };
 
-    // 이미지 삭제 함수 전역 노출 (HTML onclick에서 호출)
     window.removeImagePreview = removeImage;
 
-    // 문서 로드 완료 시 실행
     document.addEventListener("DOMContentLoaded", init);
 })();

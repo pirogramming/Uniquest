@@ -16,17 +16,22 @@
 
 {% block content %}
 <div class="mobile-container has-nav">
-    <div class="content-container">
-        <!-- 헤더 -->
-        <div class="mission-header">
-            <h2>미션 목록</h2>
-            <button class="filter-btn" onclick="window.openFilterPanel()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                </svg>
+    <!-- 헤더 (고정, 항상 표시) -->
+    <div class="mission-header">
+        <div class="header1">
+            <button class="back-to-list-btn" id="back-to-list-btn" onclick="window.closeFullscreenMap()" style="display:none;">
+                ←
             </button>
+            <h2>미션 목록</h2>
         </div>
+        <button class="filter-btn" onclick="window.openFilterPanel()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+        </button>
+    </div>
 
+    <div class="content-container">
         <!-- 툴바 -->
         <div class="mission-toolbar">
             <!-- 뷰 전환 -->
@@ -51,28 +56,17 @@
                     </svg>
                     리스트만
                 </button>
-                
             </div>
-            
-            
         </div>
 
         <!-- 지도 -->
         <div id="map">
             <!-- 플로팅 전체화면 지도 버튼 -->
             <button class="floating-map-btn" onclick="window.openFullscreenMap()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
                 </svg>
             </button>
-            <!-- 전체화면으로 표시 -->
-            <div id="fullscreen-map-container" style="display:none;">
-                <div class="top-header">
-                    <h2 class="header-title">지도</h2>
-                    <button id="close-fullscreen-map" onclick="window.closeFullscreenMap()">←</button>
-                </div>
-                <div id="fullscreen-map"></div>
-            </div>
         </div>
 
         <!-- 미션 목록 -->
@@ -83,9 +77,99 @@
 
     {% include "_bottom-nav.html" %}
 
-    
-</div>
+    <!-- 필터 백드롭 -->
+    <div id="filter-backdrop" style="display:none;"></div>
 
-<!-- 필터 패널 include -->
-{% include "missions/_filter_panel.html" %}
+    <!-- 필터 패널 -->
+    <div id="filter-panel" style="display:none;">
+        <div class="filter-header">
+            <h3>필터</h3>
+            <button type="button" class="filter-close" onclick="window.closeFilterPanel()">×</button>
+        </div>
+
+        <div class="filter-content">
+            <!-- 정렬 -->
+            <div class="filter-section">
+                <h4>정렬</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="latest" checked>
+                        <span>최신순</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="distance">
+                        <span>거리순</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="reward">
+                        <span>높은 보상순</span>
+                    </label>
+                    <label class="filter-option">
+                    <input type="radio" name="sort" value="deadline">
+                    <span>마감 임박순</span> </label>
+                </div>
+            </div>
+
+            <!-- 카테고리 -->
+            <div class="filter-section">
+                <h4>카테고리</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="ERRAND">
+                        <span>심부름</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="STUDY">
+                        <span>학업</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="RENTAL">
+                        <span>대여</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="RECRUIT">
+                        <span>구인</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="LIFE">
+                        <span>생활</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="OTHER">
+                        <span>기타</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 상태 -->
+            <div class="filter-section">
+                <h4>상태</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="WAITING" checked>
+                        <span>대기중</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="MATCHED">
+                        <span>진행중</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="COMPLETED">
+                        <span>완료</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-footer">
+            <button type="button" class="btn-reset" onclick="window.resetFilters()">초기화</button>
+            <button type="button" class="btn-apply" onclick="window.applyFilters()">적용</button>
+        </div>
+    </div>
+
+    <!-- 전체화면 지도 -->
+    <div id="fullscreen-map-container" style="display:none;">
+        <div id="fullscreen-map"></div>
+    </div>
+</div>
 {% endblock %}

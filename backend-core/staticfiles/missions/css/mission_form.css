@@ -33,7 +33,7 @@ h2 {
 }
 
 #back-btn::before {
-    content: '\2190'; /* 로그인 페이지와 동일한 화살표 */
+    content: '\2190';
     font-size: 26px;
     font-weight: bold;
     color: #344054;
@@ -43,7 +43,7 @@ h2 {
 
 /* 3. 폼 필드 디자인 */
 #mission-form {
-    padding: 20px 25px 120px 25px; /* 하단 버튼 공간 확보 */
+    padding: 20px 25px 120px 25px;
 }
 
 .field {
@@ -83,19 +83,79 @@ textarea {
     resize: none;
 }
 
-/* 4. 사진 업로드 박스 */
-.photo-upload-placeholder {
-    width: 100px;
-    height: 100px;
+/* 4. 금액 입력 UI */
+.reward-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.reward-input-wrapper input[type="number"] {
+    flex: 1;
+    padding-right: 100px; /* 한글 표시 공간 확보 */
+}
+
+.reward-korean {
+    position: absolute;
+    right: 16px;
+    color: #667085;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.reward-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.reward-btn {
+    flex: 1;
     background-color: #F9FAFB;
     border: 1px solid #EAECF0;
-    border-radius: 15px;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #344054;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reward-btn:hover {
+    background-color: #F3F4F6;
+    border-color: #D0D5DD;
+}
+
+.reward-btn:active {
+    background-color: #E5E7EB;
+}
+
+.reward-warning {
+    color: #98A2B3;
+    font-size: 12px;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* 5. 사진 업로드 */
+.image-preview-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-upload-placeholder {
+    width: 80px;
+    height: 80px;
+    background-color: #F9FAFB;
+    border: 1px solid #EAECF0;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin-bottom: 10px;
 }
 
 .photo-upload-placeholder .plus-icon {
@@ -109,7 +169,82 @@ textarea {
     color: #98A2B3;
 }
 
-/* 5. 파란색 안내 박스 */
+#image-preview-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.image-preview-item {
+    position: relative;
+}
+
+/* 6. 카테고리 그리드 */
+.category-grid select {
+    width: 100%;
+}
+
+/* 7. 마감기한 버튼 */
+.deadline-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.deadline-btn {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    background-color: #F9FAFB;
+    border: 1px solid #EAECF0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #344054;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deadline-btn:hover {
+    background-color: #F3F4F6;
+    border-color: #D0D5DD;
+}
+
+.deadline-btn:active {
+    background-color: #E5E7EB;
+}
+
+.deadline-btn.active {
+    background-color: #EFF8FF;
+    border-color: #4DA6FF;
+    color: #175CD3;
+}
+
+/* 8. 태그 입력 */
+#tag_chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pill {
+    background-color: #F3F4F6;
+    border: 1px solid #D0D5DD;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #344054;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pill:hover {
+    background-color: #E5E7EB;
+}
+
+/* 9. 안내 박스 */
 .info-box {
     background-color: #EFF8FF;
     border-radius: 12px;
@@ -132,7 +267,7 @@ textarea {
     margin: 0;
 }
 
-/* 6. 버튼 디자인 */
+/* 10. 버튼들 */
 .subbtn {
     width: 100%;
     background-color: #F2F4F7;
@@ -143,6 +278,11 @@ textarea {
     color: #475467;
     margin-top: 10px;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.subbtn:hover {
+    background-color: #E5E7EB;
 }
 
 /* 하단 고정 등록 버튼 */
@@ -163,6 +303,11 @@ textarea {
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(77, 166, 255, 0.3);
     z-index: 1000;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background-color: #3B8FE6;
 }
 
 .muted {

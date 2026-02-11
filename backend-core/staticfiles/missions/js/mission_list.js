@@ -43,6 +43,13 @@
         'OTHER': '기타'
     };
 
+    // 상태 매핑
+    const STATUS_MAP = {
+        'WAITING': { text: '대기중', class: 'waiting' },
+        'MATCHED': { text: '진행중', class: 'matched' },
+        'COMPLETED': { text: '완료', class: 'completed' }
+    };
+
     // ==================== 거리 계산 ====================
     
     /**
@@ -105,6 +112,14 @@
             case 'reward':
                 result.sort((a, b) => b.reward - a.reward);
                 break;
+            case 'deadline':
+                result.sort((a, b) => {
+                    // 마감 기한이 없는 데이터는 뒤로 보냄
+                    if (!a.deadline) return 1;
+                    if (!b.deadline) return -1;
+                    return new Date(a.deadline) - new Date(b.deadline);
+                });
+                break;
         }
 
         filteredMissions = result;
@@ -132,6 +147,7 @@
         });
 
         applyFilters();
+        closeFilterPanel();
     }
 
     /**
@@ -162,24 +178,36 @@
         const backdrop = document.getElementById('filter-backdrop');
         const panel = document.getElementById('filter-panel');
         const filterBtn = document.querySelector('.filter-btn');
-        if (filterBtn) filterBtn.classList.add('active');
         
-        if (backdrop) backdrop.style.display = 'block';
-        if (panel) panel.style.display = 'block';
+        if (backdrop) {
+            backdrop.style.display = 'block';
+            setTimeout(() => backdrop.classList.add('show'), 10);
+        }
+        if (panel) {
+            panel.style.display = 'block';
+            setTimeout(() => panel.classList.add('open'), 10);
+        }
+        if (filterBtn) filterBtn.classList.add('active');
         
         // 백드롭 클릭 시 닫기
         if (backdrop) {
             backdrop.onclick = closeFilterPanel;
         }
     }
-    
+
     function closeFilterPanel() {
         const backdrop = document.getElementById('filter-backdrop');
         const panel = document.getElementById('filter-panel');
         const filterBtn = document.querySelector('.filter-btn');
         
-        if (backdrop) backdrop.style.display = 'none';
-        if (panel) panel.style.display = 'none';
+        if (backdrop) {
+            backdrop.classList.remove('show');
+            setTimeout(() => backdrop.style.display = 'none', 300);
+        }
+        if (panel) {
+            panel.classList.remove('open');
+            setTimeout(() => panel.style.display = 'none', 300);
+        }
         if (filterBtn) filterBtn.classList.remove('active');
     }
 
@@ -216,9 +244,14 @@
     
     async function openFullscreenMap() {
         const container = document.getElementById('fullscreen-map-container');
+        const backBtn = document.getElementById('back-to-list-btn');
+        const contentContainer = document.querySelector('.content-container');
+        
         if (!container) return;
 
         container.style.display = 'block';
+        if (backBtn) backBtn.style.display = 'flex';
+        if (contentContainer) contentContainer.style.display = 'none'; // ✨ content 숨김
 
         // 전체화면 지도 초기화
         if (!fullscreenMapManager) {
@@ -248,9 +281,14 @@
 
     function closeFullscreenMap() {
         const container = document.getElementById('fullscreen-map-container');
+        const backBtn = document.getElementById('back-to-list-btn');
+        const contentContainer = document.querySelector('.content-container');
+        
         if (container) {
             container.style.display = 'none';
         }
+        if (backBtn) backBtn.style.display = 'none';
+        if (contentContainer) contentContainer.style.display = 'block'; // ✨ content 다시 표시
     }
 
     function updateFullscreenMapMarkers(missions) {
@@ -313,29 +351,42 @@
     function createMissionCardHTML(mission) {
         const detailViewUrl = `${mission.id}/`;
         
+        // 상태 정보
+        const statusInfo = STATUS_MAP[mission.status] || { text: mission.status, class: 'waiting' };
+        
         // 거리 표시 (거리순 정렬 시)
         let distanceText = '';
         if (currentFilters.sort === 'distance' && mission._distance !== undefined && mission._distance !== Infinity) {
             distanceText = mission._distance < 1 
-                ? `<span style="color:#4DA6FF; font-size:12px; margin-left:8px;">${(mission._distance * 1000).toFixed(0)}m</span>`
-                : `<span style="color:#4DA6FF; font-size:12px; margin-left:8px;">${mission._distance.toFixed(1)}km</span>`;
+                ? `<span style="color:#28a745; font-size:12px; margin-left:8px;">${(mission._distance * 1000).toFixed(0)}m</span>`
+                : `<span style="color:#28a745; font-size:12px; margin-left:8px;">${mission._distance.toFixed(1)}km</span>`;
         }
         
         return `
             <div class="card mission-card" data-id="${mission.id}" style="cursor:pointer;" onclick="location.href='${detailViewUrl}'">
-                <div style="display:flex; justify-content:space-between; align-items:start;">
-                    <div style="font-size:1.1rem; font-weight:bold; color:#333;">${mission.title}${distanceText}</div>
-                    <div style="font-weight:700; color:#28a745;">${mission.reward.toLocaleString()}원</div>
+                <div class="mission-card-header">
+                    <div class="mission-title-row cols">
+                        <div class="col1">
+                        <span class="mission-title">${mission.title}</span>
+                        ${distanceText}</div>
+                        <div class="col2">
+                        <span class="mission-status ${statusInfo.class}">${statusInfo.text}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="muted" style="margin-top:4px;">
-                    ${CATEGORY_MAP[mission.category] || mission.category} · ${mission.status} · ${new Date(mission.created_at).toLocaleDateString()}
+                    
+                <div class="mission-meta cols">
+                    <div class="col1">
+                    <span class="mission-category">${CATEGORY_MAP[mission.category] || mission.category}</span>
+                    ${mission.location_name ? `<span class="mission-location"> ${mission.location_name}</span>` : ''}</div>
+                    <div class="col2"><span class="mission-reward">${mission.reward.toLocaleString()}원</span></div>
                 </div>
-                ${mission.location_name ? `<div class="muted" style="margin-top:4px;">📍 ${mission.location_name}</div>` : ''}
-                <div style="margin-top:8px;">
-                    ${mission.tags ? mission.tags.map(t => 
-                        `<span class="muted" style="background:#f0f0f0; padding:2px 8px; border-radius:4px; margin-right:4px;">#${t.name}</span>`
-                    ).join('') : ''}
+                
+                ${mission.tags && mission.tags.length > 0 ? `
+                <div class="mission-tags">
+                    ${mission.tags.map(t => `<span class="mission-tag">#${t.name}</span>`).join('')}
                 </div>
+                ` : ''}
             </div>
         `;
     }
