@@ -53,5 +53,6 @@ urlpatterns = [
     path('change_password/info/',views.change_password,name="change_password_info"),
 
     #리뷰 페이지
-    path('review_page/',views.render_review_page,name="review_page"),
+    path('review_page/<int:mission_id>/',views.render_review_page,name="review_page"),
+    path('review_page_info/<int:mission_id>/',views.render_review_page_info,name="review_page_info"),
 ]

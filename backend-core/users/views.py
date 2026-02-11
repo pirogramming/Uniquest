@@ -447,5 +447,18 @@ def change_password_render(request):
 
 #리뷰 페이지
 
-def render_review_page(request):
+def render_review_page(request,mission_id):
     return render(request,'users/review.html')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def render_review_page_info(request,mission_id):
+    target_mission = Mission.objects.get(id=mission_id)
+    target_user = target_mission.author
+    user = request.user
+
+    mission_name = target_mission.title
+    username = target_user.username
+
+    return JsonResponse({'mission_name':mission_name,'username':username},status=200)
+
