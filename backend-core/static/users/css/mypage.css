@@ -30,16 +30,24 @@ body {
     box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* 2. 상단 타이틀 영역 (흰색 배경 분리) */
+/* 2. 상단 타이틀 영역 (흰색) - 스크롤해도 이 부분만 상단 고정 */
 .header-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px; 
-    background-color: #ffffff; /* [핵심] 상단 바만 흰색 적용 */
+    padding: 20px 25px;
+    background-color: #ffffff;
     font-size: 20px;
     font-weight: 700;
     color: #1D2939;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .settings-icon {
@@ -49,16 +57,16 @@ body {
     /* 흰색 배경이므로 검은색 아이콘 유지 */
 }
 
-/* 3. 프로필 영역 (블루 그라데이션) */
+/* 3. 프로필 카드 (블루 그라데이션) - 일반 흐름, 스크롤됨 */
 .profile-card {
-    background-color: #ffffff;
     display: flex;
     flex-direction: column;
 }
 
 .user-info-section {
-    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%); 
+    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
     padding: 30px 25px 20px 25px;
+    margin-top: 64px; /* 고정된 .header-top 높이만큼 띄움 */
     display: flex;
     align-items: center;
     gap: 15px;
@@ -76,6 +84,16 @@ body {
     font-weight: 700;
     color: #4DA6FF;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;      /* 추가: 넘치는 부분 잘림 */
+    flex-shrink: 0;        /* 추가: flex 레이아웃에서 줄어들지 않게 */
+}
+
+.profile-circle img,
+#userprofile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .text-info h2 {
@@ -140,7 +158,7 @@ body {
 
 /* 5. 메뉴 및 리스트 영역 */
 .menu-section {
-    padding: 30px 25px 150px 25px; /* 하단 네비게이션 공간 확보 */
+    padding: 30px 25px 150px 25px;
     background-color: #ffffff;
 }
 

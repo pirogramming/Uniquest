@@ -30,16 +30,24 @@ body {
     box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* 2. 상단 타이틀 영역 (흰색 배경 분리) */
+/* 2. 상단 타이틀 영역 (흰색) - 스크롤해도 이 부분만 상단 고정 */
 .header-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px; 
-    background-color: #ffffff; /* [핵심] 상단 바만 흰색 적용 */
+    padding: 20px 25px;
+    background-color: #ffffff;
     font-size: 20px;
     font-weight: 700;
     color: #1D2939;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .settings-icon {
@@ -49,16 +57,16 @@ body {
     /* 흰색 배경이므로 검은색 아이콘 유지 */
 }
 
-/* 3. 프로필 영역 (블루 그라데이션) */
+/* 3. 프로필 카드 (블루 그라데이션) - 일반 흐름, 스크롤됨 */
 .profile-card {
-    background-color: #ffffff;
     display: flex;
     flex-direction: column;
 }
 
 .user-info-section {
-    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%); 
+    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
     padding: 30px 25px 20px 25px;
+    margin-top: 64px; /* 고정된 .header-top 높이만큼 띄움 */
     display: flex;
     align-items: center;
     gap: 15px;
@@ -76,6 +84,16 @@ body {
     font-weight: 700;
     color: #4DA6FF;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;      /* 추가: 넘치는 부분 잘림 */
+    flex-shrink: 0;        /* 추가: flex 레이아웃에서 줄어들지 않게 */
+}
+
+.profile-circle img,
+#userprofile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .text-info h2 {
@@ -140,7 +158,7 @@ body {
 
 /* 5. 메뉴 및 리스트 영역 */
 .menu-section {
-    padding: 30px 25px 150px 25px; /* 하단 네비게이션 공간 확보 */
+    padding: 30px 25px 150px 25px;
     background-color: #ffffff;
 }
 
@@ -172,7 +190,7 @@ body {
 .empty-box {
     background-color: #F9FAFB;
     color: #98A2B3;
-    padding: 20px;
+    padding: 40px;
     text-align: center;
     border-radius: 15px;
     font-size: 14px;
@@ -203,98 +221,4 @@ body {
     text-align: center;
     display: block;
     cursor: pointer;
-}
-
-/* 미션 카드 섹션 스타일 */
-
-/* 1. 카드 전체 컨테이너 */
-.mission-card {
-    background-color: #ffffff;
-    border: 1px solid #F2F4F7; /* 아주 연한 테두리 */
-    border-radius: 24px;       /* 스크린샷처럼 크게 둥근 모서리 */
-    padding: 20px 24px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* 부드러운 그림자 */
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s ease;
-}
-
-.mission-card:active {
-    transform: scale(0.98); /* 클릭 시 살짝 눌리는 효과 */
-}
-
-/* 2. 카드 헤더 (제목 & WAITING 배지) */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.mission-card .title {
-    font-size: 18px;
-    font-weight: 800;
-    color: #1D2939;
-    margin: auto 0;
-}
-
-/* 상태 배지 (WAITING) */
-.status-badge.waiting {
-    background-color: #FFF4ED; /* 연한 오렌지 배경 */
-    color: #FB923C;           /* 오렌지색 글자 */
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-/* 3. 본문 내용 */
-.description-box{
-    display: flex;
-    justify-content: left;
-}
-
-.mission-content {
-    font-size: 15px;
-    color: #475467;
-    margin-bottom: 20px;
-    line-height: 1.5;
-}
-
-/* 4. 푸터 (카테고리, 장소 & 가격) */
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.card-footer .info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 카테고리 태그 (RENTAL) */
-.tag-category {
-    background-color: #94A3B8; /* 회색톤 배경 */
-    color: #ffffff;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.location {
-    font-size: 13px;
-    color: #98A2B3;
-}
-
-/* 가격 정보 (0원) */
-.price {
-    font-size: 20px;
-    font-weight: 800;
-    color: #4DA6FF; /* 유니퀘스트 메인 블루 컬러 */
 }
