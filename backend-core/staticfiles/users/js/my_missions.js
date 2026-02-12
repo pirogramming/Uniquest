@@ -54,7 +54,7 @@
     
     async function loadMyMissions() {
         try {
-            const response = await Auth.getData('/api/missions/api/my-missions/');
+            const response = await Auth.getData('/api/my-missions/');
             
             if (response && response.results) {
                 allMissions = response.results;
