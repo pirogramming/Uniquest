@@ -92,6 +92,9 @@ async function send_number() {
         transmitting.style.display = 'none'
     } else {
         const data = await response.json();
+        send.style.display = 'flex'
+        send.innerText = '인증번호 재발송'
+        transmitting.style.display = 'none'
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
     }
 }
@@ -131,7 +134,7 @@ async function check_number() {
             check_box.style.display = 'none'
             check_box_certified.style.display = 'flex'
             send.style.display = 'none'
-            complete.style.display = 'block'
+            complete.style.display = 'flex'
             alert('메일 인증 성공!')
         }
 

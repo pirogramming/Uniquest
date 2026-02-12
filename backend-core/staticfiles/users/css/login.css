@@ -59,10 +59,6 @@ body {
     margin: 4px 0 0 0;
 }
 
-#left_arrow:hover{
-    cursor:pointer;
-}
-
 /* 4. 요소 순서 강제 조정 (로고 -> 명칭 -> 입력창) */
 .input-section {
     display: flex;

@@ -14,9 +14,7 @@
         <div class="chat-container">
             <header class="chat-header">
                 <div class="header-left">
-                    <a href="{% url 'missions:chat_list' %}" class="back-btn">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </a>
+                    <button type="button" class="back-arrow" onclick="history.back()">←</button>
                     <div class="header-user-info">
                         <h2 class="user-nickname">{{ other_user.username|default:mission.author.username }}</h2>
                         <span class="status">연결 중...</span>

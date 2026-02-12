@@ -31,37 +31,44 @@ body {
     height: 100%;
 }
 
-/* 2. 헤더 레이아웃: 화살표 + 제목(1행) + 부제목(2행) */
-.signup-container h2 {
+/* 2. 헤더 레이아웃: 화살표 + 제목(1행) + 부제목(2행), 베이스라인 정렬 */
+.signup-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 15px;
+    align-items: baseline;
+    margin: 10px 0 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E4E7EC;
+}
+
+.signup-header .back-arrow {
+    line-height: 1;
+}
+
+.signup-container .signup-header h2 {
     display: grid;
     grid-template-columns: auto 1fr;
     column-gap: 15px;
     align-items: start;
     font-size: 24px;
     font-weight: 700;
-    margin: 10px 0 30px 0;
+    margin: 0;
     color: #101828;
     text-align: left;
 }
 
-/* 뒤로가기 화살표 */
-.signup-container h2::before {
-    content: '\2190'; 
-    grid-row: 1;
-    font-size: 26px;
-    color: #344054;
-    cursor: pointer;
-    line-height: 1.2;
-}
 
 .signup-container h2::after {
     content: "Uniquest와 함께 시작하세요.";
     grid-row: 2;
-    grid-column: 2;
+    grid-column: 1 / -1;  /* 전체 너비 사용 → 왼쪽부터 정렬 */
     font-size: 14px;
     font-weight: 400;
     color: #667085;
     margin-top: 4px;
+    text-align: left;
+    display: block;
 }
 
 /* 3. 입력 그룹 스타일 */
@@ -75,6 +82,12 @@ label {
     font-weight: 500;
     color: #475467;
     margin-bottom: 8px;
+}
+
+.label-icon {
+    margin-right: 6px;
+    color: #667085;
+    font-size: 13px;
 }
 
 input {
@@ -138,16 +151,71 @@ input {
     display: flex; align-items: center;
 }
 
-/* 4. 이메일 인증 섹션 */
+/* 4. 학교 이메일 인증 섹션 (연한 파란 박스) */
+.email-verify-box {
+    background-color: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.email-verify-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #101828;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.email-verify-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475467;
+    margin-bottom: 8px;
+}
+
 .email-section {
     display: flex;
     gap: 10px;
+    align-items: center;
+}
+
+.email-verify-box .email-section input {
+    flex: 1;
+}
+
+.btn-send {
+    height: 54px;
+    padding: 0 18px;
+    background-color: #F2F4F7;
+    color: #667085;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-send-state {
+    min-width: 80px;
+}
+
+.email-verify-helper {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 10px;
+    margin-bottom: 0;
 }
 
 .btn-sub {
     height: 54px;
     padding: 0 18px;
-    background-color: #F2F4F7; 
+    background-color: #F2F4F7;
     color: #667085;
     border: none;
     border-radius: 12px;
@@ -220,6 +288,10 @@ input {
     font-size: 18px;
     font-weight: 700;
     margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .footer {

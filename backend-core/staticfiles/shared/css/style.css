@@ -13,6 +13,22 @@ a {
     color: inherit; /* 링크 색상이 튀지 않도록 부모색 추종 */
 }
 
+/* 공통 뒤로가기 화살표 (로그인과 동일한 ← 스타일, 클릭 시 history.back) */
+.back-arrow {
+    font-size: 26px;
+    font-weight: bold;
+    color: #344054;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+}
+.back-arrow:hover { opacity: 0.85; }
+.back-arrow:focus { outline: none; }
+
 /* 2. 배경 설정 및 화면 중앙 배치 */
 body {
     background-color: #f8f9fa; /* 화면 바깥쪽 연회색 */

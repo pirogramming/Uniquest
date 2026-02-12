@@ -23,13 +23,6 @@
     top: 0;
 }
 
-.back-btn {
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #4b5563;
-}
-
 .header-title {
     font-size: 20px;
     font-weight: bold;

@@ -40,15 +40,6 @@ h2 {
     z-index: 1100; /* 하단 버튼(1000)보다 높게 설정 */
 }
 
-#back-btn::before {
-    content: '\2190';
-    font-size: 26px;
-    font-weight: bold;
-    color: #344054;
-    cursor: pointer;
-    line-height: 1;
-}
-
 /* 3. 폼 필드 디자인 */
 #mission-form {
     padding: 90px 25px 120px 25px;
