@@ -55,6 +55,12 @@ class ChatClient {
             });
         }
 
+        // 미션 완료 버튼 (등록자)
+        const completeMissionBtn = document.getElementById('completeMissionBtn');
+        if (completeMissionBtn) {
+            completeMissionBtn.addEventListener('click', () => this.completeMission());
+        }
+
         // 수행자 확정 버튼 (등록자)
         const confirmPerformerBtn = document.getElementById('confirmPerformerBtn');
         if (confirmPerformerBtn) {
@@ -193,6 +199,35 @@ class ChatClient {
                 if (confirmBtn) confirmBtn.remove();
             } else {
                 alert(data.error || '거절에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
+        }
+    }
+
+    async completeMission() {
+        const btn = document.getElementById('completeMissionBtn');
+        if (!btn) return;
+        if (!confirm('미션을 완료 처리하시겠습니까?')) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/complete/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '미션이 완료되었습니다.');
+                if (btn) btn.remove();
+                // 원하면 여기서 채팅 목록 등 다른 페이지로 이동
+                // window.location.href = '/api/missions/chat/';
+            } else {
+                alert(data.error || '미션 완료에 실패했습니다.');
                 btn.disabled = false;
             }
         } catch (err) {
