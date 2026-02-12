@@ -1,0 +1,32 @@
+name: Uniquest Auto Deploy
+
+on:
+  push:
+    branches:
+      - develop  # 코드가 develop 브랜치에 push되면 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd ~/Uniquest
+            git pull origin develop
+            
+            # 기존 컨테이너 종료 및 최신 이미지 빌드 후 실행
+            docker compose down
+            docker compose up -d --build
+            
+            # Django 후속 작업 (DB 마이그레이션 및 정적 파일 수집)
+            # 로그에서 확인된 backend-core 컨테이너 이름을 사용합니다.
+            docker compose exec -T backend-core python manage.py migrate
+            docker compose exec -T backend-core python manage.py collectstatic --noinput
