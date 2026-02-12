@@ -271,26 +271,96 @@ def mission_accept(request, mission_id):
         if mission.author == request.user:
             return Response({"error":"자신의 미션은 수락할 수 없습니다."},  status=status.HTTP_400_BAD_REQUEST)
         
-        mission.status = "MATCHED"
+        mission.status = "PENDING_APPROVAL"
         mission.helper = request.user
         mission.save()
 
         room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
         rid = str(room_id) if room_id is not None else str(mission.id)
 
+        requester_name = getattr(request.user, "nickname", None) or getattr(request.user, "username", "someone")
         publish_chat_event(
             room_id=rid,
             event_type="SYSTEM",
-            data={"content": "매칭이 성사되었습니다! 대화를 시작해보세요"}
+            data={"content": f"{requester_name}님이 미션 수락을 요청했습니다. 등록자가 확정하면 매칭이 완료됩니다."}
         )
 
         return JsonResponse({
             "success": True,
-            "message": "미션이 수락이 완료되었습니다",
+            "message": "수락 요청이 등록자에게 전달되었습니다. 등록자가 확정할 때까지 기다려 주세요.",
             "mission_id": mission.id,
         })
     finally:
         release_lock(lock_key, lock_value)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def mission_confirm_helper(request, mission_id):
+    """
+    등록자가 수행자를 확정. PENDING_APPROVAL -> MATCHED
+    """
+    mission = get_object_or_404(Mission, id=mission_id)
+    if mission.author != request.user:
+        return Response({"error": "등록자만 수행자를 확정할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
+    if mission.status != "PENDING_APPROVAL":
+        return Response({"error":"확정 대기 상태가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
+    if not mission.helper:
+        return Response({"error":"수행자가 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    mission.status = "MATCHED"
+    mission.save()
+
+    room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
+    rid = str(room_id) if room_id else str(mission.id)
+    publish_chat_event(room_id=rid, event_type="SYSTEM", data = {"content": "매칭이 성사되었습니다! 대화를 시작해보세요."})
+
+    return Response({"success": True, "message": "수행자가 확정되었습니다."})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def mission_reject_helper(request, mission_id):
+    """등록자가 수행자 수락을 거절. PENDING_APPROVAL → WAITING, helper 초기화"""
+    mission = get_object_or_404(Mission, id=mission_id)
+    if mission.author != request.user:
+        return Response({"error": "등록자만 거절할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
+    if mission.status != "PENDING_APPROVAL":
+        return Response({"error": "확정 대기 상태가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+    mission.status = "WAITING"
+    mission.helper = None
+    mission.save()
+
+    room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
+    rid = str(room_id) if room_id else str(mission.id)
+    publish_chat_event(room_id=rid, event_type="SYSTEM", data={"content": "등록자가 수락을 거절했습니다. 미션이 다시 모집 중입니다."})
+
+    return Response({"success": True, "message": "수락을 거절했습니다."})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def mission_complete(request, mission_id):
+    mission = get_object_or_404(Mission, id=mission_id)
+    if mission.author != request.user:
+        return Response({"error": "등록자만 완료할 수 있습니다."}, status=status.HTTP_403_FORBIDDEN)
+    if mission.status != "MATCHED":
+        return Response({'error':"매칭 완료된 미션만 완료 처리할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    mission.status = "COMPLETED"
+    mission.save()
+    
+    room_id = (request.data.get("room_id") if getattr(request, "data", None) else None) or None
+    rid = str(room_id) if room_id else str(mission.id)
+    publish_chat_event(
+        room_id=rid,
+        event_type="COMPLETE",
+        data={"content": "미션이 완료되었습니다."}
+    )
+
+    return Response({"success": True, "message": "미션이 완료되었습니다."})
         
 
 
