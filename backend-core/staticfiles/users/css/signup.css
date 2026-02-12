@@ -277,6 +277,10 @@ input {
     font-weight: 700;
 }
 
+#complete{
+    align-items: center;
+}
+
 /* 7. 메인 버튼 및 하단 푸터 */
 .btn-main {
     width: 100%;
