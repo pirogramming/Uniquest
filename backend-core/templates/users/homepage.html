@@ -4,8 +4,8 @@
 {% block title %}Uniquest{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -37,10 +37,12 @@
                 <span>미션 등록</span>
             </div>
         </a>
-        <div class="menu-item">
-            <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
-            <span>채팅</span>
-        </div>
+        <a href="{% url 'missions:chat_list' %}">
+            <div class="menu-item">
+                <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
+                <span>채팅</span>
+            </div>
+        </a>
     </div>
 </header>
 
@@ -72,7 +74,7 @@
 {% endblock %}
 
 {% block bottom_nav %}
-    {% include "_bottom-nav.html" %}
+{% include "_bottom-nav.html" %}
 {% endblock %}
 
 {% block extra_scripts %}
