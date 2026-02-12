@@ -496,6 +496,7 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "is_author": is_author,
             "can_accept": can_accept,
             "blockable_user": blockable_user,
+            "other_user": other_user,
         },
     )
 
