@@ -165,9 +165,23 @@ class ChatClient {
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.success) {
                 alert(data.message || '수행자가 확정되었습니다.');
+
+                // 수행자 확정/거부 버튼 제거
                 if (btn) btn.remove();
                 const rejectBtn = document.getElementById('rejectPerformerBtn');
                 if (rejectBtn) rejectBtn.remove();
+
+                const chatActions = document.getElementById('chatActions');
+                if (chatActions && !document.getElementById('completeMissionBtn')) {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.type = 'button';
+                    completeBtn.className = 'btn-action-gray';
+                    completeBtn.id = 'completeMissionBtn';
+                    completeBtn.textContent = '미션 완료';
+                    // 클릭 이벤트 연결
+                    completeBtn.addEventListener('click', () => this.completeMission());
+                    chatActions.appendChild(completeBtn);
+                }
             } else {
                 alert(data.error || '확정에 실패했습니다.');
                 btn.disabled = false;
@@ -388,6 +402,28 @@ class ChatClient {
         };
     }
 
+    showConfirmButtons() {
+        const chatActions = document.getElementById('chatActions');
+        if (!chatActions) return;
+        if (document.getElementById('confirmPerformerBtn')) return;
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'btn-action-outline';
+        confirmBtn.id = 'confirmPerformerBtn';
+        confirmBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i> 수행자 확정';
+        confirmBtn.addEventListener('click', () => this.confirmPerformer());
+        chatActions.appendChild(confirmBtn);
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.type = 'button';
+        rejectBtn.className = 'btn-action-gray';
+        rejectBtn.id = 'rejectPerformerBtn';
+        rejectBtn.textContent = '수행자 거부';
+        rejectBtn.addEventListener('click', () => this.rejectPerformer());
+        chatActions.appendChild(rejectBtn);
+    }
+
     handleMessage(msg) {
         switch (msg.type) {
             case 'AUTH_SUCCESS':
@@ -408,6 +444,9 @@ class ChatClient {
 
             case 'SYSTEM':
                 this.displaySystemMessage(msg.content);
+                if (msg.action === 'mission_accepted' && this.isAuthor) {
+                    this.showConfirmButtons();
+                }
                 break;
 
             case 'KICK':
