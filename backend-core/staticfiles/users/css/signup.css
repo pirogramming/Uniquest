@@ -129,6 +129,15 @@ input {
     background-color: transparent; /* 투명하게 */
 }
 
+/* 보내기 버튼 */
+#send-btn{
+    display: flex; align-items: center;
+}
+
+#transmitting{
+    display: flex; align-items: center;
+}
+
 /* 4. 이메일 인증 섹션 */
 .email-section {
     display: flex;

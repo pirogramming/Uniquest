@@ -44,6 +44,7 @@ async function renderProfile() {
         const register_missions = document.getElementById('my-registered-missions');
         const performed_missions = document.getElementById('my-performed-missions');
         const score_bar_fill = document.getElementById('score_bar_fill');
+        const imgEl = document.getElementById('userprofile');
 
         score_bar_fill.style = `width : ${user.manner_score}%;`
 
@@ -51,6 +52,13 @@ async function renderProfile() {
         if (usernameElement) usernameElement.innerText = user.username;
         if (univElement) univElement.innerText = user.university;
         if (mannerScore) mannerScore.innerText = user.manner_score;
+        if (imgEl) {
+            if (user.userphoto) {
+                imgEl.src = user.userphoto;   // 백엔드에서 준 URL 그대로
+            } else {
+                imgEl.src = '/static/users/images/profile.png';  // 기본 이미지 (경로는 프로젝트에 맞게)
+            }
+        }
 
         if (user.missions.length > 0) {
             const missionHTML = user.missions.map(({id, title, reward, status, descriptions,category,location_name}) => {

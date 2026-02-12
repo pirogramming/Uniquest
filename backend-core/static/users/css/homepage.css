@@ -39,6 +39,23 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 30px;
+    justify-content: left;
+}
+
+#profile_photo {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;           /* 원형 */
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#profile_photo img,
+#userprofile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .notification {

@@ -32,12 +32,15 @@ async function renderHomepage() {
             throw new Error(`서버 응답 오류: ${response.status}`);
         }
 
+        console.log("유저 데이터",userData);
+
         if (userData && userData.id) {
             const usernameElement = document.getElementById('username');
             const missionElement = document.getElementById('mission_cards');
             const matched = document.getElementById('matched');
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
+            const imgEl = document.getElementById('userprofile');
 
             if (usernameElement) usernameElement.innerText = userData.username;
             if (missionElement) {
@@ -85,6 +88,13 @@ async function renderHomepage() {
                 matched.innerHTML = userData.matched_count
                 waiting.innerHTML = userData.waiting_count
                 completed.innerHTML = userData.completed_count
+                if (imgEl) {
+                    if (userData.userphoto) {
+                        imgEl.src = userData.userphoto;   // 백엔드에서 준 URL 그대로
+                    } else {
+                        imgEl.src = '/static/users/images/profile.png';  // 기본 이미지 (경로는 프로젝트에 맞게)
+                    }
+                }
             }
 
             console.log("환영합니다, " + userData.username + "님!");
