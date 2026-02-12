@@ -16,11 +16,6 @@ body {
     box-sizing: border-box;
 }
 
-#left_arrow{
-    color:black;
-    text-decoration: none;
-}
-
 /* 상단 헤더 */
 h2 {
     font-size: 22px;

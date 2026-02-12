@@ -22,17 +22,43 @@
             return;
         }
 
+<<<<<<< HEAD
         try {
             const userData = await Auth.getData('/api/users/api/homepage');
+=======
+        console.log("유저 데이터",userData);
+
+        if (userData && userData.id) {
+            const usernameElement = document.getElementById('username');
+            const missionElement = document.getElementById('mission_cards');
+            const matched = document.getElementById('matched');
+            const waiting = document.getElementById('waiting');
+            const completed = document.getElementById('completed');
+            const imgEl = document.getElementById('userprofile');
+>>>>>>> de7b78e8ca7c6e03333ff328a86ff5d72bcbf30f
 
             if (!userData || !userData.id) {
                 throw new Error('사용자 데이터를 불러올 수 없습니다.');
             }
+<<<<<<< HEAD
 
             // 사용자 이름 표시
             const usernameEl = document.getElementById('username');
             if (usernameEl) {
                 usernameEl.textContent = userData.username;
+=======
+            if (matched && waiting && completed) {
+                matched.innerHTML = userData.matched_count
+                waiting.innerHTML = userData.waiting_count
+                completed.innerHTML = userData.completed_count
+                if (imgEl) {
+                    if (userData.userphoto) {
+                        imgEl.src = userData.userphoto;   // 백엔드에서 준 URL 그대로
+                    } else {
+                        imgEl.src = '/static/users/images/profile.png';  // 기본 이미지 (경로는 프로젝트에 맞게)
+                    }
+                }
+>>>>>>> de7b78e8ca7c6e03333ff328a86ff5d72bcbf30f
             }
 
             // 미션 현황 카드

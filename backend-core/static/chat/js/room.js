@@ -44,6 +44,19 @@ class ChatClient {
     }
 
     init() {
+
+        const moreMenuBtn = document.getElementById('moreMenuBtn');
+        const moreDropdown = document.getElementById('moreDropdown');
+        if (moreMenuBtn && moreDropdown) {
+            moreMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                moreDropdown.classList.toggle('active');
+            });
+            document.addEventListener('click', () => {
+                moreDropdown.classList.remove('active');
+            });
+            moreDropdown.addEventListener('click', (e) => e.stopPropagation());
+        }
         // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
         document.querySelectorAll('.btn-block, .btn-block-text').forEach(btn => {
             btn.addEventListener('click', (e) => {

@@ -4,13 +4,16 @@
 {% block title %}Uniquest{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 <header class="header">
     <div class="header-top" id="header-top">
+        <div id="profile_photo">
+            <img src="" alt="profile_image" id="userprofile">
+        </div>
         <div class="user-greeting">
             <h1>안녕하세요</h1>
             <p id="username"></p>
@@ -36,8 +39,14 @@
                 <span class="count" id="completed">0</span>
                 <span class="label">완료</span>
             </div>
-        </div>
-    </section>
+        </a>
+        <a href="{% url 'missions:chat_list' %}">
+            <div class="menu-item">
+                <div class="icon-box"><i class="fa-regular fa-comment-dots"></i></div>
+                <span>채팅</span>
+            </div>
+        </a>
+    </div>
 </header>
 
 <section class="mission-list-section" id="mission-list-section">
@@ -50,7 +59,7 @@
 {% endblock %}
 
 {% block bottom_nav %}
-    {% include "_bottom-nav.html" %}
+{% include "_bottom-nav.html" %}
 {% endblock %}
 
 {% block extra_scripts %}

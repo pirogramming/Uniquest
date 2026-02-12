@@ -110,7 +110,7 @@ async function check_number() {
             if (check_box) check_box.style.display = 'none';
             if (check_box_certified) check_box_certified.style.display = 'block';
             if (send) send.style.display = 'none';
-            if (complete) complete.style.display = 'block';
+            if (complete) complete.style.display = 'flex';
             if (next_btn) next_btn.style.display = 'block';
             alert('메일 인증 성공! 아래 "다음" 버튼을 눌러 비밀번호를 재설정하세요.');
         }

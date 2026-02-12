@@ -47,10 +47,15 @@ body {
     gap: 15px;
 }
 
-.back-btn {
-    font-size: 18px;
-    color: #1D2939;
-    text-decoration: none;
+.back-arrow {
+    font-size: 26px;
+    font-weight: bold;
+    color: #344054;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1.2;
 }
 
 .user-nickname {

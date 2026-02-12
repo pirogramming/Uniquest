@@ -242,6 +242,7 @@ def get_my_info(request):
         "missions": missions,
         "blocked_people": list(blocked_Queryset.values('id', 'username')),
         "accepted_missions": accepted_missions,
+        "userphoto": user.userphoto.url if user.userphoto else None
     })
 
 def mypage_view(request):
@@ -346,7 +347,8 @@ def get_homepage_info(request):
         "missions":mission_lst,
         "waiting_count":waiting_count,
         "matched_count":matched_count,
-        "completed_count":completed_count
+        "completed_count":completed_count,
+        "userphoto": user.userphoto.url if user.userphoto else None
     })
 
 @api_view(['GET'])

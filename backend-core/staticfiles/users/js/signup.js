@@ -68,7 +68,7 @@ async function send_number() {
 
     // 전송중 버튼 띄우기
     send.style.display = 'none'
-    transmitting.style.display = 'block'
+    transmitting.style.display = 'flex'
 
     const response = await fetch('/api/users/verify-email/', {
         method: 'POST',
@@ -87,11 +87,14 @@ async function send_number() {
         document.getElementById('check_number_box').style.display = 'block' // 인증번호란 오픈
         startTimer(300);
         alert(data.message + data.university);
-        send.style.display = 'block'
+        send.style.display = 'flex'
         send.innerText = '인증번호 재발송'
         transmitting.style.display = 'none'
     } else {
         const data = await response.json();
+        send.style.display = 'flex'
+        send.innerText = '인증번호 재발송'
+        transmitting.style.display = 'none'
         alert("발송 실패: " + (data.message || "오류가 발생했습니다."));
     }
 }
@@ -129,9 +132,9 @@ async function check_number() {
         const send = document.getElementById('send-btn')
         if (data.is_varified) {
             check_box.style.display = 'none'
-            check_box_certified.style.display = 'block'
+            check_box_certified.style.display = 'flex'
             send.style.display = 'none'
-            complete.style.display = 'block'
+            complete.style.display = 'flex'
             alert('메일 인증 성공!')
         }
 
