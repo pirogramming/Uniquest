@@ -50,10 +50,14 @@
             <footer class="chat-footer">
                 <div class="chat-actions" id="chatActions">
                     {% if is_author %}
+                    {% if can_confirm_performer %}
                     <button type="button" class="btn-action-outline" id="confirmPerformerBtn">
                         <i class="fa-regular fa-circle-check"></i> 수행자 확정
                     </button>
+                    <button type="button" class="btn-action-gray" id="rejectPerformerBtn">수행자 거부</button>
+                    {% elif show_complete_btn %}
                     <button type="button" class="btn-action-gray" id="completeMissionBtn">미션 완료</button>
+                    {% endif %}
                     {% else %}
                     {% if can_accept %}
                     <button type="button" class="btn-action-blue" id="acceptMissionBtn">미션 수락하기</button>
@@ -90,13 +94,13 @@
     <script>
         const CHAT_CONFIG = {
             roomId: {{ room_id }},
-            missionId: {{ mission_id }},
-            userId: {{ request.user.id }},
-            userNickname: "{{ request.user.username|escapejs }}",
+        missionId: {{ mission_id }},
+        userId: {{ request.user.id }},
+        userNickname: "{{ request.user.username|escapejs }}",
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
-            canAccept: {{ can_accept|yesno:'true,false' }},
-            isAuthor: {{ is_author|yesno:'true,false' }},
-            csrfToken: "{{ csrf_token }}"
+                canAccept: {{ can_accept | yesno:'true,false' }},
+        isAuthor: {{ is_author | yesno:'true,false' }},
+        csrfToken: "{{ csrf_token }}"
         };
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>
