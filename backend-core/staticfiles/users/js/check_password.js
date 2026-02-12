@@ -104,13 +104,13 @@ async function check_number() {
         const next_btn = document.getElementById('next-btn');
         const send = document.getElementById('send-btn');
 
-        if (data.token) sessionStorage.setItem('password_reset_token', data.token); //토큰을 세션 저장소에 넣기
+        if (data.token) sessionStorage.setItem('password_reset_token', data.token); //토큰을 로컬 저장소에 넣기
 
         if (data.is_varified) {
             if (check_box) check_box.style.display = 'none';
             if (check_box_certified) check_box_certified.style.display = 'block';
             if (send) send.style.display = 'none';
-            if (complete) complete.style.display = 'block';
+            if (complete) complete.style.display = 'flex';
             if (next_btn) next_btn.style.display = 'block';
             alert('메일 인증 성공! 아래 "다음" 버튼을 눌러 비밀번호를 재설정하세요.');
         }
