@@ -18,6 +18,7 @@ class Category(models.TextChoices):
 
 class MissionStatus(models.TextChoices):
     WAITING = "WAITING", "waiting"
+    PENDING_APPROVAL = "PENDING_APPROVAL", "수락 대기"
     MATCHED = "MATCHED", "matched"
     COMPLETED = "COMPLETED", "completed"
     CANCELLED = "CANCELLED", "cancelled"

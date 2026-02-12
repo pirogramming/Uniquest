@@ -45,11 +45,11 @@ class ChatClient {
 
     init() {
         // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
-        document.querySelectorAll('.btn-block').forEach(btn => {
+        document.querySelectorAll('.btn-block, .btn-block-text').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const targetId = e.currentTarget.dataset.targetId;
-                const nickname = e.currentTarget.dataset.nickname || '';
-                if (targetId) this.blockUser(parseInt(targetId, 10), nickname, e.currentTarget);
+                const username = e.currentTarget.dataset.username || '';
+                if (targetId) this.blockUser(parseInt(targetId, 10), username, e.currentTarget);
             });
         });
 
@@ -105,9 +105,9 @@ class ChatClient {
         }
     }
 
-    async blockUser(targetId, nickname, btnEl) {
+    async blockUser(targetId, username, btnEl) {
         if (!btnEl) return;
-        if (!confirm(`${nickname || '해당 유저'}를 차단하시겠습니까?`)) return;
+        if (!confirm(`${username || '해당 유저'}를 차단하시겠습니까?`)) return;
         btnEl.disabled = true;
         try {
             // 차단 = 1) 차단 목록 추가 2) 채팅방에서 강퇴 (room_id 필요)
@@ -176,7 +176,8 @@ class ChatClient {
 
             this.ws.send(JSON.stringify({
                 type: 'AUTH',
-                token: token
+                token: token,
+                username: this.userNickname || ''
             }));
         };
 

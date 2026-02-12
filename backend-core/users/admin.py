@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.html import format_html
 from .models import User
 from missions.models import Mission  # 미션 모델 임포트
 
@@ -18,8 +19,8 @@ class AuthoredMissionInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     # 1. 관리자 목록 화면 설정
     list_display = (
-        'username', 'email', 'nickname', 'university', 
-        'is_student_verified', 'is_staff', 
+        'username', 'email', 'university',
+        'is_student_verified', 'is_staff',
         'get_mission_count', 'get_blocked_count'
     )
     
@@ -30,20 +31,27 @@ class CustomUserAdmin(UserAdmin):
     inlines = [AuthoredMissionInline]
 
     # 4. 상세 수정 페이지 구성
+    readonly_fields = UserAdmin.readonly_fields + ('review_datas_preview', 'userphoto_preview')
+
     fieldsets = UserAdmin.fieldsets + (
         ('Uniquest 정보', {'fields': (
-            'nickname', 
-            'university', 
-            'is_student_verified', 
-            'univ_email', 
+            'university',
+            'is_student_verified',
+            'univ_email',
             'manner_score',
-            'blocked_people'
+            'blocked_people',
+            'userphoto_preview',
+            'userphoto',
         )}),
+        ('리뷰 데이터', {
+            'fields': ('review_datas_preview',),
+            'description': '이 유저가 받은 평가 목록 (review_datas)',
+        }),
     )
-    
+
     # 5. 유저 생성 시 필드 구성
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('추가 정보', {'fields': ('nickname', 'university', 'univ_email')}),
+        ('추가 정보', {'fields': ('university', 'univ_email')}),
     )
 
     # --- 계산 필드 정의 ---
@@ -55,3 +63,27 @@ class CustomUserAdmin(UserAdmin):
     def get_mission_count(self, obj):
         return obj.missions.count()  # related_name='missions' 기반
     get_mission_count.short_description = "등록 미션수"
+
+    def review_datas_preview(self, obj):
+        """리뷰 데이터를 읽기 쉬운 형태로 표시"""
+        if not obj.pk:
+            return "-"
+        data = obj.review_datas
+        if not data:
+            return "받은 리뷰 없음"
+        import json
+        try:
+            return json.dumps(data, indent=2, ensure_ascii=False)
+        except (TypeError, ValueError):
+            return str(data)
+    review_datas_preview.short_description = "받은 리뷰 (review_datas)"
+
+    def userphoto_preview(self, obj):
+        """업로드된 프로필 사진 미리보기"""
+        if not obj.pk or not obj.userphoto:
+            return "-"
+        return format_html(
+            '<img src="{}" style="max-width: 120px; max-height: 120px; border-radius: 8px;" />',
+            obj.userphoto.url,
+        )
+    userphoto_preview.short_description = "프로필 사진 미리보기"

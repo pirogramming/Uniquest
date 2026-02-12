@@ -301,8 +301,9 @@
                     <img src="{% static 'shared/img/default_user.png' %}" alt="프로필">
                 </div>
                 <div class="author-text">
-                    <div class="author-name">{{ mission.author.nickname|default:mission.author.username }}</div>
-                    <div class="author-score">🌡️ 점수 <span>{{ mission.author.manner_score|default:"36.5" }}점</span></div>
+                    <div class="author-name">{{ mission.author.username }}</div>
+                    <div class="author-score">🌡️ 점수 <span>{{ mission.author.manner_score|default:"36.5" }}점</span>
+                    </div>
                 </div>
                 <a href="#" class="view-profile">프로필 보기</a>
             </div>

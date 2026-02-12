@@ -35,13 +35,11 @@ async function renderProfile() {
     
     if (user) {
         // HTML에 해당 ID를 가진 태그가 있을 때만 꽂아줌
-        const nicknameElement = document.getElementById('user-nickname');
-        const name = document.getElementById('user-name');
+        const usernameElement = document.getElementById('user-username');
         const userEmail = document.getElementById('user-email');
         const university = document.getElementById('user-univ');
 
-        if (nicknameElement) nicknameElement.value = user.nickname;
-        if (name) name.value = user.username;
+        if (usernameElement) usernameElement.value = user.username;
         if (userEmail) userEmail.innerText = user.univ_email;
         if (university) university.innerText = user.university;
 
@@ -60,14 +58,8 @@ async function patchProfile() {
         return;
     }
 
-    // 1. 시안에 있는 닉네임과 이름 데이터 수집
-    const nickname = document.getElementById('user-nickname').value;
-    const username = document.getElementById('user-name').value;
-
-    const updatedData = {
-        nickname: nickname,
-        username: username
-    };
+    const username = document.getElementById('user-username').value;
+    const updatedData = { username };
 
     try {
         // 2. 백엔드 PATCH API 호출

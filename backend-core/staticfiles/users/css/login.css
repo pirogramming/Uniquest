@@ -41,16 +41,6 @@ body {
     padding-top: 15px;
 }
 
-.header::before {
-    content: '\2190'; 
-    grid-row: 1; /* [수정됨] 1 / 3에서 1로 변경: '로그인' 글자와 같은 줄에만 위치 */
-    font-size: 26px;
-    font-weight: bold;
-    color: #344054;
-    cursor: pointer;
-    line-height: 1.2; /* 로그인 텍스트(h2)의 높이와 시각적으로 맞춤 */
-}
-
 .header h2 {
     grid-row: 1; /* 첫 번째 줄 */
     grid-column: 2;
@@ -67,6 +57,10 @@ body {
     font-size: 14px;
     color: #667085;
     margin: 4px 0 0 0;
+}
+
+#left_arrow:hover{
+    cursor:pointer;
 }
 
 /* 4. 요소 순서 강제 조정 (로고 -> 명칭 -> 입력창) */

@@ -1,0 +1,67 @@
+{%load static%}
+<div class="mobile-container">
+    <header class="header-top">
+        <button class="back-btn" onclick="history.back()">〈</button>
+        <h1 class="header-title">평가</h1>
+        <div style="width: 24px;"></div> 
+        <link rel="stylesheet" href="{%static 'users/css/review.css'%}">
+    </header>
+
+
+    <div class="content-wrapper">
+        <div class="completed-mission-card">
+            <span class="label">완료된 미션</span>
+            <h2 class="mission-title" id="mission-title">점심 배달 대신 받아주실 분</h2>
+            
+            <div class="user-profile-mini">
+                <div class="profile-avatar">김</div>
+                <div class="user-info">
+                    <span class="name" id="name">김대학</span>
+                    <span class="sub-text">상대방 평가하기</span>
+                </div>
+            </div>
+        </div>
+
+        <section class="rating-section">
+            <h3>만족도를 평가해주세요</h3>
+            <p class="rating-desc">별점은 상대방의 유니퀘스트 점수에 반영됩니다</p>
+            
+            <div class="star-group" id="star-group">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+            <p class="star-guide">별점을 선택해주세요</p>
+        </section>
+
+        <section class="comment-section">
+            <div class="section-title">
+                <i class="icon-comment">💬</i> 코멘트 (선택사항)
+            </div>
+            <textarea placeholder="상대방에게 전하고 싶은 말을 남겨주세요" class="comment-input" id="comment-input"></textarea>
+        </section>
+
+        <section class="quick-comment-section">
+            <span class="section-title">빠른 코멘트</span>
+            <div class="chip-group" id="chip-group">
+                <button type="button" class="chip" data-value="P1">시간 약속을 잘 지켜요</button>
+                <button type="button" class="chip" data-value="P2">친절해요</button>
+                <button type="button" class="chip" data-value="P3">소통이 원활해요</button>
+                <button type="button" class="chip" data-value="P4">전문적이에요</button>
+                
+                <button type="button" class="chip" data-value="N1">답장이 조금 느려요</button>
+                <button type="button" class="chip" data-value="N2">설명이 부족했어요</button>
+                <button type="button" class="chip" data-value="N3">시간 약속이 아쉬워요</button>
+                <button type="button" class="chip" data-value="N4">준비물이 미흡했어요</button>
+            </div>
+        </section>
+    </div>
+
+    <div class="footer-action">
+        <button class="submit-btn disabled" id="submit-evaluation" onclick="send_info()">평가 완료</button>
+    </div>
+    <script src="{%static 'users/js/review_page.js'%}"></script>
+    <script src="{%static 'shared/js/auth.js'%}"></script>
+</div>
