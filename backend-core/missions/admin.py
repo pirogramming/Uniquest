@@ -1,6 +1,7 @@
 # Register your models here.
 # missions/admin.py
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import Mission, Tag, MissionImage
 
 
@@ -14,6 +15,18 @@ class TagAdmin(admin.ModelAdmin):
 class MissionImageInline(admin.TabularInline):
     model = MissionImage
     extra = 0
+    fields = ("image_preview", "image")
+    readonly_fields = ("image_preview",)
+
+    def image_preview(self, obj):
+        """업로드된 미션 사진 미리보기"""
+        if not obj.pk or not obj.image:
+            return "-"
+        return format_html(
+            '<img src="{}" style="max-width: 80px; max-height: 80px; object-fit: cover;" />',
+            obj.image.url,
+        )
+    image_preview.short_description = "미리보기"
 
 
 @admin.register(Mission)

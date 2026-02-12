@@ -38,7 +38,7 @@ async function renderProfile() {
         const my_missions = user.missions;
         const blockers = user.blocked_people;
 
-        const nicknameElement = document.getElementById('user-nickname');
+        const usernameElement = document.getElementById('user-username');
         const univElement = document.getElementById('user-univ');
         const mannerScore = document.getElementById('user-score'); // 점수 텍스트
         const register_missions = document.getElementById('my-registered-missions');
@@ -48,7 +48,7 @@ async function renderProfile() {
         score_bar_fill.style = `width : ${user.manner_score}%;`
 
         // 1. 기본 정보 반영
-        if (nicknameElement) nicknameElement.innerText = user.nickname;
+        if (usernameElement) usernameElement.innerText = user.username;
         if (univElement) univElement.innerText = user.university;
         if (mannerScore) mannerScore.innerText = user.manner_score;
 

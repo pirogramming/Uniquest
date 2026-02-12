@@ -33,13 +33,13 @@ async function renderHomepage() {
         }
 
         if (userData && userData.id) {
-            const nicknameElement = document.getElementById('nickname');
+            const usernameElement = document.getElementById('username');
             const missionElement = document.getElementById('mission_cards');
             const matched = document.getElementById('matched');
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
 
-            if (nicknameElement) nicknameElement.innerText = userData.nickname;
+            if (usernameElement) usernameElement.innerText = userData.username;
             if (missionElement) {
                 console.log('yeah')
                 userMission = userData.missions
@@ -87,7 +87,7 @@ async function renderHomepage() {
                 completed.innerHTML = userData.completed_count
             }
 
-            console.log("환영합니다, " + userData.nickname + "님!");
+            console.log("환영합니다, " + userData.username + "님!");
         }
     } catch (error) {
         console.error("네트워크 오류 감지", error);

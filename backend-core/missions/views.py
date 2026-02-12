@@ -483,7 +483,7 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
     mission = room.mission
     is_author = request.user == mission.author
     can_accept = not is_author and mission.status == "WAITING"
-    blockable_user = {"id": other_user.id, "nickname": other_user.nickname} if other_user else None
+    blockable_user = {"id": other_user.id, "username": other_user.username} if other_user else None
 
     return render(
         request,

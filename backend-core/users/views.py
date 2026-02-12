@@ -141,6 +141,7 @@ class RegisterView(generics.CreateAPIView):
         email = request.data.get('univ_email')
         is_student_verified = cache.get(f"varified_info_{email}")
         university = cache.get(f"university_info_{email}")
+        user_photo = request.FILES.get('user_photo')
 
         # 2. 보안 검증: 인증 정보가 없거나 False면 가입 차단
         if not is_student_verified or not university:
@@ -152,14 +153,15 @@ class RegisterView(generics.CreateAPIView):
         # 3. Serializer 검증 및 유저 생성
         # 여기서 백엔드가 직접 찾은 university 값을 주입합니다.
         serializer = self.get_serializer(data=request.data) # 회원가입용 serializer를 만들기만 함
-        serializer.is_valid(raise_exception=True) #username, password, nickname등 형식/필수값 검사
+        serializer.is_valid(raise_exception=True)  # username, password 등 형식/필수값 검사
         
         # save() 시점에 university 필드를 강제로 채워줍니다.
         # (유저 모델에 university 필드가 있다고 가정합니다)
         user = serializer.save(
             university=university,
             is_student_verified=True,
-            univ_email=email
+            univ_email=email,
+            userphoto=user_photo
         )
 
         # 4. 가입 완료 후 보안을 위해 캐시 즉시 삭제
@@ -232,14 +234,13 @@ def get_my_info(request):
     return Response({
         "id": user.id,
         "username": user.username,
-        "nickname": user.nickname,
         "university": user.university.name if user.university else None,
         "univ_email": user.univ_email,
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
-        "missions" : missions,
-        "blocked_people" : list(blocked_Queryset.values('id','nickname')),
-        "accepted_missions":accepted_missions,
+        "missions": missions,
+        "blocked_people": list(blocked_Queryset.values('id', 'username')),
+        "accepted_missions": accepted_missions,
     })
 
 def mypage_view(request):
@@ -256,19 +257,15 @@ def get_my_info_patch(request):
         # 기존 조회 로직
         return Response({
             "username": user.username,
-            "nickname": user.nickname,
             "univ_email": user.univ_email,
             "university": user.university.name if user.university else None,
         })
 
     elif request.method == 'PATCH':
         # 1. 프론트에서 보낸 데이터(updatedData) 받기
-        nickname = request.data.get('nickname')
         username = request.data.get('username')
 
         # 2. 데이터 업데이트 (값이 있을 때만)
-        if nickname:
-            user.nickname = nickname
         if username:
             user.username = username
         
@@ -277,8 +274,7 @@ def get_my_info_patch(request):
         
         return Response({
             "message": "수정 완료",
-            "nickname": user.nickname,
-            "username": user.username
+            "username": user.username,
         }, status=status.HTTP_200_OK)
 
 def mypage_modify_view(request):
@@ -292,8 +288,8 @@ def get_blocked_users_info(request):
     user = request.user
     if request.method == 'GET':
         try:
-            # 차단한 유저 목록 가져오기 (id와 nickname만)
-            blocked_users = list(user.blocked_people.all().values('id', 'nickname'))
+            # 차단한 유저 목록 가져오기 (id와 username만)
+            blocked_users = list(user.blocked_people.all().values('id', 'username'))
             
             return Response({
                 "blocked_users": blocked_users,
@@ -310,7 +306,7 @@ def get_blocked_users_info(request):
         try:
             target_user = User.objects.get(id=target_id)
             user.blocked_people.remove(target_user)
-            return Response({"message":f"{target_user.nickname}님을 차단 해제했습니다."}, status=200)
+            return Response({"message": f"{target_user.username}님을 차단 해제했습니다."}, status=200)
         except User.DoesNotExist:
             return Response({"message":"대상유저가 없습니다"},status=404) 
 
@@ -332,7 +328,7 @@ def get_home_page_guest(request):
 @permission_classes([IsAuthenticated])
 def get_homepage_info(request):
     user = request.user
-    blocked_list = list(user.blocked_people.all().values('id','nickname'))
+    blocked_list = list(user.blocked_people.all().values('id', 'username'))
     mission_lst = list(user.missions.all().values('id','title','descriptions','reward','category','status','location_name'))
     waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
     matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
@@ -340,7 +336,7 @@ def get_homepage_info(request):
     
     return Response({
         "id":user.id,
-        "nickname":user.nickname,
+        "username": user.username,
         "university":user.university.name,
         "is_student_verified":user.is_student_verified,
         "univ_email":user.univ_email,
@@ -437,7 +433,7 @@ def change_password(request):
         target_user.save()
 
         cache.delete("reset_token_{reset_token}")
-        return Response({"message": f"{target_user.username}비밀번호가 성공적으로 변경되었습니다."}, status=200)
+        return Response({"message": f"{target_user.username} 비밀번호가 성공적으로 변경되었습니다."}, status=200)
     
     except User.DoesNotExist:
         return Response({"error": "해당 이메일의 사용자를 찾을 수 없습니다."}, status=404)
@@ -447,5 +443,28 @@ def change_password_render(request):
 
 #리뷰 페이지
 
-def render_review_page(request):
+def render_review_page(request,mission_id):
     return render(request,'users/review.html')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def render_review_page_info(request,mission_id):
+    target_mission = Mission.objects.get(id=mission_id)
+    target_user = target_mission.author
+    user = request.user
+
+    mission_name = target_mission.title
+    username = target_user.username
+
+    return JsonResponse({'mission_name':mission_name,'username':username},status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def review_json(request):
+    review_json = json.loads(request.body)
+    target_mission = Mission.objects.get(id=review_json['personal_key'])
+    target_user = target_mission.author
+    target_user.review_datas.append(review_json)
+    target_user.save()
+    return Response({"status": "success", "message": target_user.username}, status=200)

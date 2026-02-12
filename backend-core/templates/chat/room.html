@@ -18,7 +18,7 @@
                         <i class="fa-solid fa-arrow-left"></i>
                     </a>
                     <div class="header-user-info">
-                        <h2 class="user-nickname">{{ other_user.nickname|default:mission.author.nickname }}</h2>
+                        <h2 class="user-nickname">{{ other_user.username|default:mission.author.username }}</h2>
                         <span class="status">연결 중...</span>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                         </button>
                         <div class="more-dropdown" id="moreDropdown">
                             <button class="dropdown-item">프로필 보기</button>
-                            <button class="dropdown-item btn-block-text" data-target-id="{{ other_user.id }}">사용자 차단</button>
+                            <button class="dropdown-item btn-block-text" data-target-id="{{ other_user.id }}" data-username="{{ other_user.username|default:mission.author.username }}">사용자 차단</button>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
             roomId: "{{ room_id }}",
             missionId: {{ mission_id }},
             userId: {{ request.user.id }},
-            userNickname: "{{ request.user.nickname|escapejs }}",
+            userNickname: "{{ request.user.username|escapejs }}",
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
             canAccept: {{ can_accept|yesno:"true,false" }},
             isAuthor: {{ is_author|yesno:"true,false" }},
