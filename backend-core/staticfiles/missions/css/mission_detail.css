@@ -32,7 +32,7 @@ body {
 /* 2. 상단 헤더 */
 .top-header {
     display: flex;
-    justify-content: flex-start; 
+    justify-content: space-between; 
     align-items: center;
     padding: 15px 25px;
     background-color: #ffffff;
@@ -41,6 +41,11 @@ body {
     top: 0;
     z-index: 100;
     gap: 12px; 
+}
+.header1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .back-btn {

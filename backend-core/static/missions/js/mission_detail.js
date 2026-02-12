@@ -7,7 +7,7 @@
  * - 미션 상세 정보 로드
  * - 지도에 미션 위치 표시
  * - 이미지 갤러리 렌더링 및 모달
- * - 작성자 여부에 따른 버튼 렌더링
+ * - 햄버거 메뉴 토글 (작성자만)
  * - 삭제 기능
  * 
  * 의존성: Auth, KakaoMapManager
@@ -48,8 +48,6 @@
 
             mapManager.fitBoundsToLocations([{ lat, lng }]);
             mapManager.setLevel(3);
-
-            console.log("✅ 지도 초기화 완료");
         } catch (err) {
             console.error("지도 초기화 실패:", err);
         }
@@ -57,39 +55,40 @@
 
     // ==================== 이미지 갤러리 ====================
     
-/**
+    /**
      * 이미지 갤러리 렌더링
-     */function renderImages(images) {
-    const section = document.getElementById('mission-images-section');
-    if (!section) return;
+     */
+    function renderImages(images) {
+        const section = document.getElementById('mission-images-section');
+        if (!section) return;
 
-    if (!images || images.length === 0) {
-        section.innerHTML = '<div class="no-images">등록된 이미지가 없습니다.</div>';
-        return;
-    }
-
-    const imagesHTML = images.map(img => {
-        // [수정] 이미지 경로가 상대경로인 경우를 대비해 처리
-        let src = img.image;
-        if (src && !src.startsWith('http') && !src.startsWith('/')) {
-            src = '/' + src; 
+        if (!images || images.length === 0) {
+            section.innerHTML = '<div class="no-images">등록된 이미지가 없습니다.</div>';
+            return;
         }
 
-        return `
-            <div class="image-item" onclick="window.openImageModal('${src}')">
-                <img src="${src}" alt="미션 이미지" 
-                     onerror="this.src='/static/shared/img/default_image.png'; this.onerror=null;" 
-                     loading="lazy">
+        const imagesHTML = images.map(img => {
+            // 이미지 경로 처리
+            let src = img.image;
+            if (src && !src.startsWith('http') && !src.startsWith('/')) {
+                src = '/' + src; 
+            }
+
+            return `
+                <div class="image-item" onclick="window.openImageModal('${src}')">
+                    <img src="${src}" alt="미션 이미지" 
+                         onerror="this.src='/static/shared/img/default_image.png'; this.onerror=null;" 
+                         loading="lazy">
+                </div>
+            `;
+        }).join('');
+
+        section.innerHTML = `
+            <div class="mission-images">
+                ${imagesHTML}
             </div>
         `;
-    }).join('');
-
-    section.innerHTML = `
-        <div class="mission-images-container">
-            ${imagesHTML}
-        </div>
-    `;
-}
+    }
 
     /**
      * 이미지 모달 열기
@@ -114,24 +113,74 @@
         }
     }
 
+    // ==================== 햄버거 메뉴 ====================
+    
+    /**
+     * 햄버거 메뉴 토글
+     */
+    function toggleMenu() {
+        const menu = document.getElementById('dropdown-menu');
+        const backdrop = document.getElementById('menu-backdrop');
+        
+        if (menu && backdrop) {
+            const isOpen = menu.classList.contains('show');
+            
+            if (isOpen) {
+                closeMenu();
+            } else {
+                menu.classList.add('show');
+                backdrop.classList.add('show');
+            }
+        }
+    }
+
+    /**
+     * 메뉴 닫기
+     */
+    function closeMenu() {
+        const menu = document.getElementById('dropdown-menu');
+        const backdrop = document.getElementById('menu-backdrop');
+        
+        if (menu) menu.classList.remove('show');
+        if (backdrop) backdrop.classList.remove('show');
+    }
+
+    /**
+     * 햄버거 버튼 표시 (작성자만)
+     */
+    function showMenuButton(isAuthor) {
+        const menuButton = document.getElementById('menu-button');
+        
+        if (menuButton && isAuthor) {
+            menuButton.classList.add('visible');
+        }
+    }
+
     // ==================== 미션 삭제 ====================
     
     async function deleteMission() {
+        // 메뉴 먼저 닫기
+        closeMenu();
+        
         if (!confirm('정말로 이 미션을 삭제하시겠습니까?\n삭제된 미션은 복구할 수 없습니다.')) {
             return;
         }
 
         try {
-            const response = await Auth.authFetch(API_DELETE_URL, {
-                method: 'DELETE'
+            const result = await fetch(API_DELETE_URL, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${Auth.getAccessToken()}`,
+                    'Content-Type': 'application/json'
+                }
             });
 
-            if (response && response.ok) {
-                const data = await response.json();
+            if (result.ok) {
+                const data = await result.json();
                 alert(data.message || '미션이 삭제되었습니다.');
                 window.location.href = '/api/missions/';
             } else {
-                const error = response ? await response.json() : {};
+                const error = await result.json();
                 alert(error.error || '삭제에 실패했습니다.');
             }
         } catch (err) {
@@ -148,13 +197,10 @@
 
             if (!mission) {
                 console.error("미션 데이터를 가져올 수 없습니다.");
-                document.getElementById('action-area').innerHTML = 
-                    `<p class="muted">로그인이 필요하거나 삭제된 미션입니다.</p>`;
                 return;
             }
 
             // 1. 이미지 표시
-            if(mission.images) console.log("이미지 있음");
             renderImages(mission.images);
 
             // 2. 지도 표시 (좌표가 있을 때만)
@@ -162,74 +208,24 @@
                 initMap(mission.location_lat, mission.location_lng);
             }
 
-            // 3. 작성자 정보 업데이트
-            const authorEl = document.getElementById('mission-author');
-            if (authorEl && mission.author_username) {
-                authorEl.textContent = mission.author_username;
-            }
-
-            // 4. 버튼 렌더링
-            renderActionButtons(mission);
+            // 3. 작성자인 경우 햄버거 버튼 표시
+            showMenuButton(mission.is_author);
 
         } catch (err) {
             console.error("상세 데이터 로드 실패:", err);
-            document.getElementById('action-area').innerHTML = 
-                `<p class="muted">로그인이 필요하거나 삭제된 미션입니다.</p>`;
-        }
-    }
-
-    /**
-     * 액션 버튼 렌더링
-     */
-    function renderActionButtons(mission) {
-        const actionArea = document.getElementById('action-area');
-        if (!actionArea) return;
-
-        if (mission.is_author) {
-            // 작성자: 채팅하기, 수정하기, 삭제하기
-            actionArea.innerHTML = `
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                    <p style="margin: 0 0 10px 0; font-size: 14px;">본인이 등록한 미션입니다.</p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="/api/missions/${mission.id}/chat/start/" 
-                           class="btn btn-primary" 
-                           style="flex: 1; min-width: 120px; padding: 10px 20px; text-decoration: none; color: white; border-radius: 8px; text-align: center;">
-                            채팅하기
-                        </a>
-                        <button onclick="location.href='/api/missions/${mission.id}/edit/'" 
-                                class="btn btn-secondary" 
-                                style="flex: 1; min-width: 120px;">
-                            수정하기
-                        </button>
-                        <button onclick="window.deleteMission()" 
-                                class="btn btn-danger" 
-                                style="flex: 1; min-width: 120px; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                            삭제하기
-                        </button>
-                    </div>
-                </div>
-            `;
-        } else {
-            // 비작성자: 채팅하기만
-            actionArea.innerHTML = `
-                <a href="/api/missions/${mission.id}/chat/start/" 
-                   class="btn btn-primary" 
-                   style="display: inline-block; width: 100%; max-width: 500px; height: 50px; font-size: 16px; line-height: 50px; text-align: center; text-decoration: none; color: white; border-radius: 8px;">
-                    채팅하기
-                </a>
-            `;
         }
     }
 
     // ==================== 이벤트 핸들러 ====================
     
     /**
-     * 키보드 이벤트 (ESC로 모달 닫기)
+     * 키보드 이벤트 (ESC로 모달/메뉴 닫기)
      */
     function initKeyboardEvents() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeImageModal();
+                closeMenu();
             }
         });
     }
@@ -248,6 +244,49 @@
         }
     }
 
+    /**
+     * 햄버거 메뉴 이벤트
+     */
+    function initMenuEvents() {
+        const menuButton = document.getElementById('menu-button');
+        const backdrop = document.getElementById('menu-backdrop');
+        const deleteBtn = document.getElementById('btn-delete');
+        
+        if (menuButton) {
+            menuButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu();
+            });
+        }
+        
+        // 삭제 버튼 이벤트
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteMission();
+            });
+        }
+        
+        if (backdrop) {
+            backdrop.addEventListener('click', closeMenu);
+        }
+        
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('dropdown-menu');
+            const menuButton = document.getElementById('menu-button');
+            
+            if (menu && menuButton) {
+                if (!menu.contains(e.target) && !menuButton.contains(e.target)) {
+                    if (menu.classList.contains('show')) {
+                        closeMenu();
+                    }
+                }
+            }
+        });
+    }
+
     // ==================== 초기화 ====================
     
     function init() {
@@ -259,6 +298,7 @@
         // 이벤트 리스너 등록
         initKeyboardEvents();
         initModalEvents();
+        initMenuEvents();
 
         // 데이터 로드
         loadMissionDetail();

@@ -17,47 +17,52 @@
 
     <form id="mission-form" enctype="multipart/form-data" data-mission-id="{{ mission.id|default:'' }}">
         {% csrf_token %}
-        <div class="field">
-    <label id="photo-count">사진 (0/5)</label>
-    <div class="image-preview-wrapper" style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <div class="photo-upload-placeholder" onclick="document.getElementById('id_images').click()" style="cursor:pointer;">
-            <div class="plus-icon">+</div>
-            <span>추가</span>
-        </div>
         
-        <div id="image-preview-container" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-    </div>
-    
-    <input type="file" 
-           name="images" 
-           id="id_images" 
-           accept="image/*" 
-           multiple 
-           style="display:none;">
-    <p class="muted">미션을 더 자세히 설명할 수 있는 사진을 추가하세요. (최대 5장)</p>
-    {% if is_update %}
-    <script id="existing-images-data" type="application/json">
-        [
-            {% for img in mission.images.all %}
-                {"id": {{ img.id }}, "image": "{{ img.image.url }}"}
-                {% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ]
-    </script>
-{% endif %}
+        <!-- 사진 업로드 -->
+        <div class="field">
+            <label id="photo-count">사진 (0/5)</label>
+            <div class="image-preview-wrapper">
+                <div class="photo-upload-placeholder" onclick="document.getElementById('id_images').click()">
+                    <div class="plus-icon">+</div>
+                    <span>추가</span>
+                </div>
+                
+                <div id="image-preview-container"></div>
+            </div>
+            
+            <input type="file" 
+                   name="images" 
+                   id="id_images" 
+                   accept="image/*" 
+                   multiple 
+                   style="display:none;">
+            <p class="muted">미션을 더 자세히 설명할 수 있는 사진을 추가하세요. (최대 5장)</p>
+            
+            {% if is_update %}
+            <script id="existing-images-data" type="application/json">
+                [
+                    {% for img in mission.images.all %}
+                        {"id": {{ img.id }}, "image": "{{ img.image.url }}"}
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            </script>
+            {% endif %}
+        </div>
 
-</div>
-
+        <!-- 제목 -->
         <div class="field">
             <label>제목</label>
             {{ form.title }}
         </div>
 
+        <!-- 설명 -->
         <div class="field">
             <label>설명</label>
             {{ form.descriptions }}
         </div>
 
+        <!-- 카테고리 -->
         <div class="field">
             <label>카테고리</label>
             <div class="category-grid">
@@ -65,63 +70,114 @@
             </div>
         </div>
 
-        <div class="field">
-            <label>금액</label>
-            {{ form.reward }}
-        </div>
+        <!-- 위치 (hidden fields) -->
         <input type="hidden" id="location_name" name="location_name" value="{{ form.location_name.value|default:'' }}">
-<input type="hidden" name="location_lat" value="{{ form.location_lat.value|default:'' }}">
-<input type="hidden" name="location_lng" value="{{ form.location_lng.value|default:'' }}">
-<input type="hidden" name="location_address" value="{{ form.location_address.value|default:'' }}">
+        <input type="hidden" name="location_lat" value="{{ form.location_lat.value|default:'' }}">
+        <input type="hidden" name="location_lng" value="{{ form.location_lng.value|default:'' }}">
+        <input type="hidden" name="location_address" value="{{ form.location_address.value|default:'' }}">
+        
+        <!-- 위치 선택 -->
         <div class="field">
             <label>위치</label>
             <input type="text" id="location_name_display" placeholder="예: 학생회관 앞" readonly />
             <button type="button" class="subbtn" onclick="goPickLocation()">지도에서 위치 선택</button>
         </div>
-        <div class="field">
-    <label>마감기한</label>
-    <div style="margin-bottom: 10px;">
-        <button type="button" id="btn_due_today" style="padding:8px 12px; margin-right:5px;">오늘 24시</button>
-        <button type="button" id="btn_due_3d" style="padding:8px 12px; margin-right:5px;">3일 후</button>
-        <button type="button" id="btn_due_7d" style="padding:8px 12px; margin-right:5px;">7일 후</button>
-        <button type="button" id="btn_due_pick" style="padding:8px 12px;">직접 선택</button>
-    </div>
-    <div class="field">
-    <label>태그 (최대 5개)</label>
-    <input type="text" id="tag_input" placeholder="#태그를 입력하고 엔터" style="width:100%; padding:8px;">
-    <div id="tag_chips" style="margin-top:10px;"></div>
-    <input type="hidden" id="tags_input" name="tags_input">
-    <p class="muted">엔터를 눌러 태그를 추가하세요</p>
-</div>
-    <input type="datetime-local" name="deadline" id="due_picker" style="display:none;">
-    <div id="due_picker_wrap" style="display:none;"></div>
-    <p id="due_preview" class="muted">마감기한을 선택하세요</p>
-</div>
 
+        <!-- 금액 -->
+        <div class="field">
+            <label>금액</label>
+            <div class="reward-input-wrapper">
+                {{ form.reward }}
+                <span class="reward-korean" id="reward-korean"></span>
+            </div>
+            <div class="reward-buttons">
+                <button type="button" class="reward-btn" data-amount="1000">+1천</button>
+                <button type="button" class="reward-btn" data-amount="3000">+3천</button>
+                <button type="button" class="reward-btn" data-amount="5000">+5천</button>
+                <button type="button" class="reward-btn" data-amount="10000">+1만</button>
+            </div>
+            <p class="reward-warning" id="reward-warning" style="display:none;">1천원 단위로 입력해 주세요</p>
+        </div>
+
+
+
+        <!-- 마감기한 -->
+        <div class="field">
+            <label>마감기한</label>
+            <div class="deadline-buttons">
+                <button type="button" id="btn_due_today" class="deadline-btn">오늘 24시</button>
+                <button type="button" id="btn_due_3d" class="deadline-btn">3일 후</button>
+                <button type="button" id="btn_due_7d" class="deadline-btn">7일 후</button>
+                <button type="button" id="btn_due_pick" class="deadline-btn">직접 선택</button>
+            </div>
+            
+            <input type="datetime-local" name="deadline" id="due_picker" style="display:none;">
+            <div id="due_picker_wrap" style="display:none;">
+                <input type="datetime-local" id="due_picker_visible">
+            </div>
+            <p id="due_preview" class="muted">마감기한을 선택하세요</p>
+        </div>
+
+        <!-- 태그 -->
+        <div class="field">
+            <label>태그 (최대 5개)</label>
+            <input type="text" id="tag_input" placeholder="#태그를 입력하고 엔터">
+            <div id="tag_chips"></div>
+            <input type="hidden" id="tags_input" name="tags_input">
+            <p class="muted">엔터를 눌러 태그를 추가하세요</p>
+        </div>
+
+        <!-- 안내 박스 -->
         <div class="info-box">
             <strong class="title">안내</strong>
             <p class="text">등록된 미션은 "대기중" 상태로 시작됩니다. 다른 학생이 신청하면 채팅으로 연락받을 수 있습니다.</p>
         </div>
 
-        <button type = "submit" class="btn" id="submit_btn">{% if is_update %}수정 완료{% else %}미션 등록하기{% endif %}</button>
+        <!-- 제출 버튼 -->
+        <button type="submit" class="btn" id="submit_btn">
+            {% if is_update %}수정 완료{% else %}미션 등록하기{% endif %}
+        </button>
     </form>
 
 {% endblock %}
-    {%block extra_scripts %}
-    
+
+{% block extra_scripts %}
     <script src="/static/shared/js/auth.js"></script>
     <script src="{% static 'missions/js/mission_form.js' %}" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    const backBtn = document.getElementById("back-btn");
-    if (backBtn) {
-        backBtn.addEventListener("click", function() {
-            // 작성 중인 내용이 있다면 확인창을 띄울 수도 있습니다.
-            if (confirm("작성 중인 내용은 저장되지 않습니다. 돌아가시겠습니까?")) {
-                window.history.back();
+            const backBtn = document.getElementById("back-btn");
+            if (backBtn) {
+                backBtn.addEventListener("click", function() {
+                    if (confirm("작성 중인 내용은 저장되지 않습니다. 돌아가시겠습니까?")) {
+                        window.history.back();
+                    }
+                });
             }
         });
-    }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const deadlineButtons = document.querySelectorAll('.deadline-btn');
+
+    deadlineButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 1. 모든 버튼에서 active 클래스를 제거 (초기화)
+            deadlineButtons.forEach(b => b.classList.remove('active'));
+            
+            // 2. 현재 클릭된 버튼에만 active 클래스 추가 (색상 고정)
+            this.classList.add('active');
+
+            // 3. (옵션) 직접 선택 버튼일 때만 날짜 피커 보여주기
+            const pickerWrap = document.getElementById('due_picker_wrap');
+            if (this.id === 'btn_due_pick') {
+                pickerWrap.style.display = 'block';
+            } else {
+                pickerWrap.style.display = 'none';
+                // 여기서 날짜 계산 로직(오늘, 3일 후 등)을 넣어주면 됩니다.
+            }
+        });
+    });
 });
     </script>
-    {% endblock %}
+{% endblock %}
