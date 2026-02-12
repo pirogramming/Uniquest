@@ -45,6 +45,16 @@ class ChatClient {
 
     init() {
 
+        // 프로필 보기
+        const viewProfileBtn = document.getElementById('viewProfileBtn');
+        if (viewProfileBtn) {
+            viewProfileBtn.addEventListener('click', (e) => {
+                const userId = viewProfileBtn.dataset.userId;
+                moreDropdown.classList.remove('active');
+                if (userId) this.showProfile(parseInt(userId, 10));
+            });
+        }
+
         const moreMenuBtn = document.getElementById('moreMenuBtn');
         const moreDropdown = document.getElementById('moreDropdown');
         if (moreMenuBtn && moreDropdown) {
@@ -89,6 +99,12 @@ class ChatClient {
         this.loadHistory().then(() => {
             this.connect();
         });
+
+        // 프로필 모달 닫기
+        const profileModalClose = document.getElementById('profileModalClose');
+        const profileModalBackdrop = document.getElementById('profileModalBackdrop');
+        if (profileModalClose) profileModalClose.addEventListener('click', () => this.closeProfileModal());
+        if (profileModalBackdrop) profileModalBackdrop.addEventListener('click', (e) => { if (e.target === profileModalBackdrop) this.closeProfileModal(); });
     }
 
     async acceptMission() {
@@ -144,6 +160,51 @@ class ChatClient {
             console.error(err);
             alert('요청 중 오류가 발생했습니다.');
             btnEl.disabled = false;
+        }
+    }
+    async showProfile(userId) {
+        const backdrop = document.getElementById('profileModalBackdrop');
+        if (!backdrop) return;
+        try {
+            const res = await fetch(`/api/users/api/profile/${userId}/`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && !data.error) {
+                const photoEl = document.getElementById('profileModalPhoto');
+                const photoPlaceholder = document.getElementById('profileModalPhotoPlaceholder');
+                const nameEl = document.getElementById('profileModalName');
+                const universityEl = document.getElementById('profileModalUniversity');
+                const mannerEl = document.getElementById('profileModalManner');
+                if (nameEl) nameEl.textContent = data.username || '';
+                if (universityEl) universityEl.textContent = data.university ? `학교: ${data.university}` : '';
+                if (mannerEl) mannerEl.textContent = data.manner_score != null ? `매너 온도 ${data.manner_score}°C` : '';
+                if (data.userphoto && photoEl) {
+                    photoEl.src = data.userphoto;
+                    photoEl.style.display = '';
+                    if (photoPlaceholder) photoPlaceholder.style.display = 'none';
+                } else {
+                    if (photoEl) photoEl.style.display = 'none';
+                    if (photoPlaceholder) photoPlaceholder.style.display = 'flex';
+                }
+                backdrop.style.display = 'flex';
+                backdrop.setAttribute('aria-hidden', 'false');
+            } else {
+                alert(data.error || '프로필을 불러올 수 없습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('프로필을 불러오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    closeProfileModal() {
+        const backdrop = document.getElementById('profileModalBackdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+            backdrop.setAttribute('aria-hidden', 'true');
         }
     }
 

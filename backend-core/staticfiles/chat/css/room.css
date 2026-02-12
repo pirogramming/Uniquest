@@ -21,7 +21,7 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
 }
 
 .chat-container {
@@ -90,7 +90,7 @@ body {
     right: 0;
     background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 130px;
     display: none;
     z-index: 100;
@@ -117,19 +117,22 @@ body {
 }
 
 .btn-block-text {
-    color: #F04438 !important; /* 차단 버튼 빨간색 */
+    color: #F04438 !important;
+    /* 차단 버튼 빨간색 */
 }
 
 /* 2. 미션 배너 */
 .mission-banner {
-    background-color: #F5FAFF; /* 연한 파란색 배경 */
+    background-color: #F5FAFF;
+    /* 연한 파란색 배경 */
     padding: 12px 20px;
     border-bottom: 1px solid #E0EFFF;
 }
 
 .banner-label {
     font-size: 11px;
-    color: #4DA6FF; /* 브랜드 파란색 */
+    color: #4DA6FF;
+    /* 브랜드 파란색 */
     font-weight: 600;
 }
 
@@ -175,13 +178,15 @@ body {
 }
 
 .other .bubble {
-    background-color: #F2F4F7; /* 상대방: 회색 */
+    background-color: #F2F4F7;
+    /* 상대방: 회색 */
     color: #1D2939;
     border-bottom-left-radius: 4px;
 }
 
 .mine .bubble {
-    background-color: #4DA6FF; /* 나: 파란색 */
+    background-color: #4DA6FF;
+    /* 나: 파란색 */
     color: #ffffff;
     border-bottom-right-radius: 4px;
 }
@@ -267,7 +272,8 @@ body {
 .circle-send-btn {
     width: 48px;
     height: 48px;
-    background: #D0D5DD; /* 비활성 시 회색 */
+    background: #D0D5DD;
+    /* 비활성 시 회색 */
     color: #ffffff;
     border: none;
     border-radius: 50%;
@@ -280,5 +286,96 @@ body {
 }
 
 .circle-send-btn:not(:disabled) {
-    background: #4DA6FF; /* 활성 시 파란색 */
+    background: #4DA6FF;
+    /* 활성 시 파란색 */
+}
+
+/* 프로필 모달 */
+.profile-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.profile-modal {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 320px;
+    width: 100%;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.profile-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #98A2B3;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+}
+
+.profile-modal-close:hover {
+    color: #1D2939;
+}
+
+.profile-modal-content {
+    text-align: center;
+}
+
+.profile-modal-photo-wrap {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-modal-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-modal-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #EAECF0;
+    color: #98A2B3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.profile-modal-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1D2939;
+    margin-bottom: 6px;
+}
+
+.profile-modal-university {
+    font-size: 14px;
+    color: #667085;
+    margin-bottom: 4px;
+}
+
+.profile-modal-manner {
+    font-size: 13px;
+    color: #4DA6FF;
+    font-weight: 600;
 }
