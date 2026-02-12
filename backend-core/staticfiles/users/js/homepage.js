@@ -1,108 +1,149 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // 지정된 이름(csrftoken)으로 시작하는 쿠키를 찾습니다.
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+/**
+ * static/users/js/homepage.js
+ * * 🏠 홈페이지 로직
+ * * 수정 사항:
+ * - 중괄호({}) 불일치 해결
+ * - 중복 선언(usernameEl) 정리
+ * - 조건문 흐름 최적화 (데이터 유무 확인 후 실행)
+ */
+
+(function () {
+    // ==================== 데이터 로딩 ====================
+    
+    async function loadHomepageData() {
+        const token = Auth.getAccessToken();
+
+        if (!token) {
+            window.location.href = '/api/users/homepage_guest/';
+            return;
+        }
+
+        try {
+            const userData = await Auth.getData('/api/users/api/homepage');
+            console.log("유저 데이터", userData);
+
+            // 1. 데이터 유효성 검사
+            if (!userData || !userData.id) {
+                throw new Error('사용자 데이터를 불러올 수 없습니다.');
             }
-        }
-    }
-    return cookieValue;
-}
 
-async function renderHomepage() {
-    const token = localStorage.getItem('access_token');
-
-    if (!token) {
-        window.location.href = '/api/users/homepage_guest/';
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/users/api/homepage', {
-            headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        const userData = await response.json();
-        if (!response.ok) {
-            throw new Error(`서버 응답 오류: ${response.status}`);
-        }
-
-        console.log("유저 데이터",userData);
-
-        if (userData && userData.id) {
-            const usernameElement = document.getElementById('username');
-            const missionElement = document.getElementById('mission_cards');
+            // 2. DOM 요소 가져오기
+            const usernameEl = document.getElementById('username');
+            const imgEl = document.getElementById('userprofile');
             const matched = document.getElementById('matched');
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
-            const imgEl = document.getElementById('userprofile');
 
-            if (usernameElement) usernameElement.innerText = userData.username;
-            if (missionElement) {
-                console.log('yeah')
-                userMission = userData.missions
-                missionElement.innerHTML = ""
-                
-                // [수정 부분] 카테고리 및 상태 배지 동적 클래스 적용
-                userData.missions.forEach(({ id, title, status, descriptions, category, reward, location_name }) => {
-                    
-                    // 1. 상태 배지 클래스 (소문자 변환하여 CSS와 매칭)
-                    const statusClass = status ? status.toLowerCase() : '';
-
-                    // 2. 카테고리 클래스 매칭 (한글/영문 코드 모두 지원하도록 보완)
-                    const categoryMap = {
-                        '심부름': 'errand', 'ERRAND': 'errand',
-                        '학업': 'study',   'STUDY': 'study',
-                        '대여': 'rent',    'RENT': 'rent',
-                        '구인': 'job',     'JOB': 'job',
-                        '생활': 'life',    'LIFE': 'life',
-                        '기타': 'etc',     'ETC': 'etc'
-                    };
-                    
-                    // 데이터 앞뒤 공백 제거 후 매핑 확인
-                    const categoryKey = category ? category.trim() : '기타';
-                    const categoryClass = categoryMap[categoryKey] || 'etc';
-
-                    missionElement.innerHTML += `<div class="mission-card" onclick="location.href='/api/missions/${id}/'" style="cursor:pointer;">
-                        <div class="card-header">
-                            <h3 class="title">${title}</h3>
-                            <span class="tag-status ${statusClass}">${status}</span>
-                        </div>
-                        <p class="description">${descriptions}</p>
-                        <div class="card-footer">
-                            <div class="info">
-                                <span class="tag-category category-${categoryClass}">${category}</span>
-                                <span class="location">${location_name || '장소 미정'}</span>
-                            </div>
-                            <span class="price">${Number(reward).toLocaleString()}원</span>
-                        </div>
-                    </div>`;
-                });
+            // 3. 사용자 정보 표시 (이름 및 프로필 사진)
+            if (usernameEl) {
+                usernameEl.textContent = userData.username;
             }
-            if (matched && waiting && completed) {
-                matched.innerHTML = userData.matched_count
-                waiting.innerHTML = userData.waiting_count
-                completed.innerHTML = userData.completed_count
-                if (imgEl) {
-                    if (userData.userphoto) {
-                        imgEl.src = userData.userphoto;   // 백엔드에서 준 URL 그대로
-                    } else {
-                        imgEl.src = '/static/users/images/profile.png';  // 기본 이미지 (경로는 프로젝트에 맞게)
-                    }
+
+            if (imgEl) {
+                if (userData.userphoto) {
+                    imgEl.src = userData.userphoto;
+                } else {
+                    imgEl.src = '/static/users/images/profile.png';
                 }
             }
 
-            console.log("환영합니다, " + userData.username + "님!");
-        }
-    } catch (error) {
-        console.error("네트워크 오류 감지", error);
-        return null;
-    }
-}
+            // 4. 미션 카운트 표시 (상단 숫자)
+            if (matched) matched.innerHTML = userData.matched_count || 0;
+            if (waiting) waiting.innerHTML = userData.waiting_count || 0;
+            if (completed) completed.innerHTML = userData.completed_count || 0;
 
-window.addEventListener('DOMContentLoaded', renderHomepage);
+            // 5. 미션 현황 카드 이벤트 바인딩 (함수 내부에서 처리)
+            updateMissionStatus(userData);
+
+            // 6. 진행중인 미션 목록 하단 렌더링
+            renderMissions(userData.missions || []);
+
+            console.log("환영합니다, " + userData.username + "님!");
+
+        } catch (error) {
+            console.error("홈페이지 데이터 로드 실패:", error);
+            
+            // 인증 실패 시 로그인 페이지로
+            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                if (typeof Auth.logout === 'function') {
+                    Auth.logout('/api/users/login/');
+                } else {
+                    window.location.href = '/api/users/login/';
+                }
+            }
+        }
+    }
+
+    // ==================== 미션 현황 카드 ====================
+    
+    function updateMissionStatus(userData) {
+        // 클릭 이벤트 추가 (기능 유지)
+        addStatusClickEvents();
+    }
+
+    /**
+     * 상태 카드 클릭 시 전체보기로 이동
+     */
+    function addStatusClickEvents() {
+        const waiting = document.getElementById('waiting');
+        const matched = document.getElementById('matched');
+        const completed = document.getElementById('completed');
+
+        const statusConfig = [
+            { el: waiting, status: 'WAITING' },
+            { el: matched, status: 'MATCHED' },
+            { el: completed, status: 'COMPLETED' }
+        ];
+
+        statusConfig.forEach(item => {
+            if (item.el && item.el.parentElement) {
+                const parent = item.el.parentElement;
+                parent.style.cursor = 'pointer';
+                // 기존 이벤트 제거 후 등록을 위해 복제하거나 단순 등록
+                parent.onclick = () => {
+                    window.location.href = `/api/users/my-missions/?tab=all&status=${item.status}`;
+                };
+            }
+        });
+    }
+
+    // ==================== 미션 목록 렌더링 ====================
+    
+    function renderMissions(missions) {
+        const container = document.getElementById('mission_cards');
+        if (!container) return;
+
+        // 진행중인 미션만 필터링 (대기중 + 진행중)
+        const activeMissions = missions.filter(m => 
+            m.status === 'WAITING' || m.status === 'MATCHED'
+        );
+
+        if (activeMissions.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#98A2B3; padding:20px;">진행중인 미션이 없습니다.</p>';
+            return;
+        }
+
+        // MissionRenderer 사용
+        if (window.MissionRenderer) {
+            MissionRenderer.renderMissions(container, activeMissions, {
+                type: 'simple',
+                emptyMessage: '진행중인 미션이 없습니다.'
+            });
+        } else {
+            console.error("MissionRenderer를 찾을 수 없습니다.");
+        }
+    }
+
+    // ==================== 초기화 ====================
+    
+    function init() {
+        loadHomepageData();
+        console.log("✅ homepage.js 초기화 완료");
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
