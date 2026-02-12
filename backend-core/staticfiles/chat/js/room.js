@@ -55,6 +55,17 @@ class ChatClient {
             });
         }
 
+        // 수행자 확정 버튼 (등록자)
+        const confirmPerformerBtn = document.getElementById('confirmPerformerBtn');
+        if (confirmPerformerBtn) {
+            confirmPerformerBtn.addEventListener('click', () => this.confirmPerformer());
+        }
+        // 수행자 거부 버튼 (등록자)
+        const rejectPerformerBtn = document.getElementById('rejectPerformerBtn');
+        if (rejectPerformerBtn) {
+            rejectPerformerBtn.addEventListener('click', () => this.rejectPerformer());
+        }
+
         const moreMenuBtn = document.getElementById('moreMenuBtn');
         const moreDropdown = document.getElementById('moreDropdown');
         if (moreMenuBtn && moreDropdown) {
@@ -131,6 +142,63 @@ class ChatClient {
             console.error(err);
             alert('요청 중 오류가 발생했습니다.');
             acceptBtn.disabled = false;
+        }
+    }
+
+    async confirmPerformer() {
+        const btn = document.getElementById('confirmPerformerBtn');
+        if (!btn) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/confirm/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '수행자가 확정되었습니다.');
+                if (btn) btn.remove();
+                const rejectBtn = document.getElementById('rejectPerformerBtn');
+                if (rejectBtn) rejectBtn.remove();
+            } else {
+                alert(data.error || '확정에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
+        }
+    }
+
+    async rejectPerformer() {
+        const btn = document.getElementById('rejectPerformerBtn');
+        if (!btn) return;
+        if (!confirm('수행자 수락을 거절하시겠습니까?')) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/reject/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '수락을 거절했습니다.');
+                if (btn) btn.remove();
+                const confirmBtn = document.getElementById('confirmPerformerBtn');
+                if (confirmBtn) confirmBtn.remove();
+            } else {
+                alert(data.error || '거절에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
         }
     }
 
