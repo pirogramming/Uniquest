@@ -470,3 +470,31 @@ def review_json(request):
     target_user.review_datas.append(review_json)
     target_user.save()
     return Response({"status": "success", "message": target_user.username}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_public_profile(request, user_id):
+    """
+    다른 유저의 공개 프로필 조회 (채팅방 프로필 보기 등).
+    이메일 등 민감 정보는 제외.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"error": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    # (선택) 차단 관계면 404 처리
+    if request.user.blocked_people.filter(id=user_id).exists():
+        return Response({"error": "접근할 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+    if user.blocked_people.filter(id=request.user.id).exists():
+        return Response({"error": "접근할 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        "id": user.id,
+        "username": user.username,
+        "university": user.university.name if user.university else None,
+        "is_student_verified": user.is_student_verified,
+        "manner_score": round(user.manner_score, 1),
+        "userphoto": user.userphoto.url if user.userphoto else None,
+    })
