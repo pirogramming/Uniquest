@@ -35,4 +35,6 @@ urlpatterns = [
 # 미디어/정적 파일 설정 (이 부분이 리스트 바깥으로 깔끔하게 빠져야 합니다)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # static: STATICFILES_DIRS(static/)에서 서빙 (room.css 등)
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    urlpatterns += staticfiles_urlpatterns()
