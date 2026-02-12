@@ -104,7 +104,7 @@ async function check_number() {
         const next_btn = document.getElementById('next-btn');
         const send = document.getElementById('send-btn');
 
-        if (data.token) sessionStorage.setItem('password_reset_token', data.token); //토큰을 세션 저장소에 넣기
+        if (data.token) sessionStorage.setItem('password_reset_token', data.token); //토큰을 로컬 저장소에 넣기
 
         if (data.is_varified) {
             if (check_box) check_box.style.display = 'none';

@@ -12,6 +12,7 @@ from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -468,3 +469,9 @@ def review_json(request):
     target_user.review_datas.append(review_json)
     target_user.save()
     return Response({"status": "success", "message": target_user.username}, status=200)
+
+
+
+def my_missions_view(request):
+    """내 미션 전체보기 페이지"""
+    return render(request, 'users/my_missions.html')
