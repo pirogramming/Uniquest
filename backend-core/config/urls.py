@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings  # 하단에 있던 것을 위로 이동
 from django.conf.urls.static import static  # 하단에 있던 것을 위로 이동
+from django.views.generic.base import RedirectView
 
 # Swagger 관련 임포트
 from drf_yasg.views import get_schema_view
@@ -23,6 +24,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    #로그인 뷰로 리다이렉트
+    path("", RedirectView.as_view(url="/api/users/login/", permanent=False)),
+    
     path('api/admin/', admin.site.urls),
     path('api/missions/', include('missions.urls')), # 관례상 api/ 를 붙여주는 것이 좋습니다.
     path('api/users/', include('users.urls')),
