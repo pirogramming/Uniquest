@@ -25,35 +25,38 @@ h2 {
     cursor: pointer;
 }
 
-/* 프로필 이미지 섹션 */
-.profile-image-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 32px;
-}
-
-.image-circle {
-    width: 110px;
-    height: 110px;
-    background-color: #4DA6FF;
-    border-radius: 50%;
+/* 프로필 섹션 중앙 정렬 */
+.profile-upload-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 40px;
+    position: relative;
 }
 
-.img-change-btn {
-    background: none;
-    border: none;
-    color: #4DA6FF;
-    font-size: 15px;
-    font-weight: 500;
+/* 동그란 이미지 컨테이너 */
+.profile-image-container {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     cursor: pointer;
+    background-color: #f2f4f6;
+}
+
+/* 이미지 스타일 */
+#profile-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.3s;
+}
+
+/* 파일 인풋 숨기기 */
+#userphoto {
+    display: none;
 }
 
 /* 입력 그룹 공통 */
