@@ -19,7 +19,10 @@ from rest_framework.decorators import api_view, permission_classes
 from common.utils import publish_chat_event
 from missions.models import Mission
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
+from missions.serializers import MissionSerializer
+
 
 #유저모델 불러오기
 User = get_user_model()
@@ -325,29 +328,47 @@ def get_home_page(request):
 def get_home_page_guest(request):
     """비로그인 사용자 전용 홈 페이지 (별도 URL/템플릿)."""
     return render(request, 'users/homepage_guest.html')
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_homepage_info(request):
     user = request.user
     blocked_list = list(user.blocked_people.all().values('id', 'username'))
-    mission_lst = list(user.missions.all().values('id','title','descriptions','reward','category','status','location_name'))
-    waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING'])
+    
+    # 1. 내가 등록한 미션들 (is_author: True)
+    my_created_missions = user.missions.all().values(
+        'id','title','descriptions','reward','category','status','location_name'
+    )
+    for m in my_created_missions:
+        m['is_author'] = True
+
+    # 2. 내가 참여(헬퍼)한 미션들 (is_author: False)
+    # Mission 모델에 helper 필드가 있다면 아래와 같이 가져와야 합니다.
+    my_joined_missions = Mission.objects.filter(helper=user).values(
+        'id','title','descriptions','reward','category','status','location_name'
+    )
+    for m in my_joined_missions:
+        m['is_author'] = False
+
+    # 두 리스트 합치기
+    mission_lst = list(my_created_missions) + list(my_joined_missions)
+
+    # 카운트 계산
+    waiting_count = len([m for m in mission_lst if m['status'] == 'WAITING' and m['is_author']])
     matched_count = len([m for m in mission_lst if m['status'] == 'MATCHED'])
     completed_count = len([m for m in mission_lst if m['status'] == 'COMPLETED'])
     
     return Response({
-        "id":user.id,
+        "id": user.id,
         "username": user.username,
-        "university":user.university.name,
-        "is_student_verified":user.is_student_verified,
-        "univ_email":user.univ_email,
-        "manner_score":user.manner_score,
-        "blocked_people":blocked_list,
-        "missions":mission_lst,
-        "waiting_count":waiting_count,
-        "matched_count":matched_count,
-        "completed_count":completed_count,
+        "university": user.university.name if user.university else None,
+        "is_student_verified": user.is_student_verified,
+        "univ_email": user.univ_email,
+        "manner_score": user.manner_score,
+        "blocked_people": blocked_list,
+        "missions": mission_lst,  # 이제 여기에 is_author가 포함됨!
+        "waiting_count": waiting_count,
+        "matched_count": matched_count,
+        "completed_count": completed_count,
         "userphoto": user.userphoto.url if user.userphoto else None
     })
 
@@ -473,10 +494,6 @@ def review_json(request):
     return Response({"status": "success", "message": target_user.username}, status=200)
 
 
-
-def my_missions_view(request):
-    """내 미션 전체보기 페이지"""
-    return render(request, 'users/my_missions.html')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_public_profile(request, user_id):
@@ -502,4 +519,93 @@ def get_public_profile(request, user_id):
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
         "userphoto": user.userphoto.url if user.userphoto else None,
+    })
+
+@login_required
+def my_missions_view(request):
+    """내 미션 전체보기 페이지"""
+    return render(request, 'users/my_missions.html')
+# ============================================
+# users/views.py - homepage_info 함수 수정
+# ============================================
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def homepage_info(request):
+    """
+    홈페이지 정보 API
+    - 사용자 정보
+    - 미션 카운트
+    - 내가 등록한 미션 최신 1개
+    - 내가 참여한 미션 최신 1개
+    """
+    user = request.user
+    
+    # 미션 카운트
+    created_count = Mission.objects.filter(author=user).count()
+    joined_count = Mission.objects.filter(helper=user).count()
+    
+    waiting_count = Mission.objects.filter(
+        author=user, 
+        status='WAITING'
+    ).count()
+    
+    matched_count = Mission.objects.filter(
+        Q(author=user) | Q(helper=user),
+        status='MATCHED'
+    ).count()
+    
+    completed_count = Mission.objects.filter(
+        Q(author=user) | Q(helper=user),
+        status='COMPLETED'
+    ).count()
+    
+    # ✨ 내가 등록한 미션 중 최신 1개 (진행중인 것만)
+    created_mission = Mission.objects.filter(
+        author=user,
+        status__in=['WAITING', 'MATCHED']
+    ).order_by('-created_at').first()
+    
+    # ✨ 내가 참여한 미션 중 최신 1개 (진행중인 것만)
+    joined_mission = Mission.objects.filter(
+        helper=user,
+        status__in=['WAITING', 'MATCHED']
+    ).order_by('-created_at').first()
+    
+    # 직렬화
+    created_data = None
+    if created_mission:
+        created_data = MissionSerializer(
+            created_mission, 
+            context={'request': request}
+        ).data
+    
+    joined_data = None
+    if joined_mission:
+        joined_data = MissionSerializer(
+            joined_mission,
+            context={'request': request}
+        ).data
+    
+    # 사용자 프로필 사진 URL
+    userphoto_url = None
+    if user.userphoto:
+        userphoto_url = request.build_absolute_uri(user.userphoto.url)
+    
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'userphoto': userphoto_url,
+        
+        # 카운트
+        'created_count': created_count,
+        'joined_count': joined_count,
+        'waiting_count': waiting_count,
+        'matched_count': matched_count,
+        'completed_count': completed_count,
+        
+        # ✨ 미션 (각 1개씩)
+        'created_mission': created_data,
+        'joined_mission': joined_data
     })

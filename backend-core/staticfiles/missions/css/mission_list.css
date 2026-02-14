@@ -37,6 +37,116 @@
     display: none;
 }
 
+/* ==================== 커스텀 마커 스타일 ==================== */
+
+/* 사용자 위치 마커 (파란색 핀) */
+.user-location-marker {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    background: #57A6FF;
+    border-radius: 50% 50% 50% 0;
+    box-shadow: 0 4px 12px rgba(87, 166, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-location-marker::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+}
+
+.user-location-marker:hover {
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.1);
+    box-shadow: 0 6px 16px rgba(87, 166, 255, 0.5);
+}
+
+/* 미션 마커 (노란색 핀) */
+.mission-marker {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    background: #FFC107;
+    border-radius: 50% 50% 50% 0;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mission-marker::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+}
+
+.mission-marker:hover {
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.15);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.6);
+    z-index: 100;
+}
+
+.mission-marker.active {
+    background: #FF9800;
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.2);
+    z-index: 101;
+}
+
+/* 미션 마커 - 상태별 색상 */
+.mission-marker.waiting {
+    background: #FFC107; /* 노란색 - 대기중 */
+}
+
+.mission-marker.matched {
+    background: #FF9800; /* 주황색 - 진행중 */
+}
+
+.mission-marker.completed {
+    background: #BDBDBD; /* 회색 - 완료 */
+}
+
+/* 마커 펄스 애니메이션 (사용자 위치) */
+.user-location-marker::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50% 50% 50% 0;
+    background: rgba(87, 166, 255, 0.3);
+    top: -4px;
+    left: -4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==================== 기존 스타일 ==================== */
+
 /* 헤더 (고정, 항상 표시) */
 .mission-header {
     height: 70px;
@@ -54,11 +164,13 @@
     transform: translateX(-50%);
     z-index: 1000;
 }
-.header1{
+
+.header1 {
     display: flex;
     align-items: center;
     gap: 0px;
 }
+
 .mission-header h2 {
     font-size: 20px;
     font-weight: 700;
@@ -79,7 +191,7 @@
     color: #374151;
     background-color: transparent;
     margin-right: 12px;
-    padding:8px;
+    padding: 8px;
     transition: background 0.2s;
 }
 
@@ -91,9 +203,10 @@
 .mission-toolbar {
     display: flex;
     flex-direction: column;
-    width:100%;
+    width: 100%;
     gap: 12px;
     padding: 12px 0;
+    margin-top: 50px;
 }
 
 .view-toggle {
@@ -104,7 +217,7 @@
 }
 
 .view-toggle button {
-    flex:1;
+    flex: 1;
     padding: 8px 16px;
     border: none;
     background: #F3F4F6;
@@ -337,112 +450,6 @@
     background: #3B8FE6;
 }
 
-/* 미션 카드 스타일 */
-.mission-card {
-    position: relative;
-}
-
-.mission-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 8px;
-}
-
-.mission-title-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.mission-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #333;
-}
-
-.mission-status {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.mission-status.waiting {
-    /* #ffd166에 20% 투명도 추가 */
-    background: rgba(255, 209, 102, 0.2); 
-    color: #FB923C;
-}
-
-.mission-status.matched {
-    /* #EFF6FF에 20% 투명도 추가 */
-    background: rgba(239, 246, 255, 0.2); 
-    color: #155DFC;
-}
-
-.mission-status.completed {
-    /* #D1FAE5에 20% 투명도 추가 */
-    background: rgba(209, 250, 229, 0.2); 
-    color: #27C27B;
-}
-
-.mission-reward {
-    font-weight: 700;
-    color: #4DA6FF;
-    white-space: nowrap;
-}
-
-.mission-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-    flex-wrap: wrap;
-}
-.cols{
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-.col1 {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-
-.mission-category {
-    background: #F3F4F6;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #6B7280;
-}
-
-.mission-location {
-    font-size: 12px;
-    color: #6B7280;
-}
-
-.mission-tags {
-    margin-top: 8px;
-}
-
-.mission-tag {
-    background: #f0f0f0;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-right: 4px;
-    font-size: 12px;
-    color: #667085;
-}
-
 /* 플로팅 버튼 */
 .floating-map-btn {
     position: absolute;
@@ -480,13 +487,13 @@
 /* 전체화면 지도 (navbar 포함) */
 #fullscreen-map-container {
     position: fixed;
-    top: 70px; /* mission-header 아래 */
+    top: 70px;
     left: 0;
     right: 0;
     bottom: 0;
     max-width: 450px;
     margin: 0 auto;
-    z-index: 999; /* mission-header보다 낮게 */
+    z-index: 999;
     background: white;
 }
 

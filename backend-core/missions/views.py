@@ -525,6 +525,7 @@ def chat_list(request: HttpRequest) -> HttpResponse:
         {"room_list": room_list},
     )
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_missions(request):
