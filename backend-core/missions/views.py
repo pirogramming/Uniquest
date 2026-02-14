@@ -19,9 +19,10 @@ from .serializers import MissionSerializer
 
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
-from common.utils import publish_chat_event
+from common.utils import publish_chat_event, redis_client
 from common.utils import publish_mission_update  
 from common.utils import acquire_lock, release_lock 
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -510,27 +511,43 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
 
 @login_required
 def chat_list(request: HttpRequest) -> HttpResponse:
-    """내가 참여한 채팅방 목록 (차단된 유저 제외)"""
+    """내가 참여한 채팅방을 미션별로 묶어서 보여줌"""
     rooms = (
         ChatRoom.objects
         .filter(models.Q(user1=request.user) | models.Q(user2=request.user))
         .select_related("mission", "mission__author", "user1", "user2")
         .order_by("-created_at")
     )
-    room_list = []
+
+    mission_groups = defaultdict(list)
     for room in rooms:
         other = room.user2 if room.user1 == request.user else room.user1
         if _is_blocked_between(request.user, other):
             continue
-        room_list.append({
+        # Redis에서 이 방의 마지막 메시지 미리보기 조회
+        last_message = None
+        try:
+            raw = redis_client.get(f"chat:room:{room.id}:last")
+            if raw:
+                data = json.loads(raw)
+                last_message = data.get("content") or None
+        except (json.JSONDecodeError, TypeError):
+            pass
+        mission_groups[room.mission].append({
             "room": room,
             "other_user": other,
-            "mission": room.mission,
+            "last_message": last_message,
         })
+
+    grouped_list = [
+        {"mission": mission, "rooms": room_items}
+        for mission, room_items in mission_groups.items()
+    ]
+
     return render(
         request,
         "chat/list.html",
-        {"room_list": room_list},
+        {"grouped_list": grouped_list},
     )
 
 

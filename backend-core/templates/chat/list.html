@@ -15,32 +15,34 @@
     </div>
 
     <section class="chat-section">
-        {% for item in room_list %}
+        {% for group in grouped_list %}
         <div class="chat-toggle-group">
             <div class="chat-mission-header" onclick="toggleChat(this)">
                 <div class="header-left">
-                    <div class="mission-icon">{{ item.mission.category|slice:":1"|default:"미" }}</div>
+                    <div class="mission-icon">{{ group.mission.category|slice:":1"|default:"미" }}</div>
                     <div class="header-text">
-                        <strong class="mission-title">{{ item.mission.title }}</strong>
-                        <span class="participant-count">상대방: {{ item.other_user.get_display_name }}</span>
+                        <strong class="mission-title">{{ group.mission.title }}</strong>
+                        <span class="participant-count">채팅 {{ group.rooms|length }}명</span>
                     </div>
                 </div>
                 <i class="fa-solid fa-chevron-down toggle-icon"></i>
             </div>
 
             <div class="chat-room-content">
-                <a href="{% url 'missions:chat_room' item.mission.id item.room.id %}" class="individual-chat-link">
+                {% for item in group.rooms %}
+                <a href="{% url 'missions:chat_room' group.mission.id item.room.id %}" class="individual-chat-link">
                     <div class="chat-user-avatar">
                         {{ item.other_user.get_display_name|slice:":1" }}
                     </div>
                     <div class="chat-user-info">
                         <div class="user-info-top">
                             <span class="user-name">{{ item.other_user.get_display_name }}</span>
-                            <span class="chat-time">{{ item.room.updated_at|date:"A g:i"|default:"최근" }}</span>
+                            <span class="chat-time">{{ item.room.created_at|date:"A g:i"|default:"최근" }}</span>
                         </div>
                         <p class="last-preview">{{ item.last_message|default:"대화 내용이 없습니다." }}</p>
                     </div>
                 </a>
+                {% endfor %}
             </div>
         </div>
         {% empty %}
