@@ -242,7 +242,8 @@ def get_my_info(request):
         "missions": missions,
         "blocked_people": list(blocked_Queryset.values('id', 'username')),
         "accepted_missions": accepted_missions,
-        "userphoto": user.userphoto.url if user.userphoto else None
+        "userphoto": user.userphoto.url if user.userphoto else None,
+        "review_data" : user.review_datas
     })
 
 def mypage_view(request):
