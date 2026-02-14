@@ -119,12 +119,12 @@ margin-bottom: 20px;
 .mission-status-card {
     /* 배경색: 흰색 70~80% 투명도 */
     background: rgba(255, 255, 255, 0.75); 
-    
+    width:320px;
     /* 뒤 배경 블러 처리 (불투명한 느낌의 핵심) */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    margin: 20px 25px; 
+    margin: 20px auto; 
     padding: 20px;
     border-radius: 20px;
     
@@ -142,7 +142,7 @@ margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #888888;
+    color: #101828;
 }
 
 .mission-status-card h3 i {

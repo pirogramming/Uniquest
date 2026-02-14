@@ -280,7 +280,8 @@
 /* 필터 패널 & 백드롭 */
 #filter-backdrop {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1001;
     opacity: 0;
@@ -300,7 +301,11 @@
     margin: 0 auto;
     background: white;
     border-radius: 20px 20px 0 0;
+    padding-bottom:20px;
     z-index: 1002;
+    overflow-y: auto;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -308,6 +313,125 @@
 #filter-panel.open {
     transform: translateY(0);
 }
+
+.filter-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 0 20px;
+    position:sticky;
+    top:0;
+    background:white;
+    z-index: 1;
+}
+.filter-header h3{
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+.filter-close{
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #9ca3af;
+    padding:0;
+    width:32px; height:32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.filter-close:hover{
+    color: #6b7280;
+}
+.filter-content{
+    padding:20px;
+}
+.filter-section{
+    margin-bottom: 24px;
+}
+.filter-section:last-child{
+    margin-bottom: 0;
+}
+.filter-section h4{
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color:#374151;
+}
+.filter-options{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.filter-option{
+    display:flex; align-items: center;
+}
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"]{
+    display: none;
+}
+.filter-option input[type="checkbox"]:hover + span,
+.filter-option input[type="radio"]:hover + span {
+    background: #f3f4f6;
+}
+.filter-option input[type="checkbox"]:checked + span,
+.filter-option input[type="radio"]:checked + span {
+    background: #4da6ff;
+    color: white;
+    border-color: #4da6ff;
+}
+.filter-option span {
+    padding: 6px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #1F2937;
+    cursor: pointer;
+    transition: all 0.2s;
+    display:inline-block;
+}
+
+.filter-footer{
+    display:flex; 
+    gap:12px;
+    padding:16px 20px;
+    border-top: 1px solid #e5e7eb;
+    position:sticky;
+    bottom:0;
+    background: white;
+}
+.btn-reset,.btn-apply {
+    flex:1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight:600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+}
+
+.btn-reset {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.btn-reset:hover {
+    background: #e5e7eb;
+}
+.btn-apply {
+    background: #4da6ff;
+    color: white;
+}
+.btn-apply:hover {
+    background: #3b82f6;
+}
+
+
+
+
 
 /* 전체화면 지도 컨테이너 */
 #fullscreen-map-container {

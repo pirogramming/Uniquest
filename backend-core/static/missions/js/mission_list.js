@@ -461,6 +461,7 @@
     window.switchView = switchView;
     window.openFullscreenMap = openFullscreenMap;
     window.closeFullscreenMap = closeFullscreenMap;
+    window.moveToCurrentLocation = moveToCurrentLocation;
 
     window.addEventListener('beforeunload', () => {
         if (eventSource) {
