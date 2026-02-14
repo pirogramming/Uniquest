@@ -39,7 +39,7 @@
                             <span class="user-name">{{ item.other_user.get_display_name }}</span>
                             <span class="chat-time">{{ item.room.created_at|date:"A g:i"|default:"최근" }}</span>
                         </div>
-                        <p class="last-preview">대화 내용이 없습니다.</p>
+                        <p class="last-preview">{{ item.last_message|default:"대화 내용이 없습니다." }}</p>
                     </div>
                 </a>
                 {% endfor %}

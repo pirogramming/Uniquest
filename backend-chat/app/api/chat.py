@@ -96,6 +96,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                 content=data,
             )
             await chat_manager.save_message(msg_obj)
+            await chat_manager.set_room_last_message(room_id, msg_obj)
 
             await chat_manager.publish_message({
                 "type": "TALK",

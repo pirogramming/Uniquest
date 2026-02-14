@@ -19,7 +19,7 @@ from .serializers import MissionSerializer
 
 from .forms import MissionCreateForm
 from .models import Mission, MissionImage, Tag, Category, ChatRoom
-from common.utils import publish_chat_event
+from common.utils import publish_chat_event, redis_client
 from common.utils import publish_mission_update  
 from common.utils import acquire_lock, release_lock 
 from collections import defaultdict
@@ -524,9 +524,19 @@ def chat_list(request: HttpRequest) -> HttpResponse:
         other = room.user2 if room.user1 == request.user else room.user1
         if _is_blocked_between(request.user, other):
             continue
+        # Redis에서 이 방의 마지막 메시지 미리보기 조회
+        last_message = None
+        try:
+            raw = redis_client.get(f"chat:room:{room.id}:last")
+            if raw:
+                data = json.loads(raw)
+                last_message = data.get("content") or None
+        except (json.JSONDecodeError, TypeError):
+            pass
         mission_groups[room.mission].append({
             "room": room,
             "other_user": other,
+            "last_message": last_message,
         })
 
     grouped_list = [
