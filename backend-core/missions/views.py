@@ -282,7 +282,11 @@ def mission_accept(request, mission_id):
         publish_chat_event(
             room_id=rid,
             event_type="SYSTEM",
-            data={"content": f"{requester_name}님이 미션 수락을 요청했습니다. 등록자가 확정하면 매칭이 완료됩니다."}
+            data={
+                "content": f"{requester_name}님이 미션 수락을 요청했습니다. 등록자가 확정하면 매칭이 완료됩니다.",
+                "mission_status": "PENDING_APPROVAL",
+                "action": "mission_accepted",
+            },
         )
 
         return JsonResponse({
@@ -483,6 +487,8 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
     mission = room.mission
     is_author = request.user == mission.author
     can_accept = not is_author and mission.status == "WAITING"
+    can_confirm_performer = is_author and mission.status == "PENDING_APPROVAL"
+    show_complete_btn = is_author and mission.status == "MATCHED"
     blockable_user = {"id": other_user.id, "username": other_user.username} if other_user else None
 
     return render(
@@ -495,6 +501,8 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "mission_id": mission.id,
             "is_author": is_author,
             "can_accept": can_accept,
+            "can_confirm_performer": can_confirm_performer,
+            "show_complete_btn": show_complete_btn,
             "blockable_user": blockable_user,
             "other_user": other_user,
         },

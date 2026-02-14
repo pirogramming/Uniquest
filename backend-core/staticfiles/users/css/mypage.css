@@ -222,3 +222,111 @@ body {
     display: block;
     cursor: pointer;
 }
+
+/* ---------- 내 리뷰 보기 토글 (시안 스타일) ---------- */
+.menu-item.my-reviews-toggle {
+    background: linear-gradient(90deg, #FFF9E6 0%, #FFFFFF 100%);
+    border-left: 4px solid #FFB800;
+    cursor: pointer;
+}
+
+.my-reviews-toggle .menu-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.review-count {
+    background: linear-gradient(135deg, #FFB800 0%, #FF9500 100%);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.my-reviews-toggle.active .menu-arrow {
+    transform: rotate(90deg);
+}
+
+.menu-arrow {
+    font-size: 18px;
+    color: #999;
+    transition: transform 0.3s ease;
+}
+
+/* 리뷰 리스트 컨테이너 (접었다 펼쳐짐) */
+.reviews-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #fafafa;
+}
+
+.reviews-container.open {
+    max-height: 1000px;
+}
+
+.review-card {
+    margin: 16px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.review-score {
+    display: flex;
+    gap: 4px;
+    font-size: 18px;
+}
+
+.review-score .star {
+    color: #FFB800;
+}
+
+.review-score .star.empty {
+    color: #E0E0E0;
+}
+
+.review-date {
+    font-size: 13px;
+    color: #999;
+}
+
+.review-comment {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.quick-tag {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #F0F4FF 0%, #E8EEFF 100%);
+    border-radius: 16px;
+    font-size: 13px;
+    color: #4A90E2;
+    font-weight: 500;
+}
+
+.no-reviews {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 15px;
+}

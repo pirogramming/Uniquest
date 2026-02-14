@@ -41,8 +41,8 @@ async function renderProfile() {
         const usernameElement = document.getElementById('user-username');
         const univElement = document.getElementById('user-univ');
         const mannerScore = document.getElementById('user-score'); // 점수 텍스트
-        const register_missions = document.getElementById('my-registered-missions');
-        const performed_missions = document.getElementById('my-performed-missions');
+        const reviewlist = document.getElementById('reviewsContainer');
+        const review_num = document.getElementById('review-count-badge');
         const score_bar_fill = document.getElementById('score_bar_fill');
         const imgEl = document.getElementById('userprofile');
 
@@ -60,83 +60,62 @@ async function renderProfile() {
             }
         }
 
-        if (user.missions.length > 0) {
-            const missionHTML = user.missions.map(({id, title, reward, status, descriptions,category,location_name}) => {
+        // 2. 리뷰 정보 반영
+        if (reviewlist) {
+            reviewlist.innerHTML = ""
+            user.review_data.forEach(({comment,my_score,quick_comment}) => {
+                let quick_comment_list = ``
+                Object.values(quick_comment).forEach((value) => {
+                    quick_comment_list += `<span class="quick-tag">${value}</span>`;
+                });
                 
-                // reward가 숫자인지 확인 후 포맷팅
-                const formattedReward = typeof reward === 'number' ? reward.toLocaleString() : reward;
+                let review_score_list = ``
+                const last_score = 5 - my_score
 
-                return `
-                    <a class="mission-card" href="/api/missions/${id}" style="text-decoration: none; color: inherit; display: block;">
-                        <div class="card-header">
-                            <h3 class="title">${title}</h3>
-                            <span class="status-badge waiting">${status}</span>
-                        </div>
-                        <div class="description-box">
-                            <p class="mission-content">${descriptions}</p>
-                        </div>
-                        
+                for (let i = 0; i < my_score; i++) {
+                    review_score_list += `<span class="star">★</span>`
+                }
+                for (let i = 0; i < last_score; i++) {
+                    review_score_list += `<span class="star empty">★</span>`
+                }
 
-                        <div class="card-footer">
-                            <div class="info">
-                                <span class="tag-category category-etc">${category}</span>
-                                <span class="location">${location_name}</span>
+
+                reviewlist.innerHTML += `<div class="review-card">
+                        <div class="review-header">
+                            <div class="review-score">
+                                ${review_score_list}
                             </div>
-                            <span class="price">${reward}원</span>
+                            <div class="review-date">2026.02.10</div>
                         </div>
-                    </a>`;
-            }).join(''); // 배열을 하나의 문자열로 합침
-
-            console.log(missionHTML)
-
-            register_missions.innerHTML = missionHTML;
-        }
-
-        if (user.accepted_missions.length > 0){
-            performed_missions.innerHTML = ""
-            user.accepted_missions.forEach(({id,title,reward,status,descriptions}) => {
-                performed_missions.innerHTML += `<div class="mission-card">
-                                                    <div class="card-header">
-                                                        <span class="status-badge waiting">${status}</span>
-                                                    </div>
-                                                    
-                                                    <div class="card-body">
-                                                        <h3 class="mission-title">${title}</h3>
-                                                        <p class="mission-content">${descriptions}</p>
-                                                    </div>
-                                                    
-                                                    <div class="card-footer">
-                                                        <div class="reward-info">
-                                                            <span class="label">보상</span>
-                                                            <span class="reward-amount">${reward}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>`
+                        <div class="review-comment">${comment}</div>
+                        <div class="quick-tags">
+                            ${quick_comment_list}
+                        </div>
+                    </div>`
             });
         }
-        // console.log('나의 미션들',my_missions)
-        // console.log('블락 인원들',blockers)
 
-        // 2. 점수 텍스트 및 막대 그래프 업데이트 [핵심 수정 부분]
+        // 3. 리뷰 개수 붙여넣기
+        if(review_num) review_num.innerText = Object.keys(user.review_data).length;
+
         if (mannerScore) {
-            // 서버 점수를 반영 (예: 85점)
             mannerScore.innerText = `${user.manner_score}점`; 
-
-            // 막대 그래프 너비(width)를 점수와 동일하게 설정
             const scoreBar = document.querySelector('.score-bar-fill');
             if (scoreBar) {
                 scoreBar.style.width = `${user.manner_score}%`;
             }
         }
+        
 
-        // 차단 관리/미션 리스트 로직 (필요 시 수정)
-        // if (register_missions) {
-        //     register_missions.innerHTML = ""; // 초기화
-        //     blockers.forEach(({id, nickname}) => {
-        //         register_missions.innerHTML += `<div>${id} : ${nickname}</div>`;
-        //     });
-        // }
+    }
+}
 
+function toggleReviews() {
+    const container = document.getElementById('reviewsContainer');
+    const toggle = document.querySelector('.my-reviews-toggle');
+    if (container && toggle) {
+        container.classList.toggle('open');
+        toggle.classList.toggle('active');
     }
 }
 

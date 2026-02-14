@@ -245,7 +245,8 @@ def get_my_info(request):
         "missions": missions,
         "blocked_people": list(blocked_Queryset.values('id', 'username')),
         "accepted_missions": accepted_missions,
-        "userphoto": user.userphoto.url if user.userphoto else None
+        "userphoto": user.userphoto.url if user.userphoto else None,
+        "review_data" : user.review_datas
     })
 
 def mypage_view(request):
@@ -264,15 +265,19 @@ def get_my_info_patch(request):
             "username": user.username,
             "univ_email": user.univ_email,
             "university": user.university.name if user.university else None,
+            "userphoto" : user.url if user.userphoto else None
         })
 
     elif request.method == 'PATCH':
         # 1. 프론트에서 보낸 데이터(updatedData) 받기
         username = request.data.get('username')
+        userphoto = request.data.get('user_photo')
 
         # 2. 데이터 업데이트 (값이 있을 때만)
         if username:
             user.username = username
+        if userphoto:
+            user.userphoto = userphoto
         
         # 3. DB 저장
         user.save()

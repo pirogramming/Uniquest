@@ -65,17 +65,15 @@ class ConnectionManager:
                             "content": "미션이 완료되었습니다."
                         }, room_id)
                     else:
-                        message = payload
-                        if msg_type == "SYSTEM" and "content" not in payload:
+                        if msg_type == "SYSTEM":
                             content = ""
                             if isinstance(data, dict):
                                 content = data.get("content", "")
                             else:
                                 content = str(data)
-                            message = {
-                                "type": "SYSTEM",
-                                "content": content
-                            }
+                            message = {"type": "SYSTEM", "content": content, **data}
+                        else:
+                            message = payload
                         await self._local_broadcast(message, room_id)
         except Exception as e:
             print(f"FastAPI Redis 리스너 에러: {e}")
