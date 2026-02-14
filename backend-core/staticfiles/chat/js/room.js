@@ -44,13 +44,13 @@ class ChatClient {
     }
 
     init() {
-
         // 프로필 보기
         const viewProfileBtn = document.getElementById('viewProfileBtn');
+        const moreDropdown = document.getElementById('moreDropdown');
         if (viewProfileBtn) {
             viewProfileBtn.addEventListener('click', (e) => {
                 const userId = viewProfileBtn.dataset.userId;
-                moreDropdown.classList.remove('active');
+                if (moreDropdown) moreDropdown.classList.remove('active');
                 if (userId) this.showProfile(parseInt(userId, 10));
             });
         }
@@ -73,7 +73,6 @@ class ChatClient {
         }
 
         const moreMenuBtn = document.getElementById('moreMenuBtn');
-        const moreDropdown = document.getElementById('moreDropdown');
         if (moreMenuBtn && moreDropdown) {
             moreMenuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -84,7 +83,8 @@ class ChatClient {
             });
             moreDropdown.addEventListener('click', (e) => e.stopPropagation());
         }
-        // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
+
+        // 차단 버튼
         document.querySelectorAll('.btn-block, .btn-block-text').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const targetId = e.currentTarget.dataset.targetId;
@@ -99,7 +99,7 @@ class ChatClient {
             acceptBtn.addEventListener('click', () => this.acceptMission());
         }
 
-        // 메시지 전송 (null이면 리스너 생략)
+        // 메시지 전송
         if (this.sendBtn) {
             this.sendBtn.addEventListener('click', () => this.sendMessage());
         }
@@ -121,7 +121,9 @@ class ChatClient {
         const profileModalClose = document.getElementById('profileModalClose');
         const profileModalBackdrop = document.getElementById('profileModalBackdrop');
         if (profileModalClose) profileModalClose.addEventListener('click', () => this.closeProfileModal());
-        if (profileModalBackdrop) profileModalBackdrop.addEventListener('click', (e) => { if (e.target === profileModalBackdrop) this.closeProfileModal(); });
+        if (profileModalBackdrop) profileModalBackdrop.addEventListener('click', (e) => { 
+            if (e.target === profileModalBackdrop) this.closeProfileModal(); 
+        });
     }
 
     async acceptMission() {
@@ -165,8 +167,6 @@ class ChatClient {
             const data = await res.json().catch(() => ({}));
             if (res.ok && data.success) {
                 alert(data.message || '수행자가 확정되었습니다.');
-
-                // 수행자 확정/거부 버튼 제거
                 if (btn) btn.remove();
                 const rejectBtn = document.getElementById('rejectPerformerBtn');
                 if (rejectBtn) rejectBtn.remove();
@@ -178,7 +178,6 @@ class ChatClient {
                     completeBtn.className = 'btn-action-gray';
                     completeBtn.id = 'completeMissionBtn';
                     completeBtn.textContent = '미션 완료';
-                    // 클릭 이벤트 연결
                     completeBtn.addEventListener('click', () => this.completeMission());
                     chatActions.appendChild(completeBtn);
                 }
@@ -238,8 +237,7 @@ class ChatClient {
             if (res.ok && data.success) {
                 alert(data.message || '미션이 완료되었습니다.');
                 if (btn) btn.remove();
-                // 원하면 여기서 채팅 목록 등 다른 페이지로 이동
-                // window.location.href = '/api/missions/chat/';
+                window.location.href = `/api/users/review_page/${this.missionId}/`
             } else {
                 alert(data.error || '미션 완료에 실패했습니다.');
                 btn.disabled = false;
@@ -256,7 +254,6 @@ class ChatClient {
         if (!confirm(`${username || '해당 유저'}를 차단하시겠습니까?`)) return;
         btnEl.disabled = true;
         try {
-            // 차단 = 1) 차단 목록 추가 2) 채팅방에서 강퇴 (room_id 필요)
             const res = await fetch('/api/users/api/block_user/', {
                 method: 'POST',
                 credentials: 'include',
@@ -268,9 +265,7 @@ class ChatClient {
                 alert(data.message || '차단되었습니다.');
                 btnEl.textContent = '차단됨';
             } else {
-                const msg = data.error || data.detail || (typeof data === 'object' ? JSON.stringify(data) : String(data)) || `차단 실패 (${res.status})`;
-                console.warn('block_user 실패:', res.status, data);
-                alert(msg);
+                alert(data.error || '차단 실패');
                 btnEl.disabled = false;
             }
         } catch (err) {
@@ -279,6 +274,7 @@ class ChatClient {
             btnEl.disabled = false;
         }
     }
+
     async showProfile(userId) {
         const backdrop = document.getElementById('profileModalBackdrop');
         if (!backdrop) return;
@@ -329,7 +325,6 @@ class ChatClient {
         try {
             const response = await fetch(`/ws/history/${this.roomId}`);
             const history = await response.json();
-
             history.forEach(msg => {
                 this.displayMessage({
                     type: msg.type || 'TALK',
@@ -339,7 +334,6 @@ class ChatClient {
                     time: msg.time
                 });
             });
-
             this.scrollToBottom();
         } catch (error) {
             console.error('히스토리 로드 실패:', error);
@@ -348,54 +342,36 @@ class ChatClient {
 
     connect() {
         this.updateStatus('연결 중...', '');
-
         this.ws = new WebSocket(this.wsUrl);
-
         this.ws.onopen = () => {
-            console.log('WebSocket 연결됨, 인증 시도...');
-            this.updateStatus('인증 중...', '');
-
-            // ✅ 첫 메시지로 AUTH 전송
-            const token = localStorage.getItem('access_token') || localStorage.getItem('access');
-
+            const token = this.getToken();
             if (!token) {
                 this.updateStatus('토큰 없음', 'error');
                 alert('로그인이 필요합니다.');
                 window.location.href = '/api/users/login/';
                 return;
             }
-
             this.ws.send(JSON.stringify({
                 type: 'AUTH',
                 token: token,
                 username: this.userNickname || ''
             }));
         };
-
         this.ws.onmessage = (event) => {
             const msg = JSON.parse(event.data);
             this.handleMessage(msg);
         };
-
         this.ws.onclose = (event) => {
-            console.log('WebSocket 종료:', event.code);
             this.isAuthenticated = false;
             this.setInputEnabled(false);
-
-            if (event.code === 4001) {
-                this.updateStatus('인증 실패', 'error');
-            } else if (event.code === 4000) {
-                // 강퇴됨: 알림 후 다른 페이지로 이동
-                this.updateStatus('연결 종료됨', 'error');
+            if (event.code === 4000) {
                 alert('차단되어 채팅방에서 나가셨습니다.');
                 window.location.href = '/api/users/homepage/';
             } else {
                 this.updateStatus('연결 끊김', 'error');
-                // 5초 후 재연결 시도
                 setTimeout(() => this.connect(), 5000);
             }
         };
-
         this.ws.onerror = (error) => {
             console.error('WebSocket 에러:', error);
             this.updateStatus('연결 오류', 'error');
@@ -427,68 +403,58 @@ class ChatClient {
     handleMessage(msg) {
         switch (msg.type) {
             case 'AUTH_SUCCESS':
-                console.log('✅ 인증 성공:', msg.user_id);
                 this.isAuthenticated = true;
                 this.setInputEnabled(true);
                 this.updateStatus('연결됨', 'connected');
                 break;
-
-            case 'ERROR':
-                console.error('❌ 에러:', msg.content);
-                this.displaySystemMessage(msg.content);
-                break;
-
             case 'TALK':
                 this.displayMessage(msg);
                 break;
-
             case 'SYSTEM':
                 this.displaySystemMessage(msg.content);
                 if (msg.action === 'mission_accepted' && this.isAuthor) {
                     this.showConfirmButtons();
                 }
                 break;
-
             case 'KICK':
                 alert(msg.content || '방장에 의해 강퇴되었습니다.');
                 window.location.href = '/api/users/homepage/';
                 break;
-
-            default:
-                console.log('알 수 없는 메시지 타입:', msg);
         }
     }
 
     sendMessage() {
         if (!this.messageInput) return;
         const content = this.messageInput.value.trim();
-
         if (!content || !this.isAuthenticated) return;
-
         this.ws.send(content);
         this.messageInput.value = '';
         this.messageInput.focus();
     }
 
+    // [수정] 좌우 배치 및 시간 아래 출력을 위한 메시지 렌더링 함수
     displayMessage(msg) {
         if (!this.messagesContainer) return;
         const messageEl = document.createElement('div');
         messageEl.classList.add('message');
 
-        const isMine = msg.sender_id === this.userId;
+        // 내 메시지인지 상대방 메시지인지 구분
+        const isMine = String(msg.sender_id) === String(this.userId);
         messageEl.classList.add(isMine ? 'mine' : 'other');
 
         let html = '';
-
+        // 상대방일 경우 닉네임 표시
         if (!isMine && msg.sender_nickname) {
             html += `<div class="sender">${this.escapeHtml(msg.sender_nickname)}</div>`;
         }
 
-        html += `<div class="content">${this.escapeHtml(msg.content)}</div>`;
+        // 말풍선과 시간 레이아웃 (시간이 말풍선 아래로 가도록)
+        const timeStr = msg.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        if (msg.time) {
-            html += `<div class="time">${msg.time}</div>`;
-        }
+        html += `
+            <div class="content">${this.escapeHtml(msg.content)}</div>
+            <div class="time">${timeStr}</div>
+        `;
 
         messageEl.innerHTML = html;
         this.messagesContainer.appendChild(messageEl);
@@ -516,7 +482,6 @@ class ChatClient {
     setInputEnabled(enabled) {
         if (this.messageInput) this.messageInput.disabled = !enabled;
         if (this.sendBtn) this.sendBtn.disabled = !enabled;
-
         if (enabled && this.messageInput) {
             this.messageInput.focus();
         }
@@ -535,12 +500,9 @@ class ChatClient {
     }
 }
 
-// 페이지 로드 시 채팅 클라이언트 초기화
 function initChatClient() {
     if (typeof CHAT_CONFIG !== 'undefined') {
         window.chatClient = new ChatClient(CHAT_CONFIG);
-    } else {
-        console.error('CHAT_CONFIG가 정의되지 않았습니다.');
     }
 }
 if (document.readyState === 'loading') {

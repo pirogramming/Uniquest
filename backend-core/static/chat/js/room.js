@@ -237,6 +237,7 @@ class ChatClient {
             if (res.ok && data.success) {
                 alert(data.message || '미션이 완료되었습니다.');
                 if (btn) btn.remove();
+                window.location.href = `/api/users/review_page/${this.missionId}/`
             } else {
                 alert(data.error || '미션 완료에 실패했습니다.');
                 btn.disabled = false;

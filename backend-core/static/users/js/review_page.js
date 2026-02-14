@@ -141,7 +141,7 @@ async function send_info(){
 
         if (response.ok){
             const data = await response.json()
-            console.log(data)
+            window.location.href = `/api/users/homepage/`
         } else {
             console.log('실패')
         }
