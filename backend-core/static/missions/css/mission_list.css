@@ -1,4 +1,4 @@
-/* 기본 카드 스타일 */
+/* ==================== 1. 기본 레이아웃 & 컨테이너 ==================== */
 .card {
     border: 1px solid #F2F4F7;
     border-radius: 12px;
@@ -12,23 +12,26 @@
     font-size: 13px;
 }
 
-/* mobile-container - 상대 위치 설정 */
 .mobile-container {
     position: relative;
     overflow-x: hidden;
 }
 
-/* content-container - 헤더 높이만큼 padding */
 .content-container {
-    padding-top: 70px;
+    margin-top: 70px;
 }
 
-/* 지도 */
+/* ==================== 2. 지도 및 컨트롤 버튼 (세로 정렬 핵심) ==================== */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
 #map {
     width: 100%;
     height: 280px;
     border-radius: 16px;
-    margin-bottom: 20px;
     transition: height 0.3s ease;
     position: relative;
 }
@@ -37,7 +40,117 @@
     display: none;
 }
 
-/* 헤더 (고정, 항상 표시) */
+/* 우측 하단 버튼 모음 컨테이너 */
+.map-controls {
+    position: absolute;
+    right: 12px;
+    bottom: 12px; /* 지도 안쪽 하단 여백 */
+    z-index: 10;
+    display: flex !important;
+    flex-direction: column !important; /* 세로 정렬 강제 */
+    gap: 8px; /* 버튼 사이 간격 */
+}
+/* 전체화면 전용 컨트롤 위치 */
+.fullscreen-controls {
+    position: absolute;
+    right: 16px;
+    bottom: 90px; /* 하단바 높이에 따라 조정하세요 */
+    z-index: 1010; /* 지도보다 높게 설정 */
+}
+
+/* 플로팅 버튼 공통 스타일 (전체화면 & 현위치) */
+.floating-map-btn, 
+.my-location-btn {
+    position: static; /* 컨테이너의 flex 영향을 받도록 초기화 */
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.floating-map-btn:hover, 
+.my-location-btn:hover {
+    transform: scale(1.05);
+    background: #F9FAFB;
+}
+
+.floating-map-btn svg, 
+.my-location-btn svg {
+    color: #667085;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== 3. 커스텀 마커 (물방울 형태 통일) ==================== */
+.user-location-marker,
+.mission-marker {
+    position: relative;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 50% 0; /* 물방울 모양 */
+    transform: translate(-50%, -100%) rotate(-45deg);
+    transition: all 0.2s ease;
+}
+
+.user-location-marker::after,
+.mission-marker::after {
+    content: "";
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    /* 부모의 -45도 회전 보정 및 정중앙 배치 */
+    transform: translate(-50%, -50%) rotate(45deg); 
+}
+
+/* 사용자 위치 (파란색 + 펄스) */
+.user-location-marker {
+    background: #4DA6FF; 
+    z-index: 100;
+}
+
+.user-location-marker::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    animation: pulse-pin 2s infinite;
+}
+
+/* 미션 마커 (노란색) */
+.mission-marker {
+    background: #FFC107;
+    z-index: 50;
+}
+
+.mission-marker:hover {
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.1);
+    z-index: 101;
+}
+
+@keyframes pulse-pin {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* ==================== 4. 헤더 & 필터 UI ==================== */
 .mission-header {
     height: 70px;
     max-width: 450px;
@@ -54,17 +167,19 @@
     transform: translateX(-50%);
     z-index: 1000;
 }
-.header1{
+
+.header1 {
     display: flex;
     align-items: center;
-    gap: 0px;
 }
+
 .mission-header h2 {
     font-size: 20px;
     font-weight: 700;
     margin: 0;
-    text-align: left;
 }
+
+
 
 .back-to-list-btn {
     width: 40px;
@@ -79,53 +194,22 @@
     color: #374151;
     background-color: transparent;
     margin-right: 12px;
-    padding:8px;
+    padding: 8px;
     transition: background 0.2s;
 }
+
+
 
 .back-to-list-btn:hover {
     background: #E5E7EB;
 }
 
-/* 툴바 */
-.mission-toolbar {
-    display: flex;
-    flex-direction: column;
-    width:100%;
-    gap: 12px;
-    padding: 12px 0;
-}
 
-.view-toggle {
-    display: flex;
-    gap: 8px;
-    padding: 4px;
-    width: 100%;
-}
 
-.view-toggle button {
-    flex:1;
-    padding: 8px 16px;
-    border: none;
-    background: #F3F4F6;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #6B7280;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
 
-.view-toggle button.active {
-    color: white;
-    background-color: #4DA6FF;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
 
+
+/* 필터 버튼 활성화 상태 */
 .filter-btn {
     width: 40px;
     height: 40px;
@@ -139,34 +223,64 @@
     transition: all 0.2s;
 }
 
-.filter-btn:hover {
-    background: #F9FAFB;
-    border-color: #D1D5DB;
-}
-
 .filter-btn.active {
-    background: #4DA6FF;
-    border-color: #4DA6FF;
+    background: #4DA6FF !important;
+    border-color: #4DA6FF !important;
+    color: white !important;
 }
 
 .filter-btn svg {
     color: #6B7280;
     width: 20px;
     height: 20px;
-    transition: color 0.2s;
 }
 
 .filter-btn.active svg {
-    color: white;
+    color: white; /* 활성화 시 아이콘도 흰색으로 */
+    stroke: white;
 }
 
-/* 필터 백드롭 */
+/* ==================== 5. 기타 UI 요소 (툴바, 패널 등) ==================== */
+.mission-toolbar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    padding-bottom: 18px;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+
+    width: 100%;
+}
+
+.view-toggle button {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    background: #F3F4F6;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #6B7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.view-toggle button.active {
+    color: white;
+    background-color: #4DA6FF;
+}
+
+/* 필터 패널 & 백드롭 */
 #filter-backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1001;
     opacity: 0;
@@ -179,21 +293,14 @@
     pointer-events: auto;
 }
 
-/* 필터 패널 (하단에서 슬라이드 업) */
 #filter-panel {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0; left: 0; right: 0;
     max-width: 450px;
     margin: 0 auto;
-    padding-bottom: 20px;
     background: white;
     border-radius: 20px 20px 0 0;
-    max-height: 70vh;
-    overflow-y: auto;
     z-index: 1002;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -202,291 +309,14 @@
     transform: translateY(0);
 }
 
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #E5E7EB;
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 1;
-}
-
-.filter-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.filter-close {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #9CA3AF;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.filter-close:hover {
-    color: #6B7280;
-}
-
-.filter-content {
-    padding: 20px;
-}
-
-.filter-section {
-    margin-bottom: 24px;
-}
-
-.filter-section:last-child {
-    margin-bottom: 0;
-}
-
-.filter-section h4 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-}
-
-.filter-options {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.filter-option {
-    display: flex;
-    align-items: center;
-}
-
-.filter-option input[type="checkbox"],
-.filter-option input[type="radio"] {
-    display: none;
-}
-
-.filter-option input[type="checkbox"]:hover + span,
-.filter-option input[type="radio"]:hover + span {
-    background: #F3F4F6;
-}
-
-.filter-option input[type="checkbox"]:checked + span,
-.filter-option input[type="radio"]:checked + span {
-    background-color: #4DA6FF;
-    color: white;
-    border-color: #4DA6FF;
-}
-
-.filter-option span {
-    font-size: 14px;
-    color: #1F2937;
-    display: inline-block;
-    padding: 6px 14px;
-    border: 1px solid #D1D5DB;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-footer {
-    display: flex;
-    gap: 12px;
-    padding: 16px 20px;
-    border-top: 1px solid #E5E7EB;
-    position: sticky;
-    bottom: 0;
-    background: white;
-}
-
-.btn-reset,
-.btn-apply {
-    flex: 1;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-}
-
-.btn-reset {
-    background: #F3F4F6;
-    color: #6B7280;
-}
-
-.btn-reset:hover {
-    background: #E5E7EB;
-}
-
-.btn-apply {
-    background: #4DA6FF;
-    color: white;
-}
-
-.btn-apply:hover {
-    background: #3B8FE6;
-}
-
-/* 미션 카드 스타일 */
-.mission-card {
-    position: relative;
-}
-
-.mission-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 8px;
-}
-
-.mission-title-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.mission-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #333;
-}
-
-.mission-status {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.mission-status.waiting {
-    /* #ffd166에 20% 투명도 추가 */
-    background: rgba(255, 209, 102, 0.2); 
-    color: #FB923C;
-}
-
-.mission-status.matched {
-    /* #EFF6FF에 20% 투명도 추가 */
-    background: rgba(239, 246, 255, 0.2); 
-    color: #155DFC;
-}
-
-.mission-status.completed {
-    /* #D1FAE5에 20% 투명도 추가 */
-    background: rgba(209, 250, 229, 0.2); 
-    color: #27C27B;
-}
-
-.mission-reward {
-    font-weight: 700;
-    color: #4DA6FF;
-    white-space: nowrap;
-}
-
-.mission-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    margin-top: 4px;
-    flex-wrap: wrap;
-}
-.cols{
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-.col1 {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-
-.mission-category {
-    background: #F3F4F6;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #6B7280;
-}
-
-.mission-location {
-    font-size: 12px;
-    color: #6B7280;
-}
-
-.mission-tags {
-    margin-top: 8px;
-}
-
-.mission-tag {
-    background: #f0f0f0;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-right: 4px;
-    font-size: 12px;
-    color: #667085;
-}
-
-/* 플로팅 버튼 */
-.floating-map-btn {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: white;
-    border: 1px solid #E5E7EB;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    transition: all 0.3s;
-}
-
-.floating-map-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.floating-map-btn.hidden {
-    display: none;
-}
-
-.floating-map-btn svg {
-    color: #667085;
-    width: 20px;
-    height: 20px;
-}
-
-/* 전체화면 지도 (navbar 포함) */
+/* 전체화면 지도 컨테이너 */
 #fullscreen-map-container {
     position: fixed;
-    top: 70px; /* mission-header 아래 */
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 70px;
+    left: 0; right: 0; bottom: 0;
     max-width: 450px;
     margin: 0 auto;
-    z-index: 999; /* mission-header보다 낮게 */
+    z-index: 999;
     background: white;
 }
 

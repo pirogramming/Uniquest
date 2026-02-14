@@ -1,10 +1,11 @@
 /**
  * static/users/js/homepage.js
- * * 🏠 홈페이지 로직
- * * 수정 사항:
- * - 중괄호({}) 불일치 해결
- * - 중복 선언(usernameEl) 정리
- * - 조건문 흐름 최적화 (데이터 유무 확인 후 실행)
+ * 
+ * 🏠 홈페이지 로직
+ * 
+ * 백워드 호환:
+ * - 새 API 형식 (created_mission, joined_mission) 지원
+ * - 기존 API 형식 (missions 배열) 지원
  */
 
 (function () {
@@ -34,7 +35,7 @@
             const waiting = document.getElementById('waiting');
             const completed = document.getElementById('completed');
 
-            // 3. 사용자 정보 표시 (이름 및 프로필 사진)
+            // 3. 사용자 정보 표시
             if (usernameEl) {
                 usernameEl.textContent = userData.username;
             }
@@ -47,16 +48,42 @@
                 }
             }
 
-            // 4. 미션 카운트 표시 (상단 숫자)
+            // 4. 미션 카운트 표시
             if (matched) matched.innerHTML = userData.matched_count || 0;
             if (waiting) waiting.innerHTML = userData.waiting_count || 0;
             if (completed) completed.innerHTML = userData.completed_count || 0;
 
-            // 5. 미션 현황 카드 이벤트 바인딩 (함수 내부에서 처리)
-            updateMissionStatus(userData);
+            // 5. 미션 현황 카드 이벤트 바인딩
+            addStatusClickEvents();
 
-            // 6. 진행중인 미션 목록 하단 렌더링
-            renderMissions(userData.missions || []);
+            // 6. 미션 목록 렌더링
+            // ✨ 새 API 형식과 기존 형식 모두 지원
+            if (userData.created_mission !== undefined || userData.joined_mission !== undefined) {
+                // 새 API 형식 (각각 1개)
+                console.log("✅ 새 API 형식 사용");
+                renderCreatedMission(userData.created_mission);
+                renderJoinedMission(userData.joined_mission);
+            } else if (userData.missions && Array.isArray(userData.missions)) {
+                // 기존 API 형식 (배열) - 백워드 호환
+                console.log("⚠️ 기존 API 형식 사용 (백워드 호환)");
+                const activeMissions = userData.missions.filter(m => 
+                    m.status === 'WAITING' || m.status === 'MATCHED'
+                );
+                
+                // 내가 등록한 미션 찾기
+                const createdMission = activeMissions.find(m => {
+                return m.is_author === true || m.author === userData.id;
+                }) || null;
+                renderCreatedMission(createdMission);
+                
+                // 내가 참여한 미션 찾기
+                const joinedMission = activeMissions.find(m => {
+                return m.is_author === false || (m.author !== undefined && m.author !== userData.id);
+                }) || null;
+                renderJoinedMission(joinedMission);
+            } else {
+                console.error("❌ API 응답 형식이 올바르지 않습니다.");
+            }
 
             console.log("환영합니다, " + userData.username + "님!");
 
@@ -76,11 +103,6 @@
 
     // ==================== 미션 현황 카드 ====================
     
-    function updateMissionStatus(userData) {
-        // 클릭 이벤트 추가 (기능 유지)
-        addStatusClickEvents();
-    }
-
     /**
      * 상태 카드 클릭 시 전체보기로 이동
      */
@@ -99,7 +121,6 @@
             if (item.el && item.el.parentElement) {
                 const parent = item.el.parentElement;
                 parent.style.cursor = 'pointer';
-                // 기존 이벤트 제거 후 등록을 위해 복제하거나 단순 등록
                 parent.onclick = () => {
                     window.location.href = `/api/users/my-missions/?tab=all&status=${item.status}`;
                 };
@@ -109,25 +130,50 @@
 
     // ==================== 미션 목록 렌더링 ====================
     
-    function renderMissions(missions) {
-        const container = document.getElementById('mission_cards');
-        if (!container) return;
+    /**
+     * 내가 등록한 미션 렌더링 (1개)
+     */
+    function renderCreatedMission(mission) {
+        const container = document.getElementById('created-mission-container');
+        if (!container) {
+            console.warn("created-mission-container를 찾을 수 없습니다.");
+            return;
+        }
 
-        // 진행중인 미션만 필터링 (대기중 + 진행중)
-        const activeMissions = missions.filter(m => 
-            m.status === 'WAITING' || m.status === 'MATCHED'
-        );
-
-        if (activeMissions.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#98A2B3; padding:20px;">진행중인 미션이 없습니다.</p>';
+        if (!mission) {
+            container.innerHTML = '<p class="empty-message">등록한 미션이 없습니다.</p>';
             return;
         }
 
         // MissionRenderer 사용
         if (window.MissionRenderer) {
-            MissionRenderer.renderMissions(container, activeMissions, {
-                type: 'simple',
-                emptyMessage: '진행중인 미션이 없습니다.'
+            MissionRenderer.renderMissions(container, [mission], {
+                type: 'simple'
+            });
+        } else {
+            console.error("MissionRenderer를 찾을 수 없습니다.");
+        }
+    }
+
+    /**
+     * 내가 참여한 미션 렌더링 (1개)
+     */
+    function renderJoinedMission(mission) {
+        const container = document.getElementById('joined-mission-container');
+        if (!container) {
+            console.warn("joined-mission-container를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (!mission) {
+            container.innerHTML = '<p class="empty-message">참여한 미션이 없습니다.</p>';
+            return;
+        }
+
+        // MissionRenderer 사용
+        if (window.MissionRenderer) {
+            MissionRenderer.renderMissions(container, [mission], {
+                type: 'simple'
             });
         } else {
             console.error("MissionRenderer를 찾을 수 없습니다.");

@@ -25,13 +25,13 @@ body {
     overflow-y: auto;
     position: relative;
 }
-
 /* 2. 헤더 섹션 (겹침 현상 제거) */
 .header {
-    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
-    padding: 50px 25px 30px 25px; 
-    border-radius: 0;
-    color: white;
+background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+padding: 50px 20px 30px 25px; 
+border-radius: 0;
+color: white;
+margin-bottom: 20px;
 }
 
 .header-top {
@@ -115,21 +115,34 @@ body {
 }
 
 /* 3. 내 미션 현황 카드 */
+/* 3. 내 미션 현황 카드 - 불투명(유리창) 스타일 */
 .mission-status-card {
-    background: #FFFFFF;
+    /* 배경색: 흰색 70~80% 투명도 */
+    background: rgba(255, 255, 255, 0.75); 
+    
+    /* 뒤 배경 블러 처리 (불투명한 느낌의 핵심) */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
     margin: 20px 25px; 
     padding: 20px;
     border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    
+    /* 테두리를 살짝 주면 투명한 느낌이 더 잘 살아요 */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    
+    /* 그림자는 조금 더 연하게 조정 */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .mission-status-card h3 {
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0 0 20px 0;
     display: flex;
     align-items: center;
     gap: 8px;
+    color: #888888;
 }
 
 .mission-status-card h3 i {
@@ -175,8 +188,8 @@ body {
 }
 
 .section-title h2 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     margin: 0;
 }
 
@@ -314,4 +327,41 @@ body {
     align-items: center;
     color: white;
     box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3);
+}
+
+.mission-section {
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #101828;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #98A2B3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.loading, .empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #98A2B3;
+    font-size: 13px;
+    font-weight:500;
 }

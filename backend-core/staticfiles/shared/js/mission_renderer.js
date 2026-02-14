@@ -177,7 +177,7 @@
                         </div>
                         <span class="mission-status ${statusInfo.class}">${statusInfo.text}</span>
                     </div>
-                    
+                    <p class="description">${mission.descriptions || ''}</p>
                     <div class="mission-meta">
                         <span class="mission-category category-${categoryClass}">${categoryText}</span>
                         ${mission.location_name ? `<span class="mission-location">${mission.location_name}</span>` : ''}
@@ -196,7 +196,7 @@
 
     /**
      * 미션 카드 HTML 생성 (homepage용 - 간소화)
-     */
+    
     function createSimpleMissionCard(mission) {
         const statusInfo = STATUS_MAP[mission.status] || { text: mission.status, class: 'waiting' };
         const categoryText = CATEGORY_MAP[mission.category] || mission.category;
@@ -218,7 +218,7 @@
                 </div>
             </div>
         `;
-    }
+    } */
 
     // ==================== 렌더링 ====================
     
@@ -235,8 +235,7 @@
             return;
         }
 
-        const cardGenerator = type === 'simple' ? createSimpleMissionCard : createMissionCard;
-        container.innerHTML = missions.map(m => cardGenerator(m, options)).join('');
+        container.innerHTML = missions.map(m => createMissionCard(m, options)).join('');
     }
 
     // ==================== 전역 노출 ====================
@@ -256,8 +255,7 @@
         
         // HTML 생성
         createMissionCard,
-        createSimpleMissionCard,
-        
+    
         // 렌더링
         renderMissions
     };

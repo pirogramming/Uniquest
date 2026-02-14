@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import RegisterView, ProfileView, MyLoginView
 from rest_framework_simplejwt.views import TokenRefreshView
+from missions import views as missions_views
 
 app_name = 'users'
 
@@ -41,8 +42,10 @@ urlpatterns = [
     #홈페이지
     path('homepage/', views.get_home_page, name="homepage"),
     path('homepage_guest/', views.get_home_page_guest, name="homepage_guest"),
-    path('my-missions/', views.my_missions_view, name='my_missions'),
-    path('api/homepage/', views.get_homepage_info, name="homepage_info"),
+    # users 앱의 urls.py에 추가
+    path('my-missions/', views.my_missions_view, name='my_missions'),  # ← 이 줄 추가!
+
+    path('api/my-missions/', missions_views.my_missions_api, name='my_missions_api'),    path('api/homepage/', views.get_homepage_info, name="homepage_info"),
     path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 
     #회원탈퇴 페이지

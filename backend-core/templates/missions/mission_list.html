@@ -7,12 +7,7 @@
     <style>
   .card { border:1px solid #eee; border-radius:12px; padding:12px; margin:10px 0; }
   .muted { color:#666; font-size: 13px; }
-  #map { 
-        width: 100%; 
-        height: 300px;  /* ✨ 고정 높이로 변경! */
-        border-radius: 12px; 
-        margin-bottom: 20px; 
-    }
+
     .card { border: 1px solid #F2F4F7; border-radius: 12px; padding: 16px; margin: 12px 0; background: #fff; }
     .muted { color: #667085; font-size: 13px; }
     .mission-header { padding: 20px 0 10px; }
@@ -20,8 +15,8 @@
     .create-link { font-size: 14px; text-decoration: none; font-weight: 600; }
     
 </style>
-    <link rel="stylesheet" href="{% static 'missions/css/mission_list.css' %}">
 <link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'missions/css/mission_list.css' %}">
 
 {% endblock %}
 
@@ -29,6 +24,7 @@
 <script src="/static/shared/js/auth.js"></script>
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
 <script src="{% static 'missions/js/map_manager.js' %}"></script>
+<script src="{% static 'shared/js/mission_renderer.js' %}" defer></script>
 <script src="{% static 'missions/js/mission_list.js' %}" defer></script>
 {% endblock %}
 
@@ -78,13 +74,20 @@
         </div>
 
         <!-- 지도 -->
-        <div id="map">
-            <!-- 플로팅 전체화면 지도 버튼 -->
-            <button class="floating-map-btn" onclick="window.openFullscreenMap()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <div class="map-wrapper" style="position: relative;"> 
+            <div id="map"></div>
+            <div class="map-controls">
+                <button class="floating-map-btn" onclick="window.openFullscreenMap()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
-                </svg>
-            </button>
+                    </svg>
+                </button>
+                <button class="my-location-btn" onclick="window.moveToCurrentLocation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+                    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 미션 목록 -->
@@ -95,99 +98,23 @@
 
     {% include "_bottom-nav.html" %}
 
-    <!-- 필터 백드롭 -->
-    <div id="filter-backdrop" style="display:none;"></div>
-
-    <!-- 필터 패널 -->
-    <div id="filter-panel" style="display:none;">
-        <div class="filter-header">
-            <h3>필터</h3>
-            <button type="button" class="filter-close" onclick="window.closeFilterPanel()">×</button>
-        </div>
-
-        <div class="filter-content">
-            <!-- 정렬 -->
-            <div class="filter-section">
-                <h4>정렬</h4>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="radio" name="sort" value="latest" checked>
-                        <span>최신순</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="radio" name="sort" value="distance">
-                        <span>거리순</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="radio" name="sort" value="reward">
-                        <span>높은 보상순</span>
-                    </label>
-                    <label class="filter-option">
-                    <input type="radio" name="sort" value="deadline">
-                    <span>마감 임박순</span> </label>
-                </div>
-            </div>
-
-            <!-- 카테고리 -->
-            <div class="filter-section">
-                <h4>카테고리</h4>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="ERRAND">
-                        <span>심부름</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="STUDY">
-                        <span>학업</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="RENTAL">
-                        <span>대여</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="RECRUIT">
-                        <span>구인</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="LIFE">
-                        <span>생활</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="OTHER">
-                        <span>기타</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- 상태 -->
-            <div class="filter-section">
-                <h4>상태</h4>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="status" value="WAITING" checked>
-                        <span>대기중</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="status" value="MATCHED">
-                        <span>진행중</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="status" value="COMPLETED">
-                        <span>완료</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-footer">
-            <button type="button" class="btn-reset" onclick="window.resetFilters()">초기화</button>
-            <button type="button" class="btn-apply" onclick="window.applyFilters()">적용</button>
-        </div>
-    </div>
+    {%include "missions/_filter_panel.html" %}
 
     <!-- 전체화면 지도 -->
     <div id="fullscreen-map-container" style="display:none;">
         <div id="fullscreen-map"></div>
+        <div class="map-controls fullscreen-controls">
+                <button class="floating-map-btn" onclick="window.closeFullscreenMap()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707"/>
+                    </svg>
+                </button>
+                <button class="my-location-btn" onclick="window.moveToCurrentLocation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+                    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+                    </svg>
+                </button>
+        </div>
     </div>
 </div>
 {% endblock %}
