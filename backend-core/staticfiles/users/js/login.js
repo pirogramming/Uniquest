@@ -52,12 +52,3 @@ async function handleLogin() {
         alert('서버 통신 불가');
     }
 }
-
-const backBtn = document.getElementById('left_arrow');
-
-if (backBtn) {
-    backBtn.addEventListener('click', () => {
-        // 브라우저의 이전 페이지로 이동
-        window.history.back();
-    });
-}

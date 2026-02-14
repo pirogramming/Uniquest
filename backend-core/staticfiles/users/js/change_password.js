@@ -17,11 +17,10 @@ async function handleSignup() {
     if (!checkPassword(document.getElementById('password').value , document.getElementById('password_check').value)) {
         return
     }
-    console.log('uyyy')
 
     const csrftoken = getCookie('csrftoken');
     
-    const password_reset_token = sessionStorage.getItem('password_reset_token')
+    const password_reset_token = localStorage.getItem('password_reset_token')
 
     const changeData = {
         password: document.getElementById('password').value,
@@ -38,12 +37,14 @@ async function handleSignup() {
     });
 
     if (response.ok) {
-        sessionStorage.removeItem('password_reset_token')
+        localStorage.removeItem('password_reset_token')
+        console.log("토큰 삭제 시도됨. 현재 토큰 상태:", localStorage.getItem('password_reset_token'));
+        alert("비밀번호 변경 성공!");
         window.location.href = "/api/users/login/"; // 가입 후 로그인 페이지로 이동
     } else {
         const errorData = await response.json();
         console.error("에러 발생:", errorData);
-        alert("변경 실패: " + JSON.stringify(errorData));
+        alert("변경 실패 ㅠㅠ: " + JSON.stringify(errorData));
     }
 }
 
@@ -62,11 +63,3 @@ function checkPassword(password,confirmPassword){
 
     return true
 }
-
-function blockNotTokener(){
-    if (sessionStorage.getItem('password_reset_token') === null){
-        window.location.href = "/api/users/login/";
-    }
-}
-
-window.addEventListener('DOMContentLoaded', blockNotTokener);
