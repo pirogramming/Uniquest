@@ -126,4 +126,15 @@ class ConnectionManager:
             history.append(doc)
         return history
 
+    async def set_room_last_message(self, room_id: str, msg_obj: ChatMessage):
+        """채팅 목록용: 해당 방의 마지막 메시지를 Redis에 저장 (Django에서 조회)"""
+        key = f"chat:room:{room_id}:last"
+        value = {
+            "content": (msg_obj.content or "")[:80],  # 목록용으로 80자 제한
+            "created_at": msg_obj.created_at.isoformat() if msg_obj.created_at else None,
+            "sender_id": msg_obj.sender_id,
+        }
+        await redis_client.set(key, json.dumps(value, ensure_ascii=False), ex=86400 * 30)
+
+
 chat_manager = ConnectionManager()
