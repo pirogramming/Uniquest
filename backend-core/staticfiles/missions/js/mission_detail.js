@@ -5,7 +5,7 @@
  * 
  * 역할:
  * - 미션 상세 정보 로드
- * - 지도에 미션 위치 표시
+ * - 지도에 미션 위치 표시 (상태별 색상)
  * - 이미지 갤러리 렌더링 및 모달
  * - 햄버거 메뉴 토글 (작성자만)
  * - 삭제 기능
@@ -15,6 +15,7 @@
 
 (function () {
     let mapManager;
+    let missionStatus = null;  // ✨ 미션 상태 저장
 
     // URL에서 mission_id 추출
     const pathParts = window.location.pathname.split('/').filter(p => p !== "");
@@ -25,7 +26,10 @@
 
     // ==================== 지도 초기화 ====================
     
-    async function initMap(lat, lng) {
+    /**
+     * 지도 초기화 (상태별 마커 색상)
+     */
+    async function initMap(lat, lng, status) {
         const container = document.getElementById('map');
         if (!container) return;
 
@@ -37,17 +41,15 @@
 
             await mapManager.init();
 
+            // ✨ 상태별 마커 생성 (InfoWindow 제거)
             const marker = mapManager.addCustomMarker(lat, lng, {
-                title: "거래 희망 장소"
+                status: status  // WAITING/MATCHED/COMPLETED
             });
-
-            mapManager.openInfoWindow(
-                marker,
-                '<div style="padding:5px; font-size:12px; font-weight:bold;">거래 장소</div>'
-            );
 
             mapManager.fitBoundsToLocations([{ lat, lng }]);
             mapManager.setLevel(3);
+            
+            console.log("✅ 지도 초기화 완료 (상태:", status, ")");
         } catch (err) {
             console.error("지도 초기화 실패:", err);
         }
@@ -200,12 +202,15 @@
                 return;
             }
 
+            // ✨ 미션 상태 저장
+            missionStatus = mission.status;
+
             // 1. 이미지 표시
             renderImages(mission.images);
 
-            // 2. 지도 표시 (좌표가 있을 때만)
+            // 2. 지도 표시 (좌표가 있을 때만, 상태 포함)
             if (mission.location_lat && mission.location_lng) {
-                initMap(mission.location_lat, mission.location_lng);
+                initMap(mission.location_lat, mission.location_lng, mission.status);
             }
 
             // 3. 작성자인 경우 햄버거 버튼 표시

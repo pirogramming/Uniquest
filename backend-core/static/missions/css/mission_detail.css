@@ -342,3 +342,88 @@ body {
     object-fit: cover;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+
+/* ==================== 공통 마커 기본 스타일 ==================== */
+.user-location-marker,
+.mission-marker {
+    position: relative;
+    cursor: pointer;
+    border-radius: 50% 50% 50% 0; /* 물방울 모양 */
+    transform: translate(-50%, -100%) rotate(-45deg); /* 끝점이 좌표에 오도록 설정 */
+    transition: all 0.2s ease;
+}
+
+/* 내부 흰색 동그라미 공통 설정 */
+.user-location-marker::after,
+.mission-marker::after {
+    content: "";
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    /* 부모가 -45도 회전되어 있으므로 보정 */
+    transform: translate(-50%, -50%) rotate(45deg); 
+}
+
+/* ==================== 1. 사용자 위치 마커 (파란색) ==================== */
+.user-location-marker {
+    width: 24px;
+    height: 24px;
+    background: #4DA6FF; 
+    box-shadow: 0 2px 8px rgba(77, 166, 255, 0.4);
+    z-index: 100;
+}
+
+.user-location-marker::after {
+    width: 8px;
+    height: 8px;
+}
+
+/* 사용자 마커 전용 펄스 애니메이션 */
+.user-location-marker::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    animation: pulse-pin 2s infinite;
+}
+
+/* ==================== 2. 미션 마커 (노란색) ==================== */
+.mission-marker {
+    width: 28px;
+    height: 28px;
+    background: #FFC107;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
+    z-index: 50;
+}
+
+.mission-marker::after {
+    width: 10px;
+    height: 10px;
+}
+
+/* 미션 마커 호버 효과 */
+.mission-marker:hover {
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.1);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.6);
+    z-index: 101;
+}
+
+/* ==================== 애니메이션 정의 ==================== */
+@keyframes pulse-pin {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
