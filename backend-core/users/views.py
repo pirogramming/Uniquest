@@ -479,8 +479,7 @@ def render_review_page(request,mission_id):
 @permission_classes([IsAuthenticated])
 def render_review_page_info(request,mission_id):
     target_mission = Mission.objects.get(id=mission_id)
-    target_user = target_mission.author
-    user = request.user
+    target_user = target_mission.helper
 
     mission_name = target_mission.title
     username = target_user.username
@@ -493,7 +492,7 @@ def render_review_page_info(request,mission_id):
 def review_json(request):
     review_json = json.loads(request.body)
     target_mission = Mission.objects.get(id=review_json['personal_key'])
-    target_user = target_mission.author
+    target_user = target_mission.helper
     target_user.review_datas.append(review_json)
     target_user.save()
     return Response({"status": "success", "message": target_user.username}, status=200)
