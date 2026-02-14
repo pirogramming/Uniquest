@@ -95,7 +95,7 @@ async function patchProfile() {
         });
 
         if (response.ok) {
-            alert("프로필이 성공적으로 변경되었습니다! ✨");
+            alert("프로필이 성공적으로 변경되었습니다!");
             window.location.href = '/api/users/mypage/'; // 저장 후 마이페이지로 이동
         } else {
             const errorData = await response.json();
