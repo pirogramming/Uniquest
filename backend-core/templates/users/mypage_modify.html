@@ -11,9 +11,16 @@
 <div class="profile-container">
         <h2><button type="button" class="back-arrow" onclick="history.back()">←</button> 프로필 수정</h2>
         
-        <div class="profile-image-section">
-            <div class="image-circle">연</div>
-            <button type="button" class="img-change-btn">프로필 사진 변경</button>
+        <div class="profile-upload-wrapper">
+            <label for="userphoto" class="profile-image-label">
+                <div class="profile-image-container">
+                    <img id="profile-preview" src="{% static 'users/images/plus.webp' %}" alt="프로필 이미지">
+                    <div class="image-overlay">
+                        <span class="camera-icon">📸</span>
+                    </div>
+                </div>
+            </label>
+            <input type="file" id="userphoto" accept="image/*" onchange="previewImage(this)">
         </div>
 
         <form id="profile-form">
