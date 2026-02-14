@@ -44,6 +44,46 @@ class ChatClient {
     }
 
     init() {
+
+        // 프로필 보기
+        const viewProfileBtn = document.getElementById('viewProfileBtn');
+        if (viewProfileBtn) {
+            viewProfileBtn.addEventListener('click', (e) => {
+                const userId = viewProfileBtn.dataset.userId;
+                moreDropdown.classList.remove('active');
+                if (userId) this.showProfile(parseInt(userId, 10));
+            });
+        }
+
+        // 미션 완료 버튼 (등록자)
+        const completeMissionBtn = document.getElementById('completeMissionBtn');
+        if (completeMissionBtn) {
+            completeMissionBtn.addEventListener('click', () => this.completeMission());
+        }
+
+        // 수행자 확정 버튼 (등록자)
+        const confirmPerformerBtn = document.getElementById('confirmPerformerBtn');
+        if (confirmPerformerBtn) {
+            confirmPerformerBtn.addEventListener('click', () => this.confirmPerformer());
+        }
+        // 수행자 거부 버튼 (등록자)
+        const rejectPerformerBtn = document.getElementById('rejectPerformerBtn');
+        if (rejectPerformerBtn) {
+            rejectPerformerBtn.addEventListener('click', () => this.rejectPerformer());
+        }
+
+        const moreMenuBtn = document.getElementById('moreMenuBtn');
+        const moreDropdown = document.getElementById('moreDropdown');
+        if (moreMenuBtn && moreDropdown) {
+            moreMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                moreDropdown.classList.toggle('active');
+            });
+            document.addEventListener('click', () => {
+                moreDropdown.classList.remove('active');
+            });
+            moreDropdown.addEventListener('click', (e) => e.stopPropagation());
+        }
         // 차단 버튼: 가장 먼저 등록 (sendBtn/messageInput 오류 시에도 동작)
         document.querySelectorAll('.btn-block, .btn-block-text').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -76,6 +116,12 @@ class ChatClient {
         this.loadHistory().then(() => {
             this.connect();
         });
+
+        // 프로필 모달 닫기
+        const profileModalClose = document.getElementById('profileModalClose');
+        const profileModalBackdrop = document.getElementById('profileModalBackdrop');
+        if (profileModalClose) profileModalClose.addEventListener('click', () => this.closeProfileModal());
+        if (profileModalBackdrop) profileModalBackdrop.addEventListener('click', (e) => { if (e.target === profileModalBackdrop) this.closeProfileModal(); });
     }
 
     async acceptMission() {
@@ -105,6 +151,106 @@ class ChatClient {
         }
     }
 
+    async confirmPerformer() {
+        const btn = document.getElementById('confirmPerformerBtn');
+        if (!btn) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/confirm/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '수행자가 확정되었습니다.');
+
+                // 수행자 확정/거부 버튼 제거
+                if (btn) btn.remove();
+                const rejectBtn = document.getElementById('rejectPerformerBtn');
+                if (rejectBtn) rejectBtn.remove();
+
+                const chatActions = document.getElementById('chatActions');
+                if (chatActions && !document.getElementById('completeMissionBtn')) {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.type = 'button';
+                    completeBtn.className = 'btn-action-gray';
+                    completeBtn.id = 'completeMissionBtn';
+                    completeBtn.textContent = '미션 완료';
+                    // 클릭 이벤트 연결
+                    completeBtn.addEventListener('click', () => this.completeMission());
+                    chatActions.appendChild(completeBtn);
+                }
+            } else {
+                alert(data.error || '확정에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
+        }
+    }
+
+    async rejectPerformer() {
+        const btn = document.getElementById('rejectPerformerBtn');
+        if (!btn) return;
+        if (!confirm('수행자 수락을 거절하시겠습니까?')) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/reject/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '수락을 거절했습니다.');
+                if (btn) btn.remove();
+                const confirmBtn = document.getElementById('confirmPerformerBtn');
+                if (confirmBtn) confirmBtn.remove();
+            } else {
+                alert(data.error || '거절에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
+        }
+    }
+
+    async completeMission() {
+        const btn = document.getElementById('completeMissionBtn');
+        if (!btn) return;
+        if (!confirm('미션을 완료 처리하시겠습니까?')) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch(`/api/missions/api/${this.missionId}/complete/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify({ room_id: this.roomId }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.success) {
+                alert(data.message || '미션이 완료되었습니다.');
+                if (btn) btn.remove();
+                // 원하면 여기서 채팅 목록 등 다른 페이지로 이동
+                // window.location.href = '/api/missions/chat/';
+            } else {
+                alert(data.error || '미션 완료에 실패했습니다.');
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('요청 중 오류가 발생했습니다.');
+            btn.disabled = false;
+        }
+    }
+
     async blockUser(targetId, username, btnEl) {
         if (!btnEl) return;
         if (!confirm(`${username || '해당 유저'}를 차단하시겠습니까?`)) return;
@@ -131,6 +277,51 @@ class ChatClient {
             console.error(err);
             alert('요청 중 오류가 발생했습니다.');
             btnEl.disabled = false;
+        }
+    }
+    async showProfile(userId) {
+        const backdrop = document.getElementById('profileModalBackdrop');
+        if (!backdrop) return;
+        try {
+            const res = await fetch(`/api/users/api/profile/${userId}/`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: this.getAuthHeaders(),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && !data.error) {
+                const photoEl = document.getElementById('profileModalPhoto');
+                const photoPlaceholder = document.getElementById('profileModalPhotoPlaceholder');
+                const nameEl = document.getElementById('profileModalName');
+                const universityEl = document.getElementById('profileModalUniversity');
+                const mannerEl = document.getElementById('profileModalManner');
+                if (nameEl) nameEl.textContent = data.username || '';
+                if (universityEl) universityEl.textContent = data.university ? `학교: ${data.university}` : '';
+                if (mannerEl) mannerEl.textContent = data.manner_score != null ? `매너 온도 ${data.manner_score}°C` : '';
+                if (data.userphoto && photoEl) {
+                    photoEl.src = data.userphoto;
+                    photoEl.style.display = '';
+                    if (photoPlaceholder) photoPlaceholder.style.display = 'none';
+                } else {
+                    if (photoEl) photoEl.style.display = 'none';
+                    if (photoPlaceholder) photoPlaceholder.style.display = 'flex';
+                }
+                backdrop.style.display = 'flex';
+                backdrop.setAttribute('aria-hidden', 'false');
+            } else {
+                alert(data.error || '프로필을 불러올 수 없습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('프로필을 불러오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    closeProfileModal() {
+        const backdrop = document.getElementById('profileModalBackdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+            backdrop.setAttribute('aria-hidden', 'true');
         }
     }
 
@@ -211,6 +402,28 @@ class ChatClient {
         };
     }
 
+    showConfirmButtons() {
+        const chatActions = document.getElementById('chatActions');
+        if (!chatActions) return;
+        if (document.getElementById('confirmPerformerBtn')) return;
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'btn-action-outline';
+        confirmBtn.id = 'confirmPerformerBtn';
+        confirmBtn.innerHTML = '<i class="fa-regular fa-circle-check"></i> 수행자 확정';
+        confirmBtn.addEventListener('click', () => this.confirmPerformer());
+        chatActions.appendChild(confirmBtn);
+
+        const rejectBtn = document.createElement('button');
+        rejectBtn.type = 'button';
+        rejectBtn.className = 'btn-action-gray';
+        rejectBtn.id = 'rejectPerformerBtn';
+        rejectBtn.textContent = '수행자 거부';
+        rejectBtn.addEventListener('click', () => this.rejectPerformer());
+        chatActions.appendChild(rejectBtn);
+    }
+
     handleMessage(msg) {
         switch (msg.type) {
             case 'AUTH_SUCCESS':
@@ -231,6 +444,9 @@ class ChatClient {
 
             case 'SYSTEM':
                 this.displaySystemMessage(msg.content);
+                if (msg.action === 'mission_accepted' && this.isAuthor) {
+                    this.showConfirmButtons();
+                }
                 break;
 
             case 'KICK':

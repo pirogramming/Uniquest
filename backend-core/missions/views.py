@@ -282,7 +282,11 @@ def mission_accept(request, mission_id):
         publish_chat_event(
             room_id=rid,
             event_type="SYSTEM",
-            data={"content": f"{requester_name}님이 미션 수락을 요청했습니다. 등록자가 확정하면 매칭이 완료됩니다."}
+            data={
+                "content": f"{requester_name}님이 미션 수락을 요청했습니다. 등록자가 확정하면 매칭이 완료됩니다.",
+                "mission_status": "PENDING_APPROVAL",
+                "action": "mission_accepted",
+            },
         )
 
         return JsonResponse({
@@ -483,6 +487,8 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
     mission = room.mission
     is_author = request.user == mission.author
     can_accept = not is_author and mission.status == "WAITING"
+    can_confirm_performer = is_author and mission.status == "PENDING_APPROVAL"
+    show_complete_btn = is_author and mission.status == "MATCHED"
     blockable_user = {"id": other_user.id, "username": other_user.username} if other_user else None
 
     return render(
@@ -495,7 +501,10 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "mission_id": mission.id,
             "is_author": is_author,
             "can_accept": can_accept,
+            "can_confirm_performer": can_confirm_performer,
+            "show_complete_btn": show_complete_btn,
             "blockable_user": blockable_user,
+            "other_user": other_user,
         },
     )
 
@@ -523,3 +532,48 @@ def chat_list(request: HttpRequest) -> HttpResponse:
         "chat/list.html",
         {"room_list": room_list},
     )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_missions(request):
+    user = request.user
+    created = Mission.objects.filter(author=user)
+    joined = Mission.objects.filter(helper=user)
+    all_missions = (created | joined).distinct()
+    
+    serializer = MissionSerializer(all_missions, many=True, context={'request': request})
+    data = serializer.data
+    
+    for item in data:
+        item['is_author'] = created.filter(id=item['id']).exists()
+        item['is_participant'] = joined.filter(id=item['id']).exists()
+        item['chat_room_id'] = None  # 채팅 연결 시 구현
+    
+    return Response({'results': data})
+# ============================================
+# missions/views.py에 추가할 코드
+# ============================================
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_missions_api(request):
+    """내가 등록하거나 참여한 미션 목록"""
+    user = request.user
+    
+    # ✅ author, helper 사용
+    created_missions = Mission.objects.filter(author=user)
+    joined_missions = Mission.objects.filter(helper=user)
+    
+    all_missions = (created_missions | joined_missions).distinct()
+    
+    from .serializers import MissionSerializer
+    serializer = MissionSerializer(all_missions, many=True, context={'request': request})
+    
+    data = []
+    for item in serializer.data:
+        mission_dict = dict(item)
+        mission_dict['is_creator'] = created_missions.filter(id=item['id']).exists()
+        mission_dict['is_participant'] = joined_missions.filter(id=item['id']).exists()
+        mission_dict['chat_room_id'] = None
+        data.append(mission_dict)
+    
+    return Response({'results': data, 'count': len(data)})

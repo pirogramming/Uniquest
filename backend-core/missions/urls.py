@@ -26,4 +26,5 @@ urlpatterns = [
     path("api/<int:mission_id>/delete/", views.mission_delete, name="mission_delete_api"),
     path("api/tags/suggest/", views.tag_suggest, name="tag_suggest_api"),
     path('api/<int:mission_id>/detail/', views.get_mission_detail, name='mission_detail_api'),
+    path('api/my-missions/', views.my_missions_api, name='my_missions_api'),
 ]

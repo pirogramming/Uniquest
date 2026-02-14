@@ -29,6 +29,7 @@ urlpatterns = [
     # 마이페이지 메인
     path('mypage/', views.mypage_view, name='mypage_screen'),
     path('api/profile/', views.get_my_info, name='get_my_info_api'),
+    path('api/profile/<int:user_id>/', views.get_public_profile, name='get_public_profile_api'),
     # 마이페이지 수정
     path('mypage_modify/', views.mypage_modify_view, name='mypage_modify_screen'),
     path('api/profile_modify/', views.get_my_info_patch, name='get_my_info_api_patch'),
@@ -40,6 +41,7 @@ urlpatterns = [
     #홈페이지
     path('homepage/', views.get_home_page, name="homepage"),
     path('homepage_guest/', views.get_home_page_guest, name="homepage_guest"),
+    path('my-missions/', views.my_missions_view, name='my_missions'),
     path('api/homepage/', views.get_homepage_info, name="homepage_info"),
     path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 

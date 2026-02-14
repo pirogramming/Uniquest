@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="chat-wrapper">
         <div class="chat-container">
@@ -20,15 +22,18 @@
                         <span class="status">연결 중...</span>
                     </div>
                 </div>
-                
+
                 <div class="header-right">
                     <div class="more-menu-container">
                         <button class="more-btn" id="moreMenuBtn">
                             <i class="fa-solid fa-ellipsis-vertical"></i>
                         </button>
                         <div class="more-dropdown" id="moreDropdown">
-                            <button class="dropdown-item">프로필 보기</button>
-                            <button class="dropdown-item btn-block-text" data-target-id="{{ other_user.id }}" data-username="{{ other_user.username|default:mission.author.username }}">사용자 차단</button>
+                            <button type="button" class="dropdown-item" id="viewProfileBtn"
+                                data-user-id="{{ other_user.id }}">프로필 보기</button>
+                            <button class="dropdown-item btn-block-text" data-target-id="{{ other_user.id }}"
+                                data-username="{{ other_user.username|default:mission.author.username }}">사용자
+                                차단</button>
                         </div>
                     </div>
                 </div>
@@ -45,14 +50,18 @@
             <footer class="chat-footer">
                 <div class="chat-actions" id="chatActions">
                     {% if is_author %}
-                        <button type="button" class="btn-action-outline" id="confirmPerformerBtn">
-                            <i class="fa-regular fa-circle-check"></i> 수행자 확정
-                        </button>
-                        <button type="button" class="btn-action-gray" id="completeMissionBtn">미션 완료</button>
+                    {% if can_confirm_performer %}
+                    <button type="button" class="btn-action-outline" id="confirmPerformerBtn">
+                        <i class="fa-regular fa-circle-check"></i> 수행자 확정
+                    </button>
+                    <button type="button" class="btn-action-gray" id="rejectPerformerBtn">수행자 거부</button>
+                    {% elif show_complete_btn %}
+                    <button type="button" class="btn-action-gray" id="completeMissionBtn">미션 완료</button>
+                    {% endif %}
                     {% else %}
-                        {% if can_accept %}
-                        <button type="button" class="btn-action-blue" id="acceptMissionBtn">미션 수락하기</button>
-                        {% endif %}
+                    {% if can_accept %}
+                    <button type="button" class="btn-action-blue" id="acceptMissionBtn">미션 수락하기</button>
+                    {% endif %}
                     {% endif %}
                 </div>
 
@@ -65,19 +74,36 @@
             </footer>
         </div>
     </div>
-
+    <!-- 프로필 모달 -->
+    <div class="profile-modal-backdrop" id="profileModalBackdrop" style="display: none;" aria-hidden="true">
+        <div class="profile-modal" id="profileModal">
+            <button type="button" class="profile-modal-close" id="profileModalClose" aria-label="닫기">&times;</button>
+            <div class="profile-modal-content">
+                <div class="profile-modal-photo-wrap">
+                    <img id="profileModalPhoto" src="" alt="" class="profile-modal-photo"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="profile-modal-photo-placeholder" id="profileModalPhotoPlaceholder"
+                        style="display: none;"><i class="fa-solid fa-user"></i></div>
+                </div>
+                <h3 class="profile-modal-name" id="profileModalName"></h3>
+                <p class="profile-modal-university" id="profileModalUniversity"></p>
+                <p class="profile-modal-manner" id="profileModalManner"></p>
+            </div>
+        </div>
+    </div>
     <script>
         const CHAT_CONFIG = {
-            roomId: "{{ room_id }}",
-            missionId: "{{ mission_id }}",
-            userId: "{{ request.user.id }}",
-            userNickname: "{{ request.user.username|escapejs }}",
+            roomId: {{ room_id }},
+        missionId: {{ mission_id }},
+        userId: {{ request.user.id }},
+        userNickname: "{{ request.user.username|escapejs }}",
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
-            canAccept: "{{ can_accept|yesno:'true,false' }}",
-            isAuthor: "{{ is_author|yesno:'true,false' }}",
-            csrfToken: "{{ csrf_token }}"
+                canAccept: {{ can_accept | yesno:'true,false' }},
+        isAuthor: {{ is_author | yesno:'true,false' }},
+        csrfToken: "{{ csrf_token }}"
         };
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>
 </body>
+
 </html>

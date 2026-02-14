@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}내 미션{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/css/my_missions.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="mobile-container has-nav">
+    <!-- 헤더 -->
+    <div class="my-missions-header">
+        <button class="back-btn" onclick="window.history.back()">
+            ←
+        </button>
+        <h2>내 미션</h2>
+        <button class="filter-btn" onclick="window.openFilterPanel()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 탭 전환 -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="all" onclick="window.switchTab('all')">
+            전체 <span class="tab-count" id="count-all">0</span>
+        </button>
+        <button class="tab-btn" data-tab="created" onclick="window.switchTab('created')">
+            내가 등록 <span class="tab-count" id="count-created">0</span>
+        </button>
+        <button class="tab-btn" data-tab="joined" onclick="window.switchTab('joined')">
+            내가 참여 <span class="tab-count" id="count-joined">0</span>
+        </button>
+    </div>
+
+    <!-- 미션 목록 -->
+    <div class="missions-container" id="missions-container">
+        <p class="loading">미션을 불러오는 중...</p>
+    </div>
+
+    {% include "_bottom-nav.html" %}
+
+    <!-- 필터 백드롭 -->
+    <div id="filter-backdrop" style="display:none;"></div>
+
+    <!-- 필터 패널 -->
+    <div id="filter-panel" style="display:none;">
+        <div class="filter-header">
+            <h3>필터</h3>
+            <button type="button" class="filter-close" onclick="window.closeFilterPanel()">×</button>
+        </div>
+
+        <div class="filter-content">
+            <!-- 상태 -->
+            <div class="filter-section">
+                <h4>상태</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="WAITING" checked>
+                        <span>대기중</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="MATCHED" checked>
+                        <span>진행중</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="status" value="COMPLETED">
+                        <span>완료</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 카테고리 -->
+            <div class="filter-section">
+                <h4>카테고리</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="ERRAND">
+                        <span>심부름</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="STUDY">
+                        <span>학업</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="RENTAL">
+                        <span>대여</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="RECRUIT">
+                        <span>구인</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="LIFE">
+                        <span>생활</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="OTHER">
+                        <span>기타</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 정렬 -->
+            <div class="filter-section">
+                <h4>정렬</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="latest" checked>
+                        <span>최신순</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="deadline">
+                        <span>마감 임박순</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="sort" value="reward">
+                        <span>높은 보상순</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-footer">
+            <button type="button" class="btn-reset" onclick="window.resetFilters()">초기화</button>
+            <button type="button" class="btn-apply" onclick="window.applyFilters()">적용</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/shared/js/auth.js"></script>
+<script src="{% static 'users/js/my_missions.js' %}"></script>
+<script src="{% static 'shared/js/mission_renderer.js' %}"></script>
+{% endblock %}
