@@ -613,3 +613,40 @@ def my_missions_api(request):
         data.append(mission_dict)
     
     return Response({'results': data, 'count': len(data)})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def chat_unread_count(request: HttpRequest) -> Response:
+    """내 전체 안 읽은 메시지 개수 (Redis unread:{user_id}:{room_id} 합산)"""
+    user_id = request.user.id
+    rooms = ChatRoom.objects.filter(
+        models.Q(user1_id=user_id) | models.Q(user2_id=user_id)
+    ).values_list("id", flat=True)
+    total = 0
+    for room_id in rooms:
+        key = f"unread:{user_id}:{room_id}"
+        try:
+            val = redis_client.get(key)
+            total += int(val) if val else 0
+        except (ValueError, TypeError):
+            pass
+    return Response({"count": total})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def chat_room_mark_read(request: HttpRequest, room_id: int) -> Response:
+    """해당 채팅방 읽음 처리 (unread 0으로)"""
+    room = get_object_or_404(ChatRoom, id=room_id)
+    if request.user not in (room.user1, room.user2):
+        return Response({"error": "권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+    key = f"unread:{request.user.id}:{room_id}"
+    redis_client.set(key, 0)
+    # 갱신된 전체 개수 반환 (선택)
+    rooms = ChatRoom.objects.filter(
+        models.Q(user1=request.user) | models.Q(user2=request.user)
+    ).values_list("id", flat=True)
+    total = 0
+    for rid in rooms:
+        val = redis_client.get(f"unread:{request.user.id}:{rid}")
+        total += int(val) if val else 0
+    return Response({"count": total})

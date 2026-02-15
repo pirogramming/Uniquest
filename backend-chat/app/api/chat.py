@@ -115,6 +115,10 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                     user_ids = resp.get("user_ids", [])
                     for uid in user_ids:
                         if int(uid) != user_id:
+                            try:
+                                await redis_client.incr(f"unread:{int(uid)}:{room_id}")
+                            except Exception:
+                                pass
                             payload = {
                                 "type": "chat_update",
                                 "target_id": int(uid),
