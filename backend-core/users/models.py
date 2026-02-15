@@ -15,6 +15,12 @@ class User(AbstractUser):
     """
     사용자 모델 (AbstractUser 상속)
     """
+    username = models.CharField(
+        unique=False,
+        max_length=150,
+        blank=True, 
+        null=True
+    )
     # 대학 정보 (FK)
     university = models.ForeignKey(
         University, 
@@ -27,7 +33,15 @@ class User(AbstractUser):
     
     # 인증 및 신뢰도
     is_student_verified = models.BooleanField(default=False, verbose_name="학생 인증 여부")
-    univ_email = models.EmailField(blank=True, null=True, verbose_name="학교 이메일")
+    univ_email = models.EmailField(blank=True,
+        null=True,
+        verbose_name="학교 이메일",
+        unique=True
+    )
+
+    USERNAME_FIELD = 'univ_email'
+
+    REQUIRED_FIELDS = ['username']
     
     # 매너 온도 (기본 80도)
     manner_score = models.FloatField(default=80, verbose_name="매너 온도")

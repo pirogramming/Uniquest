@@ -492,6 +492,7 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
     can_confirm_performer = is_author and mission.status == "PENDING_APPROVAL"
     show_complete_btn = is_author and mission.status == "MATCHED"
     blockable_user = {"id": other_user.id, "username": other_user.username} if other_user else None
+    mission_end = mission.status == "COMPLETED"
 
     return render(
         request,
@@ -507,6 +508,7 @@ def chat_room(request: HttpRequest, mission_id: int, room_id: int) -> HttpRespon
             "show_complete_btn": show_complete_btn,
             "blockable_user": blockable_user,
             "other_user": other_user,
+            "mission_end" : mission_end
         },
     )
 

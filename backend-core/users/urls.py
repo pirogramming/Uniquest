@@ -10,7 +10,8 @@ urlpatterns = [
     # 1. 회원가입 (HTML 페이지 연결 삭제 -> API 연결)
     path('signup/', views.signup_page,name='signup_view'),
     path('signup/submit/', RegisterView.as_view(), name='signup'),
-    
+    path('signup/announcement/', views.announcement_page, name='announcement'),
+
     # 2. 이메일 인증
     path('verify-email/', views.verify_email, name='verify-email'),
     

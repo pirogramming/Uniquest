@@ -194,6 +194,9 @@ class ProfileView(views.APIView):
 def login_page(request):
     return render(request, 'users/login.html')
 
+#개인정보 수집 페이지
+def announcement_page(request):
+    return render(request,'users/announcement_page.html')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MyLoginView(APIView):
@@ -458,10 +461,9 @@ def change_password(request):
     try:
         target_user = User.objects.get(univ_email=email)
         target_user.set_password(password)
-        print(target_user.password)
         target_user.save()
 
-        cache.delete("reset_token_{reset_token}")
+        cache.delete(f"reset_token_{reset_token}")
         return Response({"message": f"{target_user.username} 비밀번호가 성공적으로 변경되었습니다."}, status=200)
     
     except User.DoesNotExist:
@@ -478,9 +480,12 @@ def render_review_page(request,mission_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def render_review_page_info(request,mission_id):
-    target_mission = Mission.objects.get(id=mission_id)
-    target_user = target_mission.author
     user = request.user
+    target_mission = Mission.objects.get(id=mission_id)
+    if (target_mission.author.username == user.username): # 내가 등록자 일 때
+        target_user = target_mission.helper
+    else:
+        target_user = target_mission.author
 
     mission_name = target_mission.title
     username = target_user.username
@@ -491,9 +496,13 @@ def render_review_page_info(request,mission_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def review_json(request):
+    user = request.user
     review_json = json.loads(request.body)
     target_mission = Mission.objects.get(id=review_json['personal_key'])
-    target_user = target_mission.author
+    if (target_mission.author.username == user.username): # 내가 등록자 일 때
+        target_user = target_mission.helper
+    else:
+        target_user = target_mission.author
     target_user.review_datas.append(review_json)
     target_user.save()
     return Response({"status": "success", "message": target_user.username}, status=200)

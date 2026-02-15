@@ -100,6 +100,14 @@ input {
     box-sizing: border-box;
 }
 
+#password_condition {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 8px;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
 /* 1. 프로필 이미지 업로드 섹션 (새로 추가) */
 .profile-upload-group {
     display: flex;
@@ -314,8 +322,7 @@ input {
 }
 
 /* 8. 이용약관: 하단으로 충분히 공간 띄움 */
-.signup-container::after {
-    content: "회원가입 시 Uniquest의 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.";
+#announcement {
     display: block;
     margin-top: 30px;
     padding: 16px;
@@ -325,4 +332,8 @@ input {
     color: #667085;
     line-height: 1.6;
     text-align: left;
+}
+
+#announcement a{
+    text-decoration: underline;
 }

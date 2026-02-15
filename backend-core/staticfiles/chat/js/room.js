@@ -99,6 +99,11 @@ class ChatClient {
             acceptBtn.addEventListener('click', () => this.acceptMission());
         }
 
+        const reviewBtn = document.getElementById('reviewPageBtn');
+        if(reviewBtn) {
+            reviewBtn.addEventListener('click',() => window.location.href = `/api/users/review_page/${this.missionId}/`)
+        }
+
         // 메시지 전송
         if (this.sendBtn) {
             this.sendBtn.addEventListener('click', () => this.sendMessage());
@@ -237,6 +242,7 @@ class ChatClient {
             if (res.ok && data.success) {
                 alert(data.message || '미션이 완료되었습니다.');
                 if (btn) btn.remove();
+                window.location.href = `/api/users/review_page/${this.missionId}/`
             } else {
                 alert(data.error || '미션 완료에 실패했습니다.');
                 btn.disabled = false;
