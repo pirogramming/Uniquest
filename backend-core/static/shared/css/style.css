@@ -10,7 +10,8 @@
 
 a {
     text-decoration: none;
-    color: inherit; /* 링크 색상이 튀지 않도록 부모색 추종 */
+    color: inherit;
+    /* 링크 색상이 튀지 않도록 부모색 추종 */
 }
 
 /* 공통 뒤로가기 화살표 (로그인과 동일한 ← 스타일, 클릭 시 history.back) */
@@ -26,47 +27,62 @@ a {
     display: inline-flex;
     align-items: center;
 }
-.back-arrow:hover { opacity: 0.85; }
-.back-arrow:focus { outline: none; }
+
+.back-arrow:hover {
+    opacity: 0.85;
+}
+
+.back-arrow:focus {
+    outline: none;
+}
 
 /* 2. 배경 설정 및 화면 중앙 배치 */
 body {
-    background-color: #f8f9fa; /* 화면 바깥쪽 연회색 */
+    background-color: #f8f9fa;
+    /* 화면 바깥쪽 연회색 */
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center; /* 세로 중앙 정렬 */
+    align-items: center;
+    /* 세로 중앙 정렬 */
     min-height: 100vh;
     color: #1D2939;
 }
 
 /* 3. 전체 모바일 화면 (Wrapper) 
    - 홈화면의 mobile-container와 로그인 wrapper를 통합 */
-.signup-wrapper, .mobile-container {
+.signup-wrapper,
+.mobile-container {
     width: 100%;
-    max-width: 450px; /* 시안 표준 폭 */
+    max-width: 450px;
+    /* 시안 표준 폭 */
     min-height: 100vh;
-    background-color: #ffffff; /* 모바일 영역 내부 흰색 */
+    background-color: #ffffff;
+    /* 모바일 영역 내부 흰색 */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    position: relative; /* 하단 네비게이션 고정 기준점 */
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    position: relative;
+    /* 하단 네비게이션 고정 기준점 */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
 }
 
 /* 4. 내부 컨텐츠 영역 (Container) */
-.signup-container, .content-container {
-    padding: 20px 25px; /* 시안 표준 좌우 여백 */
+.signup-container,
+.content-container {
+    padding: 20px 25px;
+    /* 시안 표준 좌우 여백 */
     display: flex;
     flex-direction: column;
     height: 100%;
-    flex: 1; /* 하단 네비게이션이 밀리지 않게 공간 확보 */
+    flex: 1;
+    /* 하단 네비게이션이 밀리지 않게 공간 확보 */
 }
 
 /* 하단 네비게이션이 있는 페이지 전용 여백 */
 .has-nav {
-    padding-bottom: 90px; 
+    padding-bottom: 90px;
 }
 
 /* Bottom Nav */
@@ -79,12 +95,12 @@ body {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    
+
     /* [규격] 모바일 가로폭 450px에 맞춤 */
     width: 100%;
     max-width: 450px;
     height: 75px;
-    
+
     /* [디자인] 순백색 배경과 상단 경계선 */
     background: #ffffff;
     display: flex;
@@ -103,7 +119,7 @@ body {
     text-decoration: none;
     flex: 1;
     /* [기본 색상] #99A1AF */
-    color: #99A1AF; 
+    color: #99A1AF;
     gap: 4px;
     transition: color 0.2s ease;
 }
@@ -134,18 +150,19 @@ body {
 .fab-button {
     width: 48px;
     height: 48px;
-    background-color: #4DA6FF; /* 항상 파란색 고정 */
+    background-color: #4DA6FF;
+    /* 항상 파란색 고정 */
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     font-size: 24px;
-    
+
     /* [수정] 동일 선상 배치를 위해 여백/효과 삭제 */
-    margin-top: 0; 
-    border: none; 
-    box-shadow: none; 
+    margin-top: 0;
+    border: none;
+    box-shadow: none;
 }
 
 /* 4. 알림 배지 스타일 (원형 강조 & 위치 상단 이동) */
@@ -165,7 +182,7 @@ body {
     color: white;
     font-size: 10px;
     font-weight: bold;
-    
+
     /* [수정] 완벽한 원형을 위해 가로세로 고정 및 테두리 삭제 */
     width: 16px;
     height: 16px;
@@ -173,6 +190,27 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none; 
-    padding: 0; /* 원형 유지를 위해 패딩 제거 */
+    border: none;
+    padding: 0;
+    /* 원형 유지를 위해 패딩 제거 */
+}
+
+
+.nav-item-chat {
+    position: relative;
+}
+
+.nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+    background: #e53935;
+    color: #fff;
+    border-radius: 9px;
 }
