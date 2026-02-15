@@ -43,7 +43,7 @@ KAKAO_KEY = env('KAKAO_MAP_API_KEY')
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 env_allowed_hosts = os.environ.get("ALLOWED_HOSTS","")
 

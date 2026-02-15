@@ -461,10 +461,9 @@ def change_password(request):
     try:
         target_user = User.objects.get(univ_email=email)
         target_user.set_password(password)
-        print(target_user.password)
         target_user.save()
 
-        cache.delete("reset_token_{reset_token}")
+        cache.delete(f"reset_token_{reset_token}")
         return Response({"message": f"{target_user.username} 비밀번호가 성공적으로 변경되었습니다."}, status=200)
     
     except User.DoesNotExist:
