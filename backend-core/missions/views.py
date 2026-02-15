@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 from typing import Any
 
 from django.contrib.auth.decorators import login_required
@@ -526,17 +527,25 @@ def chat_list(request: HttpRequest) -> HttpResponse:
             continue
         # Redis에서 이 방의 마지막 메시지 미리보기 조회
         last_message = None
+        last_message_created_at = None
         try:
             raw = redis_client.get(f"chat:room:{room.id}:last")
             if raw:
                 data = json.loads(raw)
                 last_message = data.get("content") or None
+                created_at_str = data.get("created_at")
+                if created_at_str:
+                    try:
+                        last_message_created_at = datetime.fromisoformat(created_at_str.replace("Z", "+00:00"))
+                    except (ValueError, TypeError):
+                        pass
         except (json.JSONDecodeError, TypeError):
             pass
         mission_groups[room.mission].append({
             "room": room,
             "other_user": other,
             "last_message": last_message,
+            "last_message_created_at": last_message_created_at,
         })
 
     grouped_list = [
@@ -549,6 +558,15 @@ def chat_list(request: HttpRequest) -> HttpResponse:
         "chat/list.html",
         {"grouped_list": grouped_list},
     )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def chat_room_participants(request: HttpRequest, room_id: int) -> Response:
+    """채팅방 참여자 user_id 목록 (FastAPI 목록 갱신 알림용)"""
+    room = get_object_or_404(ChatRoom, id=room_id)
+    if request.user not in (room.user1, room.user2):
+        return Response({"error": "권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+    return Response({"user_ids": [room.user1_id, room.user2_id]})
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
