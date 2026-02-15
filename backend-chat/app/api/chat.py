@@ -105,16 +105,24 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             try:
                 django_url = os.getenv("DJANGO_API_URL", "http://backend-core:8000")
                 token = auth_msg.get("token", "")
+                url = f"{django_url}/api/missions/api/chat/room/{room_id}/participants/"
                 async with httpx.AsyncClient(timeout=5.0) as client:
                     r = await client.get(
-                        f"{django_url}/api/missions/api/chat/room/{room_id}/participants/",
+                        url,
                         headers={"Authorization": f"Bearer {token}"} if token else {},
                     )
+                print(f"[DEBUG] participants status={r.status_code} room_id={room_id} sender={user_id}")
                 if r.status_code == 200:
                     resp = r.json()
                     user_ids = resp.get("user_ids", [])
                     for uid in user_ids:
                         if int(uid) != user_id:
+                            key = f"unread:{int(uid)}:{room_id}"
+                            try:
+                                await redis_client.incr(key)
+                                print(f"[DEBUG] unread incr ok: {key}")
+                            except Exception as incr_err:
+                                print(f"[DEBUG] unread incr 실패: {key} err={incr_err}")
                             payload = {
                                 "type": "chat_update",
                                 "target_id": int(uid),
@@ -124,6 +132,8 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
                             }
                             await redis_client.publish("global_notifications", json.dumps(payload, ensure_ascii=False))
                             break
+                else:
+                    print(f"[DEBUG] participants 비200 응답 body={r.text[:200]}")
             except Exception as e:
                 print(f"[DEBUG] chat_update publish 실패: {e}")
 

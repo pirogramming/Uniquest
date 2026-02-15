@@ -25,5 +25,50 @@
     
     {%block extra_scripts %}
     {% endblock %}
+    {% if request.user.is_authenticated %}
+    <script>
+    (function() {
+        var unreadCountUrl = "{% url 'missions:chat_unread_count' %}";
+        var host = "{{ request.get_host|escapejs }}";
+        var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        var wsUrl = protocol + "//" + host + "/ws/notify/{{ request.user.id }}";
+        function setBadge(count) {
+            var badge = document.getElementById("chatUnreadBadge");
+            if (!badge) return;
+            badge.textContent = count;
+            badge.style.display = count > 0 ? "" : "none";
+        }
+        fetch(unreadCountUrl, { credentials: "include" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { setBadge(data.count); })
+            .catch(function() {});
+        var ws = new WebSocket(wsUrl);
+        ws.onmessage = function(event) {
+            try {
+                var data = JSON.parse(event.data);
+                if (data.type === "chat_update") {
+                    fetch(unreadCountUrl, { credentials: "include" })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) { setBadge(data.count); })
+                        .catch(function() {});
+                    if (data.room_id != null) {
+                        var row = document.querySelector('[data-room-id="' + data.room_id + '"]');
+                        if (row) {
+                            var preview = row.querySelector('.last-preview');
+                            var timeEl = row.querySelector('.chat-time');
+                            if (preview) preview.textContent = data.last_message || "대화 내용이 없습니다.";
+                            if (timeEl && data.created_at) {
+                                var d = new Date(data.created_at);
+                                timeEl.textContent = d.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+        };
+        ws.onclose = function() {};
+    })();
+    </script>
+    {% endif %}
 </body>
 </html>
