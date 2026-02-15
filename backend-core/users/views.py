@@ -496,6 +496,7 @@ def render_review_page_info(request,mission_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def review_json(request):
+    user = request.user
     review_json = json.loads(request.body)
     target_mission = Mission.objects.get(id=review_json['personal_key'])
     if (target_mission.author.username == user.username): # 내가 등록자 일 때
