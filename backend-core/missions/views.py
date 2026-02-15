@@ -559,6 +559,7 @@ def chat_list(request: HttpRequest) -> HttpResponse:
         {"grouped_list": grouped_list},
     )
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def chat_room_participants(request: HttpRequest, room_id: int) -> Response:

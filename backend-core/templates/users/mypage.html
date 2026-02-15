@@ -51,19 +51,18 @@
             <div class="menu-arrow">→</div>
         </a>
 
-        <section class="mission-list-group">
-            <h3>내가 등록한 미션</h3>
-            <div id="my-registered-missions" class="empty-box">
-                등록한 미션이 없습니다
+        <!-- 내 리뷰 보기 토글 -->
+        <div class="menu-item my-reviews-toggle" onclick="toggleReviews()" role="button" tabindex="0">
+            <div class="menu-left">
+                <span>⭐ 내 리뷰 보기</span>
+                <span class="review-count" id="review-count-badge">0</span>
             </div>
-        </section>
+            <div class="menu-arrow">→</div>
+        </div>
 
-        <section class="mission-list-group">
-            <h3>내가 수행한 미션</h3>
-            <div id="my-performed-missions" class="empty-box">
-                수행한 미션이 없습니다
-            </div>
-        </section>
+        <!-- 리뷰 리스트 (접었다 펼쳐지는 영역, 하드코딩) -->
+        <div class="reviews-container" id="reviewsContainer"></div>
+
 
         <button class="logout-btn" onclick="logout()">
             <p>로그아웃</p>

@@ -10,6 +10,7 @@
  * - 필터링 및 정렬
  * - 뷰 전환 (지도+리스트 / 리스트만)
  * - 전체화면 지도
+ * - 마커 클릭 이벤트 처리 ✨
  * 
  * 의존성: Auth, MissionRenderer, KakaoMapManager
  */
@@ -37,7 +38,15 @@
     
     function applyFilters() {
         let result = [...allMissions];
+        const selectedCategory = document.querySelector('.category-chip.active'); // 필터 패널 내 선택된 칩
+        const filterBtn = document.querySelector('.filter-btn');
 
+        if (selectedCategory && selectedCategory.dataset.value !== 'all') {
+            // '전체'가 아닌 특정 카테고리가 선택된 경우
+            filterBtn.classList.add('active'); 
+        } else {
+            filterBtn.classList.remove('active');
+        }
         // MissionRenderer 사용
         result = MissionRenderer.filterMissions(result, {
             categories: currentFilters.categories,
@@ -48,6 +57,7 @@
 
         filteredMissions = result;
         renderMissionList(filteredMissions);
+        updateFullscreenMapMarkers(filteredMissions);
         updateMapMarkers(filteredMissions);
     }
 
@@ -160,6 +170,7 @@
         const container = document.getElementById('fullscreen-map-container');
         const backBtn = document.getElementById('back-to-list-btn');
         const contentContainer = document.querySelector('.content-container');
+
         
         if (!container) return;
 
@@ -179,13 +190,20 @@
                 if (userLocation) {
                     await MapUtils.displayUserLocation(fullscreenMapManager);
                 }
-                
                 updateFullscreenMapMarkers(filteredMissions);
             } catch (err) {
                 console.error("전체화면 지도 초기화 실패:", err);
             }
-        } else {
-            updateFullscreenMapMarkers(filteredMissions);
+        } 
+        updateFullscreenMapMarkers(filteredMissions);
+        // 처음 열릴 때만 마커들에 맞춰 지도 범위 조정 (선택 사항)
+        const validLocations = filteredMissions.map(m => ({
+            lat: parseFloat(m.location_lat),
+            lng: parseFloat(m.location_lng)
+        })).filter(loc => !isNaN(loc.lat));
+
+        if (validLocations.length > 0) {
+            fullscreenMapManager.fitBoundsToLocations(validLocations);
         }
     }
 
@@ -193,7 +211,7 @@
         const container = document.getElementById('fullscreen-map-container');
         const backBtn = document.getElementById('back-to-list-btn');
         const contentContainer = document.querySelector('.content-container');
-        
+
         if (container) container.style.display = 'none';
         if (backBtn) backBtn.style.display = 'none';
         if (contentContainer) contentContainer.style.display = 'block';
@@ -211,13 +229,19 @@
             const lng = parseFloat(mission.location_lng);
 
             if (isNaN(lat) || isNaN(lng)) return;
+            fullscreenMapManager.addCustomMarker(lat, lng, {
+            status: mission.status,
+            onClick: () => {
+                window.location.href = `/api/missions/${mission.id}/`;
+            }
+        });
 
+            // ✨ 마커 생성 + 클릭 시 상세페이지 이동
             const marker = fullscreenMapManager.addCustomMarker(lat, lng, {
-                title: mission.title
-            });
-
-            fullscreenMapManager.onMarkerClick(marker, () => {
-                fullscreenMapManager.openInfoWindow(marker, createInfoWindowHTML(mission));
+                status: mission.status,  // WAITING/MATCHED/COMPLETED
+                onClick: () => {
+                    window.location.href = `/api/missions/${mission.id}/`;
+                }
             });
 
             validLocations.push({ lat, lng });
@@ -261,24 +285,13 @@
         });
     }
 
-    function createInfoWindowHTML(mission) {
-        const detailViewUrl = `${mission.id}/`;
-        
-        return `
-            <div style="padding:10px; min-width:160px; font-size:14px; line-height:1.5;">
-                <div style="font-weight:bold; color:#333;">${mission.title}</div>
-                <div style="color:#28a745; font-size:12px; margin-bottom:5px;">
-                    보상: ${mission.reward.toLocaleString()}원
-                </div>
-                <a href="${detailViewUrl}" style="color:#007bff; text-decoration:none; font-weight:bold; font-size:12px;">
-                    상세보기 →
-                </a>
-            </div>
-        `;
-    }
-
-    // ==================== 지도 마커 ====================
+    // ==================== 지도 마커 업데이트 ====================
     
+    /**
+     * 지도 마커 업데이트
+     * - map_manager: 마커 생성/표시 (CSS 스타일 적용)
+     * - mission_list: 클릭 시 상세페이지 이동
+     */
     function updateMapMarkers(missions) {
         if (!mapManager || !mapManager.map) return;
 
@@ -295,12 +308,12 @@
                 return;
             }
 
+            // ✨ 마커 생성 + 클릭 시 상세페이지 이동
             const marker = mapManager.addCustomMarker(lat, lng, {
-                title: mission.title
-            });
-
-            mapManager.onMarkerClick(marker, () => {
-                mapManager.openInfoWindow(marker, createInfoWindowHTML(mission));
+                status: mission.status,  // WAITING/MATCHED/COMPLETED
+                onClick: () => {
+                    window.location.href = `/api/missions/${mission.id}/`;
+                }
             });
 
             validLocations.push({ lat, lng });
@@ -415,6 +428,30 @@
         }
     }
 
+    window.moveToCurrentLocation = async function(isFullscreen = false) {
+    const targetManager = isFullscreen ? fullscreenMapManager : mapManager;
+    
+    if (!targetManager) return;
+    
+    console.log(isFullscreen ? "전체화면 현위치 탐색..." : "일반 지도 현위치 탐색...");
+    
+    try {
+        // KakaoMapManager 내부의 getUserLocation 활용
+        const loc = await targetManager.getUserLocation();
+        
+        // 해당 지도의 중심 이동
+        targetManager.setCenter(loc.lat, loc.lng);
+        targetManager.setLevel(3);
+        
+        // 내 위치 마커 표시 (MapUtils 활용)
+        await MapUtils.displayUserLocation(targetManager);
+        
+    } catch (err) {
+        console.error("현위치 이동 실패:", err);
+        alert("위치 정보를 가져올 수 없습니다.");
+    }
+};
+
     // ==================== 전역 함수 노출 ====================
     
     window.openFilterPanel = openFilterPanel;
@@ -424,6 +461,7 @@
     window.switchView = switchView;
     window.openFullscreenMap = openFullscreenMap;
     window.closeFullscreenMap = closeFullscreenMap;
+    window.moveToCurrentLocation = moveToCurrentLocation;
 
     window.addEventListener('beforeunload', () => {
         if (eventSource) {
