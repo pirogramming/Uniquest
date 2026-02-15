@@ -103,8 +103,30 @@
             wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
                 canAccept: {{ can_accept | yesno:'true,false' }},
         isAuthor: {{ is_author | yesno:'true,false' }},
-        csrfToken: "{{ csrf_token }}"
+        csrfToken: "{{ csrf_token }}",
+        markReadUrl: "{% url 'missions:chat_room_mark_read' room_id %}"
         };
+    </script>
+    <script>
+        (function() {
+            var url = CHAT_CONFIG.markReadUrl;
+            var csrf = CHAT_CONFIG.csrfToken;
+            fetch(url, {
+                method: "POST",
+                headers: { "X-CSRFToken": csrf, "Content-Type": "application/json" },
+                credentials: "include"
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var badge = document.getElementById("chatUnreadBadge");
+                if (badge) {
+                    var c = data.count != null ? data.count : 0;
+                    badge.textContent = c;
+                    badge.style.display = c > 0 ? "" : "none";
+                }
+            })
+            .catch(function() {});
+        })();
     </script>
     <script src="{% static 'chat/js/room.js' %}"></script>
 </body>

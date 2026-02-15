@@ -53,6 +53,9 @@ if env_allowed_hosts:
 else:
     # 개발 환경을 위해 기본값 설정
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Docker 내부 호출: FastAPI(backend-chat) → Django(backend-core) participants API 허용
+if "backend-core" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = list(ALLOWED_HOSTS) + ["backend-core"]
 
 # @login_required 리다이렉트 경로
 LOGIN_URL = '/api/users/login/'
@@ -83,6 +86,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

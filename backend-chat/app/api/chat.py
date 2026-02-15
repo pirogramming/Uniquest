@@ -1,10 +1,13 @@
 import asyncio
 import json
+import os
+import httpx
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from datetime import datetime
 from app.services.chat_service import chat_manager
 from app.models.chat import ChatMessage
-from app.core.auth import verify_token  # ✅ 추가
+from app.core.auth import verify_token
+from app.core.config import redis_client
 
 router = APIRouter()
 
@@ -97,6 +100,42 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             )
             await chat_manager.save_message(msg_obj)
             await chat_manager.set_room_last_message(room_id, msg_obj)
+
+            # 상대방에게 채팅 목록 갱신 알림 (Redis Publish)
+            try:
+                django_url = os.getenv("DJANGO_API_URL", "http://backend-core:8000")
+                token = auth_msg.get("token", "")
+                url = f"{django_url}/api/missions/api/chat/room/{room_id}/participants/"
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    r = await client.get(
+                        url,
+                        headers={"Authorization": f"Bearer {token}"} if token else {},
+                    )
+                print(f"[DEBUG] participants status={r.status_code} room_id={room_id} sender={user_id}")
+                if r.status_code == 200:
+                    resp = r.json()
+                    user_ids = resp.get("user_ids", [])
+                    for uid in user_ids:
+                        if int(uid) != user_id:
+                            key = f"unread:{int(uid)}:{room_id}"
+                            try:
+                                await redis_client.incr(key)
+                                print(f"[DEBUG] unread incr ok: {key}")
+                            except Exception as incr_err:
+                                print(f"[DEBUG] unread incr 실패: {key} err={incr_err}")
+                            payload = {
+                                "type": "chat_update",
+                                "target_id": int(uid),
+                                "room_id": int(room_id),
+                                "last_message": (data or "")[:80],
+                                "created_at": msg_obj.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                            }
+                            await redis_client.publish("global_notifications", json.dumps(payload, ensure_ascii=False))
+                            break
+                else:
+                    print(f"[DEBUG] participants 비200 응답 body={r.text[:200]}")
+            except Exception as e:
+                print(f"[DEBUG] chat_update publish 실패: {e}")
 
             await chat_manager.publish_message({
                 "type": "TALK",

@@ -30,14 +30,15 @@
 
             <div class="chat-room-content">
                 {% for item in group.rooms %}
-                <a href="{% url 'missions:chat_room' group.mission.id item.room.id %}" class="individual-chat-link">
+                <a href="{% url 'missions:chat_room' group.mission.id item.room.id %}" class="individual-chat-link"
+                    data-room-id="{{ item.room.id }}">
                     <div class="chat-user-avatar">
                         {{ item.other_user.get_display_name|slice:":1" }}
                     </div>
                     <div class="chat-user-info">
                         <div class="user-info-top">
                             <span class="user-name">{{ item.other_user.get_display_name }}</span>
-                            <span class="chat-time">{{ item.room.created_at|date:"A g:i"|default:"최근" }}</span>
+                            <span class="chat-time">{% if item.last_message_created_at %}{{item.last_message_created_at|date:"A g:i" }}{% else %}{{ item.room.created_at|date:"A g:i"|default:"최근" }}{% endif %}</span>
                         </div>
                         <p class="last-preview">{{ item.last_message|default:"대화 내용이 없습니다." }}</p>
                     </div>
