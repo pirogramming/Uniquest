@@ -162,8 +162,12 @@ def mission_update(request, mission_id):
 def get_mission_list(request):
     """JSON으로 미션 목록 반환 (Serializer 적용 버전)"""
     # 관련 데이터를 한 번에 가져오도록(Select/Prefetch) 최적화
-    qs = Mission.objects.select_related("author").prefetch_related("tags", "images").order_by("-created_at")
-    
+    qs = Mission.objects.select_related("author", "author__university").prefetch_related("tags", "images").order_by("-created_at")
+
+    # 내 학교 미션만 (로그인 유저의 university와 작성자(author)의 university가 같은 것만)
+    if getattr(request.user, "university", None):
+        qs = qs.filter(author__university=request.user.university)
+
     # 필터링 로직
     category = request.GET.get("category")
     if category in Category.values:
