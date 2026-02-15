@@ -194,6 +194,9 @@ class ProfileView(views.APIView):
 def login_page(request):
     return render(request, 'users/login.html')
 
+#개인정보 수집 페이지
+def announcement_page(request):
+    return render(request,'users/announcement_page.html')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MyLoginView(APIView):
@@ -478,8 +481,12 @@ def render_review_page(request,mission_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def render_review_page_info(request,mission_id):
+    user = request.user
     target_mission = Mission.objects.get(id=mission_id)
-    target_user = target_mission.helper
+    if (target_mission.author.username == user.username): # 내가 등록자 일 때
+        target_user = target_mission.helper
+    else:
+        target_user = target_mission.author
 
     mission_name = target_mission.title
     username = target_user.username
@@ -492,7 +499,10 @@ def render_review_page_info(request,mission_id):
 def review_json(request):
     review_json = json.loads(request.body)
     target_mission = Mission.objects.get(id=review_json['personal_key'])
-    target_user = target_mission.helper
+    if (target_mission.author.username == user.username): # 내가 등록자 일 때
+        target_user = target_mission.helper
+    else:
+        target_user = target_mission.author
     target_user.review_datas.append(review_json)
     target_user.save()
     return Response({"status": "success", "message": target_user.username}, status=200)

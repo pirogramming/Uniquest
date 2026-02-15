@@ -1,0 +1,130 @@
+/* 가로 393px 고정 및 모바일 인터페이스 최적화 */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* 외부 배경은 차분하게 */
+    display: flex;
+    justify-content: center;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    width: 393px; /* 팀장님의 물리적 규격 준수 */
+    min-height: 100vh;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+/* 상단 내비게이션 바: 수평 정렬 및 고정 */
+.nav-header {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    padding: 16px 20px;
+    background-color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+#back-arrow {
+    text-decoration: none;
+    color: #333333;
+    font-size: 24px;
+    font-weight: 300;
+    margin-right: 12px; /* 타이틀과의 간격 확보 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #212529;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* 본문 콘텐츠 영역 */
+.content {
+    padding: 24px 20px;
+    flex: 1;
+}
+
+.intro-text {
+    font-size: 15px;
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* 요약 박스: 강조 포인트 */
+.summary-box {
+    background-color: #f1f7ff; /* 연세 블루 톤 가미 */
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 32px;
+}
+
+.summary-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #004b95; /* 포인트 컬러 */
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.summary-box ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.summary-box li {
+    font-size: 14px;
+    color: #343a40;
+    margin-bottom: 8px;
+}
+
+/* 상세 섹션 */
+.detail-section h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #212529;
+    margin: 28px 0 12px 0;
+    border-left: 4px solid #004b95; /* 섹션 구분선 */
+    padding-left: 10px;
+}
+
+.detail-section p, 
+.detail-section li {
+    font-size: 14px;
+    color: #6c757d;
+    line-height: 1.7;
+    margin: 8px 0;
+}
+
+.detail-section ul {
+    padding-left: 18px;
+}
+
+/* 푸터 영역 */
+footer {
+    padding: 40px 20px 30px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-top: 1px solid #f1f3f5;
+}
+
+footer p {
+    font-size: 12px;
+    color: #adb5bd;
+    margin: 4px 0;
+}
