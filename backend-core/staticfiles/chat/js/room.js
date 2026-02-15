@@ -99,6 +99,11 @@ class ChatClient {
             acceptBtn.addEventListener('click', () => this.acceptMission());
         }
 
+        const reviewBtn = document.getElementById('reviewPageBtn');
+        if(reviewBtn) {
+            reviewBtn.addEventListener('click',() => window.location.href = `/api/users/review_page/${this.missionId}/`)
+        }
+
         // 메시지 전송
         if (this.sendBtn) {
             this.sendBtn.addEventListener('click', () => this.sendMessage());
