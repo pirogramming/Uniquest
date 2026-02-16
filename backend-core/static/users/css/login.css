@@ -182,8 +182,7 @@ input {
     margin-left: 15px;
 }
 
-.signup-container::after {
-    content: "로그인 시 Uniquest의 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.";
+#announcement {
     display: block;
     margin-top: auto; 
     margin-bottom: 20px;
@@ -194,4 +193,8 @@ input {
     color: #667085;
     line-height: 1.6;
     text-align: left;
+}
+
+#announcement a{
+    text-decoration: underline;
 }
