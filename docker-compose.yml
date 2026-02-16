@@ -9,8 +9,8 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./backend-core/media:/app/media
       - ./backend-core/staticfiles:/app/staticfiles
-      - /etc/letsencrypt:/etc/letsencrypt  # 추가 (인증서 파일)
-      - /var/lib/letsencrypt:/var/lib/letsencrypt # 추가 (인증서 관리용)
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # 추가 (인증서 파일)
+      - /var/lib/letsencrypt:/var/lib/letsencrypt:ro # 추가 (인증서 관리용)
     depends_on:
       - backend-core
       - backend-chat
