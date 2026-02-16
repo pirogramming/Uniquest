@@ -44,7 +44,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
     
     # 매너 온도 (기본 80도)
-    manner_score = models.FloatField(default=80, verbose_name="매너 온도")
+    manner_score = models.FloatField(default=3, verbose_name="매너 온도")
     blocked_people = models.ManyToManyField(
         'self',
         symmetrical=False,

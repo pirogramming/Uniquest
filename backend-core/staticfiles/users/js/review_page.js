@@ -21,32 +21,13 @@ const csrftoken = getCookie('csrftoken');
 
 //페이지 랜더링
 async function renderReviewpage() {
-    const token = localStorage.getItem('access_token');
-
-    if (!token) {
-        window.location.href = '/api/users/login/';
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/users/review_page_info/${pk}/`, {
-            headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            const mission_title = document.getElementById('mission-title');
-            const register_name = document.getElementById('name');
-            mission_title.innerText = data.mission_name;
-            register_name.innerText = data.username;
-            console.log(data)
-
-        } else {
-            throw new Error(`서버 응답 오류: ${response.status}`);
-        }
-    } catch(error){
-        console.log("오류감지",error)
-    }
+    const data = await Auth.getData(`/api/users/review_page_info/${pk}/`);
+    if (!data) return;
+    const mission_title = document.getElementById('mission-title');
+    const register_name = document.getElementById('name');
+    if (mission_title) mission_title.innerText = data.mission_name;
+    if (register_name) register_name.innerText = data.username;
+    console.log(data);
 }
 
 //버튼 활성화, 비활성화 로직
@@ -114,41 +95,23 @@ function getSelectedChips() {
     return Array.from(activeChips).map(chip => chip.textContent);
 }
 
-async function send_info(){
-    const token = localStorage.getItem('access_token');
-    const personal_key = pk;
-    const my_score = star_score;
-    const quick_comment = getSelectedChips();
-    const comment = document.getElementById('comment-input').value;
-
-    review_data = {
-        "personal_key":personal_key,
-        "my_score":my_score,
-        "quick_comment":quick_comment,
-        "comment":comment,
+async function send_info() {
+    const review_data = {
+        personal_key: pk,
+        my_score: star_score,
+        quick_comment: getSelectedChips(),
+        comment: document.getElementById('comment-input').value,
+    };
+    const data = await Auth.postData(
+        '/api/users/review_json/',
+        review_data,
+        false,
+        { headers: { 'X-CSRFToken': csrftoken } }
+    );
+    
+    if (data !== null) {
+        window.location.href = '/api/users/homepage/';
     }
-
-    try{
-        const response = await fetch('/api/users/review_json/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-                'Authorization':`Bearer ${token}`
-            },
-            body: JSON.stringify(review_data)
-        });
-
-        if (response.ok){
-            const data = await response.json()
-            window.location.href = `/api/users/homepage/`
-        } else {
-            console.log('실패')
-        }
-    } catch(error){
-        console.log('네트워크 에러',error)
-    }
-
 }
 
 

@@ -300,9 +300,9 @@ margin-bottom: 20px;
     color: #4DA6FF;
 }
 
-/* 하단 네비게이션 */
+/* 하단 네비게이션 - 화면 바닥에 고정 */
 .bottom-nav {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 100%;
     height: 70px;
@@ -311,6 +311,7 @@ margin-bottom: 20px;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #eee;
+    z-index: 1000;
 }
 
 .bottom-nav .badge, .bottom-nav .notification-dot {
@@ -327,6 +328,11 @@ margin-bottom: 20px;
     align-items: center;
     color: white;
     box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3);
+}
+
+/* 하단 네비 높이만큼 여백 (스크롤 시 콘텐츠가 가려지지 않도록) */
+.mission-list-section {
+    padding-bottom: 90px;
 }
 
 .mission-section {

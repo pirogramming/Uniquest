@@ -20,7 +20,7 @@ async function handleSignup() {
 
     const csrftoken = getCookie('csrftoken');
     
-    const password_reset_token = localStorage.getItem('password_reset_token')
+    const password_reset_token = sessionStorage.getItem('password_reset_token')
 
     const changeData = {
         password: document.getElementById('password').value,
