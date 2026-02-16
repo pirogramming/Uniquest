@@ -1,34 +1,7 @@
 async function getUserData() {
-    const token = localStorage.getItem('access_token');
-    
-    if (!token) {
-        console.warn("로그인 토큰이 없습니다.");
-        window.location.href = "/api/users/login/"
-        return null;
-    }
-
-    try {
-        const response = await fetch('/api/users/api/profile/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            console.log("유저 정보 로드 성공:", userData);
-            return userData;
-        } else {
-            console.error("토큰이 만료되었거나 유효하지 않습니다.");
-            return null;
-        }
-    } catch (error) {
-        alert("네트워크 오류 발생:");
-        window.location,href = "/api/users/login/"
-        return null;
-    }
+    const userData = await Auth.getData('/api/users/api/profile/');
+    if (userData) console.log("유저 정보 로드 성공:", userData);
+    return userData;
 }
 
 async function renderProfile() {
@@ -45,8 +18,6 @@ async function renderProfile() {
         const review_num = document.getElementById('review-count-badge');
         const score_bar_fill = document.getElementById('score_bar_fill');
         const imgEl = document.getElementById('userprofile');
-
-        score_bar_fill.style = `width : ${user.manner_score}%;`
 
         // 1. 기본 정보 반영
         if (usernameElement) usernameElement.innerText = user.username;
@@ -102,11 +73,9 @@ async function renderProfile() {
             mannerScore.innerText = `${user.manner_score}점`; 
             const scoreBar = document.querySelector('.score-bar-fill');
             if (scoreBar) {
-                scoreBar.style.width = `${user.manner_score}%`;
+                scoreBar.style.width = `${Math.round((user.manner_score / 5) * 100)}%`;
             }
         }
-        
-
     }
 }
 
@@ -120,40 +89,18 @@ function toggleReviews() {
 }
 
 function logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
     alert("로그아웃 되었습니다.");
-    window.location.href = "/api/users/login/";
+    Auth.logout("/api/users/login/");
 }
 
 
 async function signout() {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    try {
-        const res = await fetch('/api/users/api/signout/', {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (res.ok) {
-            const data = await res.json();
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            console.error("회원 탈퇴 완료");
-            window.location.href = "/api/users/login/"
-            return
-        } else {
-            console.error("탈퇴 중 에러발생");
-            alert('에러')
-            return null;
-        }
-    } catch (error) {
-        console.error("오류 발생:", error);
+    const res = await Auth.deleteData('/api/users/api/signout/');
+    if (res !== null) {
+        Auth.clearTokens();
+        window.location.href = "/api/users/login/";
+    } else {
+        alert('에러');
     }
 }
 

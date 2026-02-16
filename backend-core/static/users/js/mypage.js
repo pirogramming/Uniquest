@@ -19,8 +19,6 @@ async function renderProfile() {
         const score_bar_fill = document.getElementById('score_bar_fill');
         const imgEl = document.getElementById('userprofile');
 
-        score_bar_fill.style = `width : ${user.manner_score}%;`
-
         // 1. 기본 정보 반영
         if (usernameElement) usernameElement.innerText = user.username;
         if (univElement) univElement.innerText = user.university;
@@ -75,7 +73,7 @@ async function renderProfile() {
             mannerScore.innerText = `${user.manner_score}점`; 
             const scoreBar = document.querySelector('.score-bar-fill');
             if (scoreBar) {
-                scoreBar.style.width = `${user.manner_score}%`;
+                scoreBar.style.width = `${Math.round((user.manner_score / 5) * 100)}%`;
             }
         }
     }

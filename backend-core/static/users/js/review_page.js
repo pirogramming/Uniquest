@@ -108,6 +108,7 @@ async function send_info() {
         false,
         { headers: { 'X-CSRFToken': csrftoken } }
     );
+    
     if (data !== null) {
         window.location.href = '/api/users/homepage/';
     }

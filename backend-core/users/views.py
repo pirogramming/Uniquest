@@ -504,8 +504,19 @@ def review_json(request):
     else:
         target_user = target_mission.author
     target_user.review_datas.append(review_json)
+
+    total_score = 0
+    for review_data in target_user.review_datas:
+        total_score += int(review_data['my_score'])
+    total_length = len(target_user.review_datas)
+    if total_length == 0:
+        average_score = 0
+    else:
+        average_score = total_score / total_length
+    target_user.manner_score = round(total_score / total_length, 1)
     target_user.save()
-    return Response({"status": "success", "message": target_user.username}, status=200)
+
+    return Response({"status": "success", "average_score":average_score}, status=200)
 
 
 @api_view(['GET'])
