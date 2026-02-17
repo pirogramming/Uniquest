@@ -49,8 +49,9 @@ urlpatterns = [
     path('api/my-missions/', missions_views.my_missions_api, name='my_missions_api'),    path('api/homepage/', views.get_homepage_info, name="homepage_info"),
     path('api/homepage_unlogin/',views.get_homepage_info_unlogin,name="homepage_unlogin"),
 
-    #회원탈퇴 페이지
-    path('api/signout/',views.signout,name="signout"),
+    # 회원탈퇴: 확인 페이지(HTML) / API(DELETE)
+    path('signout/', views.signout_page, name='signout_page'),
+    path('api/signout/', views.signout, name="signout"),
 
     #비밀번호 찾기
     path('check_password/',views.check_password,name="check_password"),

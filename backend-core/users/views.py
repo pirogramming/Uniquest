@@ -428,8 +428,12 @@ def block_user(request):
 
     return Response({'message': '차단되었습니다'}, status=200)
     
-#회원 탈퇴
+# 회원 탈퇴 확인 페이지 (HTML)
+def signout_page(request):
+    return render(request, 'users/signout.html')
 
+
+#회원 탈퇴 API
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def signout(request):
