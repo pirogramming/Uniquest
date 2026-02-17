@@ -1,0 +1,247 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 (mypage 스타일 계승) */
+.mobile-container.has-nav {
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+/* 2. 상단 헤더 영역 - 왼쪽 정렬 및 뒤로가기 화살표 */
+.profile-card .header-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-start; /* 3번 요청: 왼쪽 배치 */
+    align-items: center;
+    padding: 20px 25px;
+    background-color: #ffffff;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.back-arrow {
+    text-decoration: none;
+    font-size: 24px;
+    color: #1D2939;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.header-top span {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1D2939;
+}
+
+/* 3. 유저 정보 섹션 (블루 그라데이션) */
+.user-info-section {
+    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+    padding: 30px 25px 20px 25px;
+    margin-top: 64px; /* 헤더 높이만큼 띄움 */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-circle {
+    width: 75px;
+    height: 75px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.text-info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.text-info p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 4px;
+}
+
+/* 학교 인증 뱃지 */
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #4DA6FF;
+    background: #ffffff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+/* 4. 유니퀘스트 점수 섹션 (mypage 스타일 계승) */
+.score-section {
+    background-color: #6BB6FF;
+    padding: 0 25px 35px 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.score-header span:first-child {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#user-score {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.score-bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.score-bar-fill {
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+.score-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+}
+
+/* 5. 리뷰 섹션 헤더 */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 25px 15px;
+}
+
+.section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1D2939;
+}
+
+.section-badge {
+    background: linear-gradient(135deg, #FFB800 0%, #FF9500 100%);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 12px;
+}
+
+/* 6. 리뷰 카드 디자인 (Mission 카드 + Review 토글 스타일 조합) */
+.reviews-wrapper {
+    padding: 0 20px 100px;
+}
+
+.review-card {
+    background: #ffffff;
+    border: 1px solid #F2F4F7;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    /* 미션 카드 특유의 부드러운 그림자 적용 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.review-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475467;
+}
+
+.review-stars {
+    color: #FFB800; /* 금색 별점 */
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.review-text {
+    font-size: 15px;
+    color: #344054;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    word-break: break-all;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #98A2B3;
+    text-align: right;
+}
+
+/* 데이터 없을 때 (Empty State) */
+.reviews-empty {
+    background-color: #F9FAFB;
+    color: #98A2B3;
+    padding: 60px 20px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.reviews-empty i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 15px;
+    opacity: 0.3;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #4DA6FF;
+}
+
+.loading-spinner i {
+    font-size: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

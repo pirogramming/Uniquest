@@ -1,6 +1,8 @@
 const pathSegments = window.location.pathname.split('/')
 const pk = pathSegments.pop() || pathSegments.pop();
 let star_score = 0
+let target_user_id = null;  // ✅ 추가
+
 
 function getCookie(name) {
     let cookieValue = null;
@@ -27,6 +29,8 @@ async function renderReviewpage() {
     const register_name = document.getElementById('name');
     if (mission_title) mission_title.innerText = data.mission_name;
     if (register_name) register_name.innerText = data.username;
+    target_user_id = data.target_user_id;  // ✅ 추가
+
     console.log(data);
 }
 
@@ -96,19 +100,15 @@ function getSelectedChips() {
 }
 
 async function send_info() {
+    // ✅ personal_key는 미션 ID(pk)로 원복
     const review_data = {
-        personal_key: pk,
+        personal_key: pk,         // URL에서 가져온 미션 ID
         my_score: star_score,
         quick_comment: getSelectedChips(),
         comment: document.getElementById('comment-input').value,
     };
-    const data = await Auth.postData(
-        '/api/users/review_json/',
-        review_data,
-        false,
-        { headers: { 'X-CSRFToken': csrftoken } }
-    );
-    
+
+    const data = await Auth.postData('/api/users/review_json/', review_data);
     if (data !== null) {
         window.location.href = '/api/users/homepage/';
     }
