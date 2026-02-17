@@ -55,6 +55,33 @@
         }
     }
 
+    /**
+     * 위치 정보 없음 메시지 표시
+     */
+    function showNoLocationMessage() {
+        const container = document.getElementById('map');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 300px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                color: #6c757d;
+                gap: 12px;
+            ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+                </svg>
+                <div style="font-size: 16px; font-weight: 500;">장소 설정 없음</div>
+            </div>
+        `;
+    }
+
     // ==================== 이미지 갤러리 ====================
     
     /**
@@ -211,6 +238,9 @@
             // 2. 지도 표시 (좌표가 있을 때만, 상태 포함)
             if (mission.location_lat && mission.location_lng) {
                 initMap(mission.location_lat, mission.location_lng, mission.status);
+            } else {
+                // ✨ 위치 정보가 없으면 "장소 설정 없음" 메시지 표시
+                showNoLocationMessage();
             }
 
             // 3. 작성자인 경우 햄버거 버튼 표시

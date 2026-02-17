@@ -141,13 +141,13 @@
     }
 
     function resetFilters() {
-        currentState.statuses = ['WAITING', 'MATCHED'];
+        currentState.statuses = ['WAITING', 'MATCHED', 'COMPLETED'];
         currentState.categories = [];
         currentState.sort = 'latest';
         
         // UI 업데이트
         document.querySelectorAll('input[name="status"]').forEach(input => {
-            input.checked = (input.value === 'WAITING' || input.value === 'MATCHED');
+            input.checked =true;
         });
         document.querySelectorAll('input[name="category"]').forEach(input => {
             input.checked = false;
