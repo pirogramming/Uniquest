@@ -1,6 +1,10 @@
 /**
  * 프로필 페이지 리뷰 렌더링 스크립트
  */
+/**
+ * 프로필 페이지 리뷰 렌더링 스크립트
+ * mypage.js의 카드 구조와 동일하게 맞춤
+ */
 function renderReviews(reviews) {
     const container = document.getElementById('reviewsContainer');
     const badge = document.getElementById('review-count-badge');
@@ -9,36 +13,59 @@ function renderReviews(reviews) {
 
     // 데이터가 객체(dict)로 들어올 경우를 대비한 안전장치
     const reviewList = Array.isArray(reviews) ? reviews : [];
-    badge.textContent = reviewList.length;
+    if (badge) badge.textContent = reviewList.length;
 
     if (reviewList.length === 0) {
         container.innerHTML = `
             <div class="reviews-empty">
-                <i class="fa fa-comment-slash" style="font-size: 30px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                <i class="fa fa-comment-slash"></i>
                 아직 받은 리뷰가 없습니다
             </div>
         `;
         return;
     }
 
-    container.innerHTML = reviewList.map(review => {
-        // 평점(my_score) 처리 (숫자가 아닐 경우 대비)
-        const rating = parseInt(review.my_score || 0);
-        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-        
-        return `
+    container.innerHTML = ""; // 기존 내용 비우기
+
+    reviewList.forEach((review) => {
+        // 1. 퀵 코멘트 태그 생성 (mypage.js 로직)
+        let quick_comment_list = '';
+        if (review.quick_comment) {
+            Object.values(review.quick_comment).forEach((value) => {
+                quick_comment_list += `<span class="quick-tag">${value}</span>`;
+            });
+        }
+
+        // 2. 별점 생성 (mypage.js 로직)
+        let review_score_list = '';
+        const my_score = parseInt(review.my_score || 0);
+        const last_score = 5 - my_score;
+
+        for (let i = 0; i < my_score; i++) {
+            review_score_list += `<span class="star">★</span>`;
+        }
+        for (let i = 0; i < last_score; i++) {
+            review_score_list += `<span class="star empty">★</span>`;
+        }
+
+        // 3. 카드 HTML 조립 (mypage.js와 동일한 구조)
+        // 날짜 데이터가 없으면 오늘 날짜나 기본값 표시
+        const dateStr = review.created_at || '2026.02.10';
+
+        container.innerHTML += `
             <div class="review-card">
                 <div class="review-header">
-                    <span class="review-author">
-                        <i class="fa fa-user-circle"></i> ${review.author || '익명 사용자'}
-                    </span>
-                    <span class="review-stars">${stars}</span>
+                    <div class="review-score">
+                        ${review_score_list}
+                    </div>
+                    <div class="review-date">${dateStr}</div>
                 </div>
-                <div class="review-text">${review.comment || review.content || '내용 없음'}</div>
-                <div class="review-date">${review.created_at || ''}</div>
-            </div>
-        `;
-    }).join('');
+                <div class="review-comment">${review.comment || '내용 없음'}</div>
+                <div class="quick-tags">
+                    ${quick_comment_list}
+                </div>
+            </div>`;
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
