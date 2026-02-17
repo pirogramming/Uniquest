@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}회원탈퇴{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'users/css/signout.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="signout-wrapper">
+    <div class="signout-container">
+        <header class="signout-header">
+            <button type="button" class="back-arrow" onclick="goToMypage()" aria-label="마이페이지로 돌아가기">←</button>
+            <h1>회원탈퇴</h1>
+        </header>
+
+        <!-- 로그인한 사용자 정보 (JS로 채움) -->
+        <section class="user-info-box" id="signout-user-info">
+            <p class="user-info-label">탈퇴할 계정</p>
+            <p class="user-email" id="signout-user-email">—</p>
+            <p class="user-name" id="signout-user-name">—</p>
+        </section>
+
+        <!-- 경고 영역 -->
+        <section class="warning-box">
+            <div class="warning-icon" aria-hidden="true">⚠</div>
+            <h2 class="warning-title">정말 탈퇴하시겠습니까?</h2>
+            <p class="warning-desc">탈퇴 시 계정 및 모든 개인정보가 즉시 삭제되며 복구할 수 없습니다.</p>
+        </section>
+
+        <!-- 삭제되는 정보 -->
+        <section class="deleted-info">
+            <h3>삭제되는 정보</h3>
+            <ul>
+                <li>학교 이메일 계정</li>
+                <li>사용자 이름 및 프로필 정보</li>
+                <li>유니퀘스트 점수 및 활동 기록</li>
+                <li>작성한 미션 및 리뷰 데이터</li>
+            </ul>
+        </section>
+
+        <!-- 재가입 안내 -->
+        <section class="reregister-notice">
+            <span class="notice-icon" aria-hidden="true">💡</span>
+            <p>탈퇴 후 동일한 학교 이메일로 재가입이 가능하나, 기존 데이터는 복구되지 않습니다.</p>
+        </section>
+
+        <!-- 버튼 -->
+        <div class="button-group">
+            <button type="button" class="btn-cancel" onclick="goToMypage()">취소</button>
+            <button type="button" class="btn-withdraw" onclick="confirmSignout()">회원탈퇴</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'shared/js/auth.js' %}"></script>
+    <script src="{% static 'users/js/signout.js' %}"></script>
+{% endblock %}

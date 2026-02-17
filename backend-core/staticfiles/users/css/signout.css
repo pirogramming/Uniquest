@@ -1,0 +1,218 @@
+@charset "UTF-8";
+
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1D2939;
+}
+
+.signout-wrapper {
+    width: 100%;
+    max-width: 450px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.signout-container {
+    padding: 20px 25px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 헤더: 뒤로가기 + 제목 */
+.signout-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    margin-bottom: 8px;
+}
+
+.signout-header .back-arrow {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #344054;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.signout-header .back-arrow:hover {
+    background-color: #F2F4F7;
+}
+
+.signout-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #101828;
+    margin: 0;
+}
+
+/* 탈퇴할 계정 정보 */
+.user-info-box {
+    padding: 16px;
+    background-color: #F9FAFB;
+    border: 1px solid #E4E7EC;
+    border-radius: 12px;
+}
+
+.user-info-label {
+    font-size: 12px;
+    color: #667085;
+    margin: 0 0 6px 0;
+}
+
+.user-info-box .user-email,
+.user-info-box .user-name {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #344054;
+}
+
+.user-info-box .user-name {
+    margin-top: 4px;
+    font-weight: 500;
+    color: #475467;
+}
+
+/* 경고 박스 (연한 빨강/핑크) */
+.warning-box {
+    padding: 24px 20px;
+    background-color: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.warning-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FEE2E2;
+    border-radius: 50%;
+    font-size: 24px;
+    color: #B45309;
+    font-weight: bold;
+}
+
+.warning-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #B91C1C;
+    margin: 0 0 8px 0;
+}
+
+.warning-desc {
+    font-size: 14px;
+    color: #667085;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 삭제되는 정보 */
+.deleted-info {
+    text-align: left;
+}
+
+.deleted-info h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #344054;
+    margin: 0 0 12px 0;
+}
+
+.deleted-info ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #475467;
+    line-height: 1.8;
+}
+
+.deleted-info li {
+    margin-bottom: 4px;
+}
+
+.deleted-info li::marker {
+    color: #DC2626;
+}
+
+/* 재가입 안내 (연한 노란 박스) */
+.reregister-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    background-color: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 12px;
+}
+
+.reregister-notice .notice-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.reregister-notice p {
+    margin: 0;
+    font-size: 13px;
+    color: #667085;
+    line-height: 1.5;
+}
+
+/* 버튼 영역 */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn-cancel {
+    width: 100%;
+    height: 52px;
+    background-color: #ffffff;
+    color: #344054;
+    border: 1px solid #D0D5DD;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.btn-cancel:hover {
+    background-color: #F9FAFB;
+    border-color: #98A2B3;
+}
+
+.btn-withdraw {
+    width: 100%;
+    height: 52px;
+    background-color: #B91C1C;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.btn-withdraw:hover {
+    background-color: #991B1B;
+}
