@@ -146,8 +146,8 @@
         currentFilters.view = viewType;
         
         const mapEl = document.getElementById('map');
-        const floatingBtn = document.querySelector('.floating-map-btn');
-        const myLocationBtn = document.querySelector('.my-location-btn');
+        const mapWrapper = document.querySelector('.map-wrapper');  // ✅ 추가
+        const mapControls = document.querySelector('.map-controls');  // ✅ 추가
         const viewBtns = document.querySelectorAll('.view-btn');
 
         viewBtns.forEach(btn => {
@@ -160,14 +160,10 @@
 
         if (viewType === 'list') {
             // 리스트 뷰: 지도 숨김, 버튼들 숨김
-            if (mapEl) mapEl.classList.add('hidden');
-            if (floatingBtn) floatingBtn.style.display = 'none';
-            if (myLocationBtn) myLocationBtn.style.display = 'none';
+            if (mapWrapper) mapWrapper.style.display = 'none';
         } else {
             // 지도+리스트 뷰: 지도 보임, 버튼들 보임
-            if (mapEl) mapEl.classList.remove('hidden');
-            if (floatingBtn) floatingBtn.style.display = 'flex';
-            if (myLocationBtn) myLocationBtn.style.display = 'flex';
+            if (mapWrapper) mapWrapper.style.display = 'block';  // ✅ map-wrapper 표시
         }
     }
 
