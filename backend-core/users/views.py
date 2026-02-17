@@ -490,7 +490,7 @@ def render_review_page_info(request,mission_id):
     mission_name = target_mission.title
     username = target_user.username
 
-    return JsonResponse({'mission_name':mission_name,'username':username},status=200)
+    return JsonResponse({'mission_name':mission_name,'username':username,"target_user_id": target_user.id,},status=200)
 
 
 @api_view(['POST'])
@@ -499,25 +499,37 @@ def review_json(request):
     user = request.user
     review_json = json.loads(request.body)
     target_mission = Mission.objects.get(id=review_json['personal_key'])
+    
     if (target_mission.author.username == user.username): # 내가 등록자 일 때
         target_user = target_mission.helper
     else:
         target_user = target_mission.author
+
+    # --- 수정 부분 시작 ---
+    # 만약 review_datas가 None이거나 딕셔너리일 경우를 대비해 리스트로 초기화/변환
+    if not isinstance(target_user.review_datas, list):
+        target_user.review_datas = []
+    
+    # 이제 리스트이므로 append 가능
     target_user.review_datas.append(review_json)
+    # --- 수정 부분 끝 ---
 
     total_score = 0
+    # 합계 계산
     for review_data in target_user.review_datas:
-        total_score += int(review_data['my_score'])
+        total_score += int(review_data.get('my_score', 0)) # get을 써서 안전하게 가져오기
+    
     total_length = len(target_user.review_datas)
+    
     if total_length == 0:
         average_score = 0
     else:
-        average_score = total_score / total_length
-    target_user.manner_score = round(total_score / total_length, 1)
+        average_score = round(total_score / total_length, 1)
+    
+    target_user.manner_score = average_score
     target_user.save()
 
-    return Response({"status": "success", "average_score":average_score}, status=200)
-
+    return Response({"status": "success", "average_score": average_score}, status=200)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -527,11 +539,11 @@ def get_public_profile(request, user_id):
     이메일 등 민감 정보는 제외.
     """
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.select_related("university").get(id=user_id)
     except User.DoesNotExist:
         return Response({"error": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
 
-    # (선택) 차단 관계면 404 처리
+    # 차단 관계면 404 처리
     if request.user.blocked_people.filter(id=user_id).exists():
         return Response({"error": "접근할 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
     if user.blocked_people.filter(id=request.user.id).exists():
@@ -543,8 +555,25 @@ def get_public_profile(request, user_id):
         "university": user.university.name if user.university else None,
         "is_student_verified": user.is_student_verified,
         "manner_score": round(user.manner_score, 1),
-        "userphoto": user.userphoto.url if user.userphoto else None,
+        "userphoto": request.build_absolute_uri(user.userphoto.url) if user.userphoto else None,
+        "review_datas": user.review_datas or [],  # ✅ 추가
     })
+
+from django.shortcuts import render, get_object_or_404
+
+def user_profile_view(request, user_id):
+    """타유저 프로필 페이지 렌더링"""
+    profile_user = get_object_or_404(
+        User.objects.select_related("university"),
+        id=user_id
+    )
+    return render(request, "users/user_profile.html", {
+        "profile_user": profile_user,
+    })
+
+
+
+
 
 @login_required
 def my_missions_view(request):
