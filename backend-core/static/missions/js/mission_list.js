@@ -93,8 +93,10 @@
         currentFilters.categories = Array.from(categoryInputs).map(input => input.value);
 
         // 상태
-        const statusInputs = document.querySelectorAll('input[name="status"]:checked');
-        currentFilters.statuses = Array.from(statusInputs).map(input => input.value);
+        const statusInput = document.querySelector('input[name="status"]:checked');
+        if (statusInput) {
+            currentFilters.statuses = [statusInput.value];  // 배열에 하나만 담김
+        }
 
         applyFilters();
         closeFilterPanel();
@@ -145,6 +147,7 @@
         
         const mapEl = document.getElementById('map');
         const floatingBtn = document.querySelector('.floating-map-btn');
+        const myLocationBtn = document.querySelector('.my-location-btn');
         const viewBtns = document.querySelectorAll('.view-btn');
 
         viewBtns.forEach(btn => {
@@ -156,11 +159,15 @@
         });
 
         if (viewType === 'list') {
+            // 리스트 뷰: 지도 숨김, 버튼들 숨김
             if (mapEl) mapEl.classList.add('hidden');
-            if (floatingBtn) floatingBtn.classList.remove('hidden');
+            if (floatingBtn) floatingBtn.style.display = 'none';
+            if (myLocationBtn) myLocationBtn.style.display = 'none';
         } else {
+            // 지도+리스트 뷰: 지도 보임, 버튼들 보임
             if (mapEl) mapEl.classList.remove('hidden');
-            if (floatingBtn) floatingBtn.classList.add('hidden');
+            if (floatingBtn) floatingBtn.style.display = 'flex';
+            if (myLocationBtn) myLocationBtn.style.display = 'flex';
         }
     }
 
