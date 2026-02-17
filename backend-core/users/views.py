@@ -268,7 +268,7 @@ def get_my_info_patch(request):
             "username": user.username,
             "univ_email": user.univ_email,
             "university": user.university.name if user.university else None,
-            "userphoto" : user.url if user.userphoto else None
+            "userphoto" : user.userphoto.url if user.userphoto else None
         })
 
     elif request.method == 'PATCH':
