@@ -14,30 +14,9 @@ function getCookie(name) {
 }
 
 async function getUserData() {
-    const token = localStorage.getItem('access_token');
-    
-    if (!token) {
-        console.warn("로그인 토큰이 없습니다.");
-        return null;
-    }
-
-    try {
-        const response = await fetch('/api/users/api/profile_modify/');
-
-        if (response.ok) {
-            const userData = await response.json();
-            console.log("유저 정보 로드 성공:", userData);
-            return userData;
-        } else {
-            alert('토큰이 만료되었거나 유효하지 않습니다.')
-            console.error("토큰이 만료되었거나 유효하지 않습니다.");
-            window.location.href = '/api/users/login/';
-            return null;
-        }
-    } catch (error) {
-        console.error("네트워크 오류 발생:", error);
-        return null;
-    }
+    const userData = await Auth.getData('/api/users/api/profile_modify/');
+    if (userData) console.log("유저 정보 로드 성공:", userData);
+    return userData;
 }
 
 async function renderProfile() {
@@ -67,51 +46,31 @@ async function renderProfile() {
 }
 
 async function patchProfile() {
-    const token = localStorage.getItem('access_token');
-    
-    if (!token) {
-        alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-        window.location.href = '/api/users/login/';
-        return;
-    }
-
     const username = document.getElementById('user-username').value;
-    const userInput = document.getElementById('userphoto')
+    const userInput = document.getElementById('userphoto');
     const formData = new FormData();
-
-    formData.append('username',username)
+    formData.append('username', username);
     if (userInput.files.length > 0) {
         formData.append('user_photo', userInput.files[0]);
     }
 
-    try {
-        // 2. 백엔드 PATCH API 호출
-        const response = await fetch('/api/users/api/profile_modify/', {
-            method: 'PATCH',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: formData
-        });
-
-        if (response.ok) {
-            alert("프로필이 성공적으로 변경되었습니다!");
-            window.location.href = '/api/users/mypage/'; // 저장 후 마이페이지로 이동
-        } else {
-            const errorData = await response.json();
-            alert("수정 실패: " + (errorData.detail || "오류가 발생했습니다."));
-        }
-    } catch (error) {
-        console.error("네트워크 오류:", error);
-        alert("서버 연결에 실패했습니다. 인터넷 연결을 확인해주세요.");
+    const result = await Auth.patchData(
+        '/api/users/api/profile_modify/',
+        formData,
+        true,
+        { headers: { 'X-CSRFToken': getCookie('csrftoken') } }
+    );
+    if (result !== null) {
+        alert("프로필이 성공적으로 변경되었습니다!");
+        window.location.href = '/api/users/mypage/';
+    } else {
+        alert("수정 실패: 오류가 발생했습니다.");
     }
-};
+}
 
-function logout(){
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+function logout() {
     alert('로그아웃 되었습니다');
-    window.location.href = "/users/login/";
+    Auth.logout("/api/users/login/");
 }
 
 function previewImage(input) {
