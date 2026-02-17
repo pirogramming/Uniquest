@@ -31,19 +31,6 @@ body {
     border-bottom: 1px solid #f1f3f5;
 }
 
-#back-arrow {
-    text-decoration: none;
-    color: #333333;
-    font-size: 24px;
-    font-weight: 300;
-    margin-right: 12px; /* 타이틀과의 간격 확보 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-}
-
 .header-title {
     font-size: 18px;
     font-weight: 700;

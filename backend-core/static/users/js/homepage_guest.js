@@ -1,6 +1,31 @@
 /**
  * 비로그인 전용 홈 페이지: API로 미션 목록만 불러와서 렌더링
  */
+
+const CATEGORY_MAP = {
+    'ERRAND': '심부름',
+    'STUDY': '학업',
+    'RENTAL': '대여',
+    'RECRUIT': '구인',
+    'LIFE': '생활',
+    'OTHER': '기타'
+};
+
+const CATEGORY_CLASS_MAP = {
+    '심부름': 'errand', 'ERRAND': 'errand',
+    '학업': 'study', 'STUDY': 'study',
+    '대여': 'rent', 'RENTAL': 'rent',
+    '구인': 'job', 'RECRUIT': 'job',
+    '생활': 'life', 'LIFE': 'life',
+    '기타': 'etc', 'OTHER': 'etc'
+};
+
+const STATUS_MAP = {
+    'WAITING': { text: '대기중', class: 'waiting' },
+    'MATCHED': { text: '진행중', class: 'matched' },
+    'COMPLETED': { text: '완료', class: 'completed' }
+};
+
 async function loadGuestHomepage() {
     if (localStorage.getItem('access_token')) {
         window.location.href = '/api/users/homepage/';
@@ -38,10 +63,10 @@ async function loadGuestHomepage() {
 
         container.innerHTML = latestMissions.map(function (m) {
             const title = (m.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            const category = m.category || '기타';
+            const category = CATEGORY_MAP[m.category] || '기타';
             const location_name = m.location_name || '장소 미지정';
             const reward = m.reward != null ? m.reward.toLocaleString() + '원' : '가격 미정';
-            const status = m.status || '진행중';
+            const status = STATUS_MAP[m.status].text || '진행중';
             const id = m.id || '';
 
             // 카테고리에 맞는 클래스 선택

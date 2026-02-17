@@ -268,7 +268,7 @@ def get_my_info_patch(request):
             "username": user.username,
             "univ_email": user.univ_email,
             "university": user.university.name if user.university else None,
-            "userphoto" : user.url if user.userphoto else None
+            "userphoto" : user.userphoto.url if user.userphoto else None
         })
 
     elif request.method == 'PATCH':
@@ -428,8 +428,12 @@ def block_user(request):
 
     return Response({'message': '차단되었습니다'}, status=200)
     
-#회원 탈퇴
+# 회원 탈퇴 확인 페이지 (HTML)
+def signout_page(request):
+    return render(request, 'users/signout.html')
 
+
+#회원 탈퇴 API
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def signout(request):
