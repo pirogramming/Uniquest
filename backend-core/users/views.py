@@ -1,7 +1,12 @@
 from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import UserRegisterSerializer, UserProfileSerializer
+from .serializers import (
+    UserRegisterSerializer,
+    UserProfileSerializer,
+    UserMypageSerializer,
+    UserProfileModifySerializer,
+)
 from django.contrib.auth import get_user_model
 from django.shortcuts import render,redirect
 import json
@@ -234,23 +239,8 @@ def logout(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated]) # 🛡️ 토큰 해독 보안 요원
 def get_my_info(request):
-    user = request.user
-    missions = list(user.missions.all().values('id','title','reward','status','descriptions','category','location_name'))
-    accepted_missions = list(user.accepted_missions.all().values('id','title','reward','status','descriptions'))
-    blocked_Queryset = user.blocked_people.all()
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "university": user.university.name if user.university else None,
-        "univ_email": user.univ_email,
-        "is_student_verified": user.is_student_verified,
-        "manner_score": round(user.manner_score, 1),
-        "missions": missions,
-        "blocked_people": list(blocked_Queryset.values('id', 'username')),
-        "accepted_missions": accepted_missions,
-        "userphoto": user.userphoto.url if user.userphoto else None,
-        "review_data" : user.review_datas
-    })
+    serializer = UserMypageSerializer(request.user)
+    return Response(serializer.data)
 
 def mypage_view(request):
     return render(request, 'users/mypage.html')
@@ -261,33 +251,18 @@ def mypage_view(request):
 @permission_classes([IsAuthenticated])
 def get_my_info_patch(request):
     user = request.user
-    
+
     if request.method == 'GET':
-        # 기존 조회 로직
-        return Response({
-            "username": user.username,
-            "univ_email": user.univ_email,
-            "university": user.university.name if user.university else None,
-            "userphoto" : user.userphoto.url if user.userphoto else None
-        })
+        serializer = UserProfileModifySerializer(user)
+        return Response(serializer.data)
 
     elif request.method == 'PATCH':
-        # 1. 프론트에서 보낸 데이터(updatedData) 받기
-        username = request.data.get('username')
-        userphoto = request.data.get('user_photo')
-
-        # 2. 데이터 업데이트 (값이 있을 때만)
-        if username:
-            user.username = username
-        if userphoto:
-            user.userphoto = userphoto
-        
-        # 3. DB 저장
-        user.save()
-        
+        serializer = UserProfileModifySerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response({
             "message": "수정 완료",
-            "username": user.username,
+            "username": serializer.instance.username,
         }, status=status.HTTP_200_OK)
 
 def mypage_modify_view(request):
@@ -541,14 +516,8 @@ def get_public_profile(request, user_id):
     if user.blocked_people.filter(id=request.user.id).exists():
         return Response({"error": "접근할 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
 
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "university": user.university.name if user.university else None,
-        "is_student_verified": user.is_student_verified,
-        "manner_score": round(user.manner_score, 1),
-        "userphoto": user.userphoto.url if user.userphoto else None,
-    })
+    serializer = UserProfileSerializer(user)
+    return Response(serializer.data)
 
 @login_required
 def my_missions_view(request):
