@@ -232,16 +232,11 @@
             const lng = parseFloat(mission.location_lng);
 
             if (isNaN(lat) || isNaN(lng)) return;
-            fullscreenMapManager.addCustomMarker(lat, lng, {
-            status: mission.status,
-            onClick: () => {
-                window.location.href = `/api/missions/${mission.id}/`;
-            }
-        });
 
-            // ✨ 마커 생성 + 클릭 시 상세페이지 이동
-            const marker = fullscreenMapManager.addCustomMarker(lat, lng, {
-                status: mission.status,  // WAITING/MATCHED/COMPLETED
+            // ✨ category 전달 → 카테고리별 색상 자동 적용
+            fullscreenMapManager.addCustomMarker(lat, lng, {
+                category: mission.category,
+                status: mission.status,
                 onClick: () => {
                     window.location.href = `/api/missions/${mission.id}/`;
                 }
@@ -292,7 +287,7 @@
     
     /**
      * 지도 마커 업데이트
-     * - map_manager: 마커 생성/표시 (CSS 스타일 적용)
+     * - map_manager: 마커 생성/표시 (카테고리별 색상 적용)
      * - mission_list: 클릭 시 상세페이지 이동
      */
     function updateMapMarkers(missions) {
@@ -311,9 +306,10 @@
                 return;
             }
 
-            // ✨ 마커 생성 + 클릭 시 상세페이지 이동
-            const marker = mapManager.addCustomMarker(lat, lng, {
-                status: mission.status,  // WAITING/MATCHED/COMPLETED
+            // ✨ category 전달 → 카테고리별 색상 자동 적용
+            mapManager.addCustomMarker(lat, lng, {
+                category: mission.category,
+                status: mission.status,
                 onClick: () => {
                     window.location.href = `/api/missions/${mission.id}/`;
                 }
@@ -432,28 +428,28 @@
     }
 
     window.moveToCurrentLocation = async function(isFullscreen = false) {
-    const targetManager = isFullscreen ? fullscreenMapManager : mapManager;
-    
-    if (!targetManager) return;
-    
-    console.log(isFullscreen ? "전체화면 현위치 탐색..." : "일반 지도 현위치 탐색...");
-    
-    try {
-        // KakaoMapManager 내부의 getUserLocation 활용
-        const loc = await targetManager.getUserLocation();
+        const targetManager = isFullscreen ? fullscreenMapManager : mapManager;
         
-        // 해당 지도의 중심 이동
-        targetManager.setCenter(loc.lat, loc.lng);
-        targetManager.setLevel(3);
+        if (!targetManager) return;
         
-        // 내 위치 마커 표시 (MapUtils 활용)
-        await MapUtils.displayUserLocation(targetManager);
+        console.log(isFullscreen ? "전체화면 현위치 탐색..." : "일반 지도 현위치 탐색...");
         
-    } catch (err) {
-        console.error("현위치 이동 실패:", err);
-        alert("위치 정보를 가져올 수 없습니다.");
-    }
-};
+        try {
+            // KakaoMapManager 내부의 getUserLocation 활용
+            const loc = await targetManager.getUserLocation();
+            
+            // 해당 지도의 중심 이동
+            targetManager.setCenter(loc.lat, loc.lng);
+            targetManager.setLevel(3);
+            
+            // 내 위치 마커 표시 (MapUtils 활용)
+            await MapUtils.displayUserLocation(targetManager);
+            
+        } catch (err) {
+            console.error("현위치 이동 실패:", err);
+            alert("위치 정보를 가져올 수 없습니다.");
+        }
+    };
 
     // ==================== 전역 함수 노출 ====================
     
