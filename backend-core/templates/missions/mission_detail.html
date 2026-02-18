@@ -298,7 +298,11 @@
             <div class="author-label">등록자 정보</div>
             <div class="author-profile">
                 <div class="profile-img">
+                {% if mission.author.userphoto %}
+                    <img src="{{ mission.author.userphoto.url }}" alt="프로필">
+                {% else %}
                     <img src="{% static 'users/images/profile.png' %}" alt="프로필">
+                {% endif %}
                 </div>
                 <div class="author-text">
                     <div class="author-name">{{ mission.author.username }}</div>
