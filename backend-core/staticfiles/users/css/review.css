@@ -228,7 +228,7 @@ body {
 
 /* 선택되었을 때 (사진 속 파란색) */
 .chip.active {
-    background-color: #74a0ff; /* 사진과 유사한 블루 */
+    background-color: #4DA6FF; /* 사진과 유사한 블루 */
     color: white;
     font-weight: 500;
 }
@@ -260,6 +260,6 @@ body {
 }
 
 .submit-btn:not(.disabled) {
-    background-color: #6fa6ff;
+    background-color: #4DA6FF;
     color: white;
 }
