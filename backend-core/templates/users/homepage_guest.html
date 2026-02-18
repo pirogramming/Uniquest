@@ -6,46 +6,13 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'users/css/homepage_guest.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    {% comment %} <style>
-        .welcome-header {
-            text-align: center;
-            padding: 20px 0 30px;
-        }
-        .logo-circle {
-            width: 64px;
-            height: 64px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 0 auto 16px;
-        }
-        .brand-name { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-        .brand-subtitle { font-size: 14px; opacity: 0.9; }
-        .guest-cta {
-            display: block;
-            text-align: center;
-            margin: 24px 20px;
-            padding: 14px 24px;
-            background: var(--white);
-            color: var(--primary-blue);
-            border-radius: 14px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-        .guest-cta:hover { opacity: 0.95; }
-    </style> {% endcomment %}
 {% endblock %}
 
 {% block content %}
 <header class="header">
     <div class="header-top">
         <section class="welcome-header">
-            <div class="logo-circle">U</div>
-            <h1 class="brand-name">Uniquest</h1>
+            <img src="{% static 'users/images/logo.png' %}" alt="Uniquest Logo" class="login-logo">
             <p class="brand-subtitle">대학생 미션 중개 플랫폼</p>
         </section>
     </div>
@@ -61,7 +28,8 @@
     </div>
 </section>
 
-<div style="padding: 0 20px 100px;"> <p class="guest-footer-text">로그인 후 이용 가능합니다</p>
+<div style="padding: 0 20px 100px;"> 
+    <p class="guest-footer-text">로그인 후 이용 가능합니다</p>
     <a href="{% url 'users:login' %}" class="guest-cta">로그인</a>
     <a href="{% url 'users:signup_view' %}" class="guest-cta">회원가입</a>
 </div>
@@ -72,5 +40,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script src="{% static 'users/js/homepage_guest.js' %}"></script>
+    <script src="{% static 'users/js/homepage_guest.js' %} %"></script>
 {% endblock %}

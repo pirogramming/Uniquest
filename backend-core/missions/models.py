@@ -17,11 +17,11 @@ class Category(models.TextChoices):
 
 
 class MissionStatus(models.TextChoices):
-    WAITING = "WAITING", "waiting"
+    WAITING = "WAITING", "대기중"
     PENDING_APPROVAL = "PENDING_APPROVAL", "수락 대기"
-    MATCHED = "MATCHED", "matched"
-    COMPLETED = "COMPLETED", "completed"
-    CANCELLED = "CANCELLED", "cancelled"
+    MATCHED = "MATCHED", "진행중"
+    COMPLETED = "COMPLETED", "완료"
+    CANCELLED = "CANCELLED", "취소됨"
 
 
 class Tag(models.Model):
