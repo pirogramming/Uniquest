@@ -14,8 +14,31 @@
  * 
  * 수정 사항:
  * - getUserLocation(): 3단계 폴백 전략
- * - 커스텀 마커: CSS 스타일 사용 (파란색 핀/노란색 핀)
+ * - 커스텀 마커: CSS 스타일 사용 (파란색 핀/카테고리별 색상 핀)
+ * - CATEGORY_COLORS: 카테고리별 색상 단일 소스 관리
  */
+
+// ==================== 카테고리 색상 단일 소스 ====================
+
+const CATEGORY_COLORS = {
+    ERRAND:  '#3679E3',  // 심부름 - 파랑
+    STUDY:   '#27C27B',  // 학업   - 초록
+    RENTAL:  '#FFB800',  // 대여   - 노랑
+    RECRUIT: '#8B5CF6',  // 구인   - 보라
+    LIFE:    '#FF6B9A',  // 생활   - 핑크
+    OTHER:   '#94A3B8',  // 기타   - 회색
+};
+
+const CATEGORY_LABELS = {
+    ERRAND:  '심부름',
+    STUDY:   '학업',
+    RENTAL:  '대여',
+    RECRUIT: '구인',
+    LIFE:    '생활',
+    OTHER:   '기타',
+};
+
+const CATEGORY_COLOR_DEFAULT = '#94A3B8'; // fallback
 
 class KakaoMapManager {
     constructor(containerId, options = {}) {
@@ -177,10 +200,10 @@ class KakaoMapManager {
     }
 
     /**
-     * 커스텀 마커 추가 (CSS 스타일 사용 - 노란색 핀)
+     * 커스텀 마커 추가 (카테고리별 색상 적용)
      * @param {number} lat 
      * @param {number} lng 
-     * @param {object} options { status: 'WAITING'|'MATCHED'|'COMPLETED', onClick: fn }
+     * @param {object} options { category: 'ERRAND'|'STUDY'|..., status: 'WAITING'|..., onClick: fn }
      * @returns {kakao.maps.CustomOverlay}
      */
     addCustomMarker(lat, lng, options = {}) {
@@ -191,13 +214,17 @@ class KakaoMapManager {
 
         const position = new kakao.maps.LatLng(lat, lng);
         
-        // CSS 마커 DOM 생성
+        // 카테고리 색상 결정 (단일 소스: CATEGORY_COLORS)
+        const color = CATEGORY_COLORS[options.category] ?? CATEGORY_COLOR_DEFAULT;
+
+        // CSS 마커 DOM 생성 (색상은 inline style로 주입)
         const markerEl = document.createElement('div');
         markerEl.className = 'mission-marker';
-        
-        // 상태별 클래스 추가
+        markerEl.style.background = color;
+
+        // 상태별 클래스 추가 (흐리게 처리 등 상태 UI에 활용)
         if (options.status) {
-            markerEl.classList.add(options.status.toLowerCase());
+            markerEl.classList.add(`status-${options.status.toLowerCase()}`);
         }
         
         // CustomOverlay 생성
@@ -404,6 +431,8 @@ function waitForKakaoMaps() {
 // ==================== 전역 노출 ====================
 
 window.KakaoMapManager = KakaoMapManager;
+window.CATEGORY_COLORS = CATEGORY_COLORS;
+window.CATEGORY_LABELS = CATEGORY_LABELS;
 window.MapUtils = {
     displayUserLocation,
     waitForKakaoMaps

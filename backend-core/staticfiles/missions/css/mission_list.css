@@ -134,10 +134,10 @@
     animation: pulse-pin 2s infinite;
 }
 
-/* 미션 마커 (노란색) */
+/* 미션 마커 - 색상은 JS(CATEGORY_COLORS)에서 inline style로 주입됨 */
 .mission-marker {
-    background: #FFC107;
     z-index: 50;
+    /* background 는 map_manager.js 의 CATEGORY_COLORS 에서 결정 */
 }
 
 .mission-marker:hover {
@@ -145,12 +145,48 @@
     z-index: 101;
 }
 
+/* 매칭 완료된 미션 마커는 약간 흐리게 처리 */
+.mission-marker.status-matched,
+.mission-marker.status-completed {
+    opacity: 0.5;
+}
+
 @keyframes pulse-pin {
     0% { transform: scale(1); opacity: 0.8; }
     100% { transform: scale(2.5); opacity: 0; }
 }
 
-/* ==================== 4. 헤더 & 필터 UI ==================== */
+/* ==================== 4. 지도 범례 ==================== */
+.map-legend {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 10;
+    background: white;
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    color: #374151;
+    pointer-events: none; /* 지도 클릭 방해 안 하도록 */
+}
+
+.map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0;
+    line-height: 1;
+}
+
+.map-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ==================== 5. 헤더 & 필터 UI ==================== */
 .mission-header {
     height: 70px;
     max-width: 450px;
@@ -205,10 +241,6 @@
 }
 
 
-
-
-
-
 /* 필터 버튼 활성화 상태 */
 .filter-btn {
     width: 40px;
@@ -240,7 +272,7 @@
     stroke: white;
 }
 
-/* ==================== 5. 기타 UI 요소 (툴바, 패널 등) ==================== */
+/* ==================== 6. 기타 UI 요소 (툴바, 패널 등) ==================== */
 .mission-toolbar {
     display: flex;
     flex-direction: column;
@@ -428,9 +460,6 @@
 .btn-apply:hover {
     background: #3b82f6;
 }
-
-
-
 
 
 /* 전체화면 지도 컨테이너 */
