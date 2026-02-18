@@ -100,7 +100,7 @@
         missionId: {{ mission_id }},
         userId: {{ request.user.id }},
         userNickname: "{{ request.user.username|escapejs }}",
-            wsUrl: "ws://{{ request.get_host }}/ws/chat/{{ room_id }}",
+            wsUrl: "{% if request.is_secure %}wss{% else %}ws{% endif %}://{{ request.get_host }}/ws/chat/{{ room_id }}",
                 canAccept: {{ can_accept | yesno:'true,false' }},
         isAuthor: {{ is_author | yesno:'true,false' }},
         csrfToken: "{{ csrf_token }}",
