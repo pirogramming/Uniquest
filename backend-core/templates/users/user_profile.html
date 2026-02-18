@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }}님의 프로필{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'users/css/user_profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="mobile-container has-nav">
+    <header class="profile-card">
+        <div class="header-top">
+            <a class="back-arrow" href="javascript:history.back()">←</a>
+            <span class="header-title">프로필</span>
+        </div>
+
+        <div class="user-info-section">
+            <div class="profile-circle">
+                <img 
+                    src="{% if profile_user.userphoto %}{{ profile_user.userphoto.url }}{% else %}{% static 'users/images/profile.png' %}{% endif %}" 
+                    alt="profile_image" 
+                    id="userprofile"
+                >
+            </div>
+            <div class="text-info">
+                <h2 id="user-username">{{ profile_user.username }}</h2>
+                <p id="user-univ">
+                    {% if profile_user.university %}{{ profile_user.university.name }}{% else %}소속 대학 없음{% endif %}
+                </p>
+                {% if profile_user.is_student_verified %}
+                <span class="verified-badge">
+                    <i class="fa fa-check-circle"></i> 학생 인증 완료
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-header">
+                <span>유니퀘스트 점수</span>
+                <span id="user-score">{{ profile_user.manner_score }}점</span>
+            </div>
+            <div class="score-bar-bg">
+                <div class="score-bar-fill" style="width: {% widthratio profile_user.manner_score 5 100 %}%"></div>
+            </div>
+            <p class="score-desc">유니퀘스트 점수는 미션 완료와 평가에 따라 변동됩니다</p>
+        </div>
+    </header>
+
+    <main class="menu-section">
+        <div class="section-header">
+            <span class="section-title">⭐ 받은 리뷰</span>
+            <span class="section-badge" id="review-count-badge">0</span>
+        </div>
+
+        <div class="reviews-wrapper">
+            <div id="reviewsContainer">
+                <div class="loading-spinner">
+                    <i class="fa fa-spinner"></i> 불러오는 중...
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+    {% include "_bottom-nav.html" %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'shared/js/auth.js' %}"></script>
+<script>
+    // JSON 데이터를 안전하게 JS 변수로 할당 (파일 분리 시 HTML에 이 줄은 남겨두어야 합니다)
+    const reviewData = {{ profile_user.review_datas|safe|default:"[]" }};
+</script>
+<script src="{% static 'users/js/user_profile.js' %}"></script>
+{% endblock %}
