@@ -40,7 +40,7 @@
 
 /* 3. 유저 정보 섹션 (블루 그라데이션) */
 .user-info-section {
-    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+    background: #4DA6FF;
     padding: 30px 25px 20px 25px;
     margin-top: 64px;
     display: flex;
@@ -95,7 +95,7 @@
 
 /* 4. 유니퀘스트 점수 섹션 */
 .score-section {
-    background-color: #6BB6FF;
+    background-color: #4DA6FF;
     padding: 0 25px 35px 25px;
     display: flex;
     flex-direction: column;
