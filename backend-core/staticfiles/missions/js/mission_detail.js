@@ -5,7 +5,7 @@
  * 
  * 역할:
  * - 미션 상세 정보 로드
- * - 지도에 미션 위치 표시 (카테고리별 색상)
+ * - 지도에 미션 위치 표시 (상태별 색상)
  * - 이미지 갤러리 렌더링 및 모달
  * - 햄버거 메뉴 토글 (작성자만)
  * - 삭제 기능
@@ -15,7 +15,7 @@
 
 (function () {
     let mapManager;
-    let missionStatus = null;
+    let missionStatus = null;  // ✨ 미션 상태 저장
 
     // URL에서 mission_id 추출
     const pathParts = window.location.pathname.split('/').filter(p => p !== "");
@@ -27,9 +27,9 @@
     // ==================== 지도 초기화 ====================
     
     /**
-     * 지도 초기화 (카테고리별 색상 마커)
+     * 지도 초기화 (상태별 마커 색상)
      */
-    async function initMap(lat, lng, status, category) {
+    async function initMap(lat, lng, status) {
         const container = document.getElementById('map');
         if (!container) return;
 
@@ -41,16 +41,15 @@
 
             await mapManager.init();
 
-            // ✅ 카테고리별 색상 + 상태 클래스 적용
+            // ✨ 상태별 마커 생성 (InfoWindow 제거)
             const marker = mapManager.addCustomMarker(lat, lng, {
-                category: category,  // 카테고리별 색상
-                status: status       // WAITING/MATCHED/COMPLETED
+                status: status  // WAITING/MATCHED/COMPLETED
             });
 
             mapManager.fitBoundsToLocations([{ lat, lng }]);
             mapManager.setLevel(3);
             
-            console.log("✅ 지도 초기화 완료 (카테고리:", category, "상태:", status, ")");
+            console.log("✅ 지도 초기화 완료 (상태:", status, ")");
         } catch (err) {
             console.error("지도 초기화 실패:", err);
         }
@@ -98,6 +97,7 @@
         }
 
         const imagesHTML = images.map(img => {
+            // 이미지 경로 처리
             let src = img.image;
             if (src && !src.startsWith('http') && !src.startsWith('/')) {
                 src = '/' + src; 
@@ -144,12 +144,16 @@
 
     // ==================== 햄버거 메뉴 ====================
     
+    /**
+     * 햄버거 메뉴 토글
+     */
     function toggleMenu() {
         const menu = document.getElementById('dropdown-menu');
         const backdrop = document.getElementById('menu-backdrop');
         
         if (menu && backdrop) {
             const isOpen = menu.classList.contains('show');
+            
             if (isOpen) {
                 closeMenu();
             } else {
@@ -159,6 +163,9 @@
         }
     }
 
+    /**
+     * 메뉴 닫기
+     */
     function closeMenu() {
         const menu = document.getElementById('dropdown-menu');
         const backdrop = document.getElementById('menu-backdrop');
@@ -167,8 +174,12 @@
         if (backdrop) backdrop.classList.remove('show');
     }
 
+    /**
+     * 햄버거 버튼 표시 (작성자만)
+     */
     function showMenuButton(isAuthor) {
         const menuButton = document.getElementById('menu-button');
+        
         if (menuButton && isAuthor) {
             menuButton.classList.add('visible');
         }
@@ -177,6 +188,7 @@
     // ==================== 미션 삭제 ====================
     
     async function deleteMission() {
+        // 메뉴 먼저 닫기
         closeMenu();
         
         if (!confirm('정말로 이 미션을 삭제하시겠습니까?\n삭제된 미션은 복구할 수 없습니다.')) {
@@ -217,16 +229,17 @@
                 return;
             }
 
+            // ✨ 미션 상태 저장
             missionStatus = mission.status;
 
             // 1. 이미지 표시
             renderImages(mission.images);
 
-            // 2. 지도 표시 (좌표가 있을 때만)
+            // 2. 지도 표시 (좌표가 있을 때만, 상태 포함)
             if (mission.location_lat && mission.location_lng) {
-                // ✅ category 추가 전달
-                initMap(mission.location_lat, mission.location_lng, mission.status, mission.category);
+                initMap(mission.location_lat, mission.location_lng, mission.status);
             } else {
+                // ✨ 위치 정보가 없으면 "장소 설정 없음" 메시지 표시
                 showNoLocationMessage();
             }
 
@@ -240,6 +253,9 @@
 
     // ==================== 이벤트 핸들러 ====================
     
+    /**
+     * 키보드 이벤트 (ESC로 모달/메뉴 닫기)
+     */
     function initKeyboardEvents() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -249,15 +265,23 @@
         });
     }
 
+    /**
+     * 모달 배경 클릭으로 닫기
+     */
     function initModalEvents() {
         const modal = document.getElementById('imageModal');
         if (modal) {
             modal.addEventListener('click', function(e) {
-                if (e.target === this) closeImageModal();
+                if (e.target === this) {
+                    closeImageModal();
+                }
             });
         }
     }
 
+    /**
+     * 햄버거 메뉴 이벤트
+     */
     function initMenuEvents() {
         const menuButton = document.getElementById('menu-button');
         const backdrop = document.getElementById('menu-backdrop');
@@ -270,6 +294,7 @@
             });
         }
         
+        // 삭제 버튼 이벤트
         if (deleteBtn) {
             deleteBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -282,13 +307,16 @@
             backdrop.addEventListener('click', closeMenu);
         }
         
+        // 메뉴 외부 클릭 시 닫기
         document.addEventListener('click', function(e) {
             const menu = document.getElementById('dropdown-menu');
             const menuButton = document.getElementById('menu-button');
             
             if (menu && menuButton) {
                 if (!menu.contains(e.target) && !menuButton.contains(e.target)) {
-                    if (menu.classList.contains('show')) closeMenu();
+                    if (menu.classList.contains('show')) {
+                        closeMenu();
+                    }
                 }
             }
         });
@@ -297,14 +325,17 @@
     // ==================== 초기화 ====================
     
     function init() {
+        // 전역 함수 노출
         window.deleteMission = deleteMission;
         window.openImageModal = openImageModal;
         window.closeImageModal = closeImageModal;
 
+        // 이벤트 리스너 등록
         initKeyboardEvents();
         initModalEvents();
         initMenuEvents();
 
+        // 데이터 로드
         loadMissionDetail();
 
         console.log("✅ mission_detail.js 초기화 완료");
