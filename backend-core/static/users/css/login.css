@@ -31,71 +31,84 @@ body {
     height: 100%;
 }
 
-/* 3. 헤더 레이아웃 수정 */
+/* 3. 헤더 레이아웃 수정 - 화살표와 텍스트 나란히 배치 */
 .header {
-    display: grid;
-    grid-template-columns: auto 1fr; /* 화살표 / 나머지 영역 */
-    column-gap: 15px; 
-    align-items: start; /* 요소를 위쪽 정렬하여 텍스트 첫 줄에 맞춤 */
-    margin-bottom: 35px;
     padding-top: 15px;
+    margin-bottom: 35px;
+    display: flex;         
+    align-items: flex-start; 
+    gap: 12px;             
 }
 
-/* 텍스트 정렬 및 로고 배치를 위한 영역 */
+.header > a, .header > i {
+    text-decoration: none;
+    color: inherit;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    height: 28px; 
+}
+
 .header-text {
-    grid-column: 2;
-    text-align: left; /* 상단 텍스트는 화살표 옆 왼쪽 정렬 */
+    flex: 1; 
 }
 
 .header h2 {
     font-size: 24px;
     font-weight: 700;
-    margin: 0;
+    margin: 0; 
     color: #101828;
     line-height: 1.2;
+    text-align: left;
 }
 
 .header p {
     font-size: 14px;
     color: #667085;
-    margin: 4px 0 0 0;
+    margin: 4px 0 0 0; 
+    text-align: left;
 }
 
-/* 4. 로고 이미지 스타일 */
+/* 4. 로고 및 문구 중앙 정렬 수정 (핵심 수정 부분) */
+.logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* 로고와 문구 모두 가로 중앙 정렬 */
+    justify-content: center;
+    width: 100%;
+    margin-top: 40px;       /* 헤더와의 간격 */
+    margin-bottom: 40px;    /* 입력창과의 간격 */
+}
+
 .login-logo {
-    width: 370px;   
+    width: 80%;           
+    max-width: 280px;     
     height: auto;
     display: block;
-    margin: 50px 0 5px -25px; /* 왼쪽으로 25px 당김 */
+    margin: 0 auto;         /* 로고 자체 중앙 배치 */
 }
 
-/* 로고 밑에 '대학생 미션 중개 플랫폼' 문구 */
-.header-text::after {
-    content: "대학생 미션 중개 플랫폼";
+/* 로고 밑 문구 */
+.logo-subtext {
     display: block;
-    width: 370px;        
-    margin-left: -25px;  
+    margin-top: 15px;      
     text-align: center;
     font-size: 15px;     
     font-weight: 500;    
     color: #667085;
-    margin-top: 20px;    
-    margin-bottom: 20px;
 }
 
+/* 5. 입력창 및 버튼 디자인 */
 .input-section {
     display: flex;
     flex-direction: column;
-    text-align: center;
 }
 
-/* [순서 3] 입력창 영역 */
 .email-section, .input-group {
     text-align: left;
     margin-bottom: 18px;
 }
 
-/* 5. 입력창 및 버튼 디자인 */
 label {
     display: block;
     font-size: 14px;
@@ -117,7 +130,6 @@ input {
     background-size: 18px;
 }
 
-/* 아이콘 이미지 (Data URI 사용으로 별도 파일 없이 작동) */
 #email {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2398A2B3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /%3E%3C/svg%3E");
 }
@@ -139,7 +151,6 @@ input {
     margin-top: 15px;
 }
 
-/* 로그인 없이 둘러보기 버튼 */
 .btn-guest {
     display: flex;
     align-items: center;
@@ -175,7 +186,6 @@ input {
     font-size: 14px;
 }
 
-/* 비밀번호 찾기 (회색 링크) */
 #search_key {
     display: inline-block;
     color: #98A2B3;
@@ -187,14 +197,12 @@ input {
     color: #667085;
 }
 
-/* 회원가입 하기 (파란색 링크) */
 #signup {
     color: #4DA6FF;
     text-decoration: none;
     font-weight: 600;
 }
 
-/* 두 메뉴 사이의 구분선 */
 #search_key::after {
     content: "|";
     margin-left: 15px;
