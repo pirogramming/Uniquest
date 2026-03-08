@@ -1,0 +1,34 @@
+/* 별점 컴포넌트 본체 */
+.star-rating {
+    /* JS가 값을 주지 않았을 때의 기본값 설정 */
+    --star-size: 32px;
+    --rating: 0%;
+
+    display: inline-block;
+
+    /* 전체 너비 = 별 1개 크기 * 5 */
+    width: calc(var(--star-size) * 5);
+    height: var(--star-size);
+    background-color: #e0e0e0; /* 바탕 회색 */
+
+    /* SVG 마스크 */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: repeat-x;
+    mask-repeat: repeat-x;
+
+    /* 마스크 하나의 크기를 변수로 지정 */
+    -webkit-mask-size: var(--star-size) var(--star-size);
+    mask-size: var(--star-size) var(--star-size);
+}
+
+/* 채워지는 노란색 박스 자동 생성 */
+.star-rating::before {
+    content: "";
+    display: block;
+    height: 100%;
+    background-color: #ffc107; /* 노란색 */
+
+    /* JS에서 넘겨준 --rating 값을 너비로 사용 */
+    width: var(--rating);
+}

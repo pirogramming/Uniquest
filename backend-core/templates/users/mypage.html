@@ -6,6 +6,7 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'users/css/mypage.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/star.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
@@ -34,8 +35,8 @@
                 <span>유니퀘스트 점수</span>
                 <span id="user-score"></span>
             </div>
-            <div class="score-bar-bg">
-                <div class="score-bar-fill" id="score_bar_fill"></div>
+            <div class="score-stars-wrap">
+                <div class="star-rating" id="mypage-star-rating" data-rating="0" data-size="32"></div>
             </div>
             <p class="score-desc">유니퀘스트 점수는 미션 완료와 평가에 따라 변동됩니다</p>
         </div>
@@ -79,5 +80,6 @@
 
 {% block extra_scripts %}
     <script src="{% static 'shared/js/auth.js' %}"></script>
+    <script src="{% static 'users/js/star.js' %}"></script>
     <script src="{% static 'users/js/mypage.js' %}"></script>
 {% endblock %}

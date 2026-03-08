@@ -16,7 +16,6 @@ async function renderProfile() {
         const mannerScore = document.getElementById('user-score'); // 점수 텍스트
         const reviewlist = document.getElementById('reviewsContainer');
         const review_num = document.getElementById('review-count-badge');
-        const score_bar_fill = document.getElementById('score_bar_fill');
         const imgEl = document.getElementById('userprofile');
 
         // 1. 기본 정보 반영
@@ -70,10 +69,10 @@ async function renderProfile() {
         if(review_num) review_num.innerText = Object.keys(user.review_data).length;
 
         if (mannerScore) {
-            mannerScore.innerText = `${user.manner_score}점`; 
-            const scoreBar = document.querySelector('.score-bar-fill');
-            if (scoreBar) {
-                scoreBar.style.width = `${Math.round((user.manner_score / 5) * 100)}%`;
+            mannerScore.innerText = `${user.manner_score}점`;
+            const starPercent = Math.round((user.manner_score / 5) * 100);
+            if (typeof setStarRating === 'function') {
+                setStarRating('mypage-star-rating', starPercent, 32);
             }
         }
     }
