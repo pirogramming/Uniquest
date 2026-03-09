@@ -1,11 +1,12 @@
 {%load static%}
 <div class="mobile-container">
     <header class="header-top">
-        <button type="button" class="back-arrow" onclick="history.back()">←</button>
+        <button type="button" class="back-arrow" onclick="history.back()" aria-label="뒤로가기">{% include "shared/_back_icon_svg.html" %}</button>
         <h1 class="header-title">평가</h1>
         <div style="width: 24px;"></div> 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <link rel="stylesheet" href="{%static 'users/css/review.css'%}">
+        <link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'users/css/review.css' %}">
     </header>
 
 

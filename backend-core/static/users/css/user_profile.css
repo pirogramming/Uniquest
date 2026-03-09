@@ -24,13 +24,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.back-arrow {
-    text-decoration: none;
-    font-size: 24px;
-    color: #1D2939;
-    font-weight: 700;
-    line-height: 1;
-}
+/* .back-arrow 스타일은 shared/css/style.css 공통 디자인 사용 */
 
 .header-top span {
     font-size: 20px;

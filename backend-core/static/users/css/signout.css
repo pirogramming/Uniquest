@@ -33,23 +33,7 @@ body {
     margin-bottom: 8px;
 }
 
-.signout-header .back-arrow {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    font-size: 22px;
-    color: #344054;
-    cursor: pointer;
-    border-radius: 8px;
-}
-
-.signout-header .back-arrow:hover {
-    background-color: #F2F4F7;
-}
+/* .back-arrow 스타일은 shared/css/style.css 공통 디자인 사용 */
 
 .signout-header h1 {
     font-size: 22px;

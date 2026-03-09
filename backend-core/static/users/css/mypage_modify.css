@@ -18,6 +18,8 @@ body {
 
 /* 상단 헤더 */
 h2 {
+    display: flex;
+    align-items: center;
     font-size: 22px;
     font-weight: 700;
     margin-top: 0;

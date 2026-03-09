@@ -38,16 +38,7 @@ body {
     z-index: 10;
 }
 
-.back-arrow {
-    font-size: 26px;
-    font-weight: bold;
-    color: #344054;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    line-height: 1.2;
-}
+/* .back-arrow 스타일은 shared/css/style.css 공통 디자인 사용 */
 
 .header-title {
     font-size: 20px;

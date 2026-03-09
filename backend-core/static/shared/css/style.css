@@ -14,24 +14,39 @@ a {
     /* 링크 색상이 튀지 않도록 부모색 추종 */
 }
 
-/* 공통 뒤로가기 화살표 (로그인과 동일한 ← 스타일, 클릭 시 history.back) */
+/* 공통 뒤로가기 버튼 (40x40 둥근 사각형, SVG 화살표, hover/active 피드백) */
+.back-btn,
 .back-arrow {
-    font-size: 26px;
-    font-weight: bold;
-    color: #344054;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    line-height: 1.2;
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #374151;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
 }
 
+.back-btn:hover,
 .back-arrow:hover {
-    opacity: 0.85;
+    background: #E5E7EB;
 }
 
+.back-btn:active,
+.back-arrow:active {
+    background: #D1D5DB;
+    transform: scale(0.93);
+}
+
+.back-btn:focus,
 .back-arrow:focus {
     outline: none;
 }

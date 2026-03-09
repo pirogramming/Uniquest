@@ -30,24 +30,7 @@
     margin: 0;
 }
 
-.back-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #374151;
-    transition: background 0.2s;
-}
-
-.back-btn:hover {
-    background: #E5E7EB;
-}
+/* .back-btn 스타일은 shared/css/style.css에 통합됨 (동일 디자인) */
 
 .filter-btn {
     width: 40px;

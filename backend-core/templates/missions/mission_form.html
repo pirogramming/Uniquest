@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    <h2><button type="button" class="back-arrow" onclick="history.back()">←</button>
+    <h2><button type="button" class="back-arrow" onclick="history.back()" aria-label="뒤로가기">{% include "shared/_back_icon_svg.html" %}</button>
         {% if is_update %} 미션 수정 {% else %} 미션 등록 {% endif %}
     </h2>
 

@@ -10,7 +10,7 @@
 
 {% block content %}
 <header class="header">
-            <button type="button" class="back-arrow" onclick="history.back()">←</button>
+            <button type="button" class="back-arrow" onclick="history.back()" aria-label="뒤로가기">{% include "shared/_back_icon_svg.html" %}</button>
             <h1 class="header-title">차단 관리</h1>
         </header>
 

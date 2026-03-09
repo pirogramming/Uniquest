@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="profile-container">
-        <h2><button type="button" class="back-arrow" onclick="history.back()">←</button> 프로필 수정</h2>
+        <h2><button type="button" class="back-arrow" onclick="history.back()" aria-label="뒤로가기">{% include "shared/_back_icon_svg.html" %}</button> 프로필 수정</h2>
         
         <div class="profile-upload-wrapper">
             <label for="userphoto" class="profile-image-label">

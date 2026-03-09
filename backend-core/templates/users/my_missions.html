@@ -12,9 +12,7 @@
 <div class="mobile-container has-nav">
     <!-- 헤더 -->
     <div class="my-missions-header">
-        <button class="back-btn" onclick="window.history.back()">
-            ←
-        </button>
+        <button type="button" class="back-btn" onclick="window.history.back()" aria-label="뒤로가기">{% include "shared/_back_icon_svg.html" %}</button>
         <h2>내 미션</h2>
         <button class="filter-btn" onclick="window.openFilterPanel()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
