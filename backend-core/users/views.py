@@ -8,10 +8,10 @@ from .serializers import (
     UserProfileModifySerializer,
 )
 from django.contrib.auth import get_user_model
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 import json
 import uuid
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 import requests # Univcert 호출용
 from .utils import extract_univ,send_verification_email,verify_code
 from rest_framework.views import APIView
@@ -22,7 +22,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from common.utils import publish_chat_event
-from missions.models import Mission
+from missions.models import Mission, MissionStatus
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -451,35 +451,63 @@ def change_password(request):
 def change_password_render(request):
     return render(request,'users/change_password.html')
 
-#리뷰 페이지
+# 리뷰 페이지: 미션 참여자(등록자/수행자)이고 미션이 완료된 경우에만 접근 가능
+def _can_access_review(user, mission):
+    """미션에 참여했고 미션이 완료된 경우에만 True."""
+    if mission.status != MissionStatus.COMPLETED:
+        return False
+    if mission.helper_id is None:
+        return False
+    return user.id == mission.author_id or user.id == mission.helper_id
 
-def render_review_page(request,mission_id):
-    return render(request,'users/review.html')
 
-@api_view(['GET'])
+@login_required
+def render_review_page(request, mission_id):
+    mission = get_object_or_404(Mission, id=mission_id)
+    if not _can_access_review(request.user, mission):
+        return HttpResponseForbidden(
+            "해당 미션에 참여한 사용자만, 미션 완료 후 리뷰를 작성할 수 있습니다."
+        )
+    return render(request, "users/review.html")
+
+
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def render_review_page_info(request,mission_id):
+def render_review_page_info(request, mission_id):
+    mission = get_object_or_404(Mission, id=mission_id)
+    if not _can_access_review(request.user, mission):
+        return Response(
+            {"error": "해당 미션에 참여한 사용자만, 미션 완료 후 리뷰를 작성할 수 있습니다."},
+            status=403,
+        )
     user = request.user
-    target_mission = Mission.objects.get(id=mission_id)
-    if (target_mission.author.username == user.username): # 내가 등록자 일 때
-        target_user = target_mission.helper
+    if mission.author_id == user.id:
+        target_user = mission.helper
     else:
-        target_user = target_mission.author
-
-    mission_name = target_mission.title
+        target_user = mission.author
+    mission_name = mission.title
     username = target_user.username
+    return JsonResponse(
+        {"mission_name": mission_name, "username": username, "target_user_id": target_user.id},
+        status=200,
+    )
 
-    return JsonResponse({'mission_name':mission_name,'username':username,"target_user_id": target_user.id,},status=200)
 
-
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def review_json(request):
     user = request.user
-    review_json = json.loads(request.body)
-    target_mission = Mission.objects.get(id=review_json['personal_key'])
-    
-    if (target_mission.author.username == user.username): # 내가 등록자 일 때
+    body = json.loads(request.body)
+    mission_id = body.get("personal_key")
+    if mission_id is None:
+        return Response({"error": "미션 정보가 없습니다."}, status=400)
+    target_mission = get_object_or_404(Mission, id=mission_id)
+    if not _can_access_review(user, target_mission):
+        return Response(
+            {"error": "해당 미션에 참여한 사용자만, 미션 완료 후 리뷰를 작성할 수 있습니다."},
+            status=403,
+        )
+    if target_mission.author_id == user.id:
         target_user = target_mission.helper
     else:
         target_user = target_mission.author
@@ -490,13 +518,13 @@ def review_json(request):
         target_user.review_datas = []
     
     # 이제 리스트이므로 append 가능
-    target_user.review_datas.append(review_json)
+    target_user.review_datas.append(body)
     # --- 수정 부분 끝 ---
 
     total_score = 0
     # 합계 계산
     for review_data in target_user.review_datas:
-        total_score += int(review_data.get('my_score', 0)) # get을 써서 안전하게 가져오기
+        total_score += int(review_data.get("my_score", 0))  # get을 써서 안전하게 가져오기
     
     total_length = len(target_user.review_datas)
     
@@ -531,7 +559,6 @@ def get_public_profile(request, user_id):
     serializer = UserProfileSerializer(user)
     return Response(serializer.data)
 
-from django.shortcuts import render, get_object_or_404
 
 def user_profile_view(request, user_id):
     """타유저 프로필 페이지 렌더링"""
