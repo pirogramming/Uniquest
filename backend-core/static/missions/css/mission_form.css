@@ -1,0 +1,323 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 및 모바일 규격 */
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 450px;
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. 상단 헤더 디자인 */
+h2 {
+    position: fixed;
+    top:0;  
+    width:100%;
+    max-width: 450px;
+    box-sizing: border-box;
+    height: 70px; /* 헤더 높이 고정 */
+    font-size: 20px;
+    font-weight: 700;
+    color: #1D2939;
+    background-color: #ffffff;
+    padding: 20px 25px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #F2F4F7;
+    z-index: 1100; /* 하단 버튼(1000)보다 높게 설정 */
+}
+
+/* 3. 폼 필드 디자인 */
+#mission-form {
+    padding: 90px 25px 120px 25px;
+}
+
+.field {
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #344054;
+    margin-bottom: 12px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+textarea,
+select {
+    width: 100%;
+    border: 1px solid #D0D5DD;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+    border-color: #4DA6FF;
+}
+
+textarea {
+    min-height: 150px;
+    resize: none;
+}
+
+/* 4. 금액 입력 UI */
+.reward-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.reward-input-wrapper input[type="number"] {
+    flex: 1;
+    padding-right: 100px; /* 한글 표시 공간 확보 */
+}
+
+.reward-korean {
+    position: absolute;
+    right: 16px;
+    color: #667085;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.reward-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.reward-btn {
+    flex: 1;
+    background-color: #F2F4F7;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475467;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reward-btn:hover {
+    background-color: #E5E7EB;
+    border-color:#E5E7EB;
+}
+
+.reward-btn:active {
+    background-color: #E5E7EB;
+}
+
+.reward-warning {
+    color: #98A2B3;
+    font-size: 12px;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* 5. 사진 업로드 */
+.image-preview-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-upload-placeholder {
+    width: 80px;
+    height: 80px;
+    background-color: #F9FAFB;
+    border: 1px solid #EAECF0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.photo-upload-placeholder .plus-icon {
+    font-size: 24px;
+    color: #98A2B3;
+    margin-bottom: 4px;
+}
+
+.photo-upload-placeholder span {
+    font-size: 12px;
+    color: #98A2B3;
+}
+
+#image-preview-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.image-preview-item {
+    position: relative;
+}
+
+/* 6. 카테고리 그리드 */
+.category-grid select {
+    width: 100%;
+}
+
+/* 7. 마감기한 버튼 */
+.deadline-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.deadline-btn {
+    width: 100%;
+    background-color: #F2F4F7;
+    border-radius: 8px;
+    padding: 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475467;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deadline-btn:hover {
+    background-color: #E5E7EB;
+    border-color:#E5E7EB;
+
+}
+
+.deadline-btn.active {
+    background-color: #4DA6FF !important;
+    color: #ffffff !important;
+    border:none;
+}
+
+/* 기본 상태: 약간 흐린 회색(muted) */
+#due_preview {
+    color: #475467; /* 원하는 기본 색상 */
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+
+/* 8. 태그 입력 */
+#tag_chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pill {
+    background-color: #F3F4F6;
+    border: 1px solid #D0D5DD;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #344054;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pill:hover {
+    background-color: #E5E7EB;
+}
+
+/* 9. 안내 박스 */
+.info-box {
+    background-color: #EFF8FF;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 10px;
+}
+
+.info-box .title {
+    color: #175CD3;
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.info-box .text {
+    color: #175CD3;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 10. 버튼들 */
+.subbtn {
+    width: 100%;
+    background-color: #F2F4F7;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 600;
+    color: #475467;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.subbtn:hover {
+    background-color: #E5E7EB;
+}
+
+/* 하단 고정 등록 버튼 */
+.btn {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 50px);
+    max-width: 400px;
+    height: 56px;
+    background-color: #4DA6FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(77, 166, 255, 0.3);
+    z-index: 1000;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background-color: #3B8FE6;
+}
+
+.muted {
+    font-size: 12px;
+    color: #98A2B3;
+    line-height: 1.4;
+    margin-top: 8px;
+}

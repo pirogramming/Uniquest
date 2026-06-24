@@ -1,0 +1,479 @@
+/* ==================== 1. 기본 레이아웃 & 컨테이너 ==================== */
+.card {
+    border: 1px solid #F2F4F7;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    background: #fff;
+}
+
+.muted {
+    color: #667085;
+    font-size: 13px;
+}
+
+.mobile-container {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.content-container {
+    margin-top: 70px;
+}
+
+/* ==================== 2. 지도 및 컨트롤 버튼 (세로 정렬 핵심) ==================== */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#map {
+    width: 100%;
+    height: 280px;
+    border-radius: 16px;
+    transition: height 0.3s ease;
+    position: relative;
+}
+
+#map.hidden {
+    display: none;
+}
+
+/* 우측 하단 버튼 모음 컨테이너 */
+.map-controls {
+    position: absolute;
+    right: 12px;
+    bottom: 12px; /* 지도 안쪽 하단 여백 */
+    z-index: 10;
+    display: flex !important;
+    flex-direction: column !important; /* 세로 정렬 강제 */
+    gap: 8px; /* 버튼 사이 간격 */
+}
+/* 전체화면 전용 컨트롤 위치 */
+.fullscreen-controls {
+    position: absolute;
+    right: 16px;
+    bottom: 90px; /* 하단바 높이에 따라 조정하세요 */
+    z-index: 1010; /* 지도보다 높게 설정 */
+}
+
+/* 플로팅 버튼 공통 스타일 (전체화면 & 현위치) */
+.floating-map-btn, 
+.my-location-btn {
+    position: static; /* 컨테이너의 flex 영향을 받도록 초기화 */
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.floating-map-btn:hover, 
+.my-location-btn:hover {
+    transform: scale(1.05);
+    background: #F9FAFB;
+}
+
+.floating-map-btn svg, 
+.my-location-btn svg {
+    color: #667085;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== 3. 커스텀 마커 (물방울 형태 통일) ==================== */
+.user-location-marker,
+.mission-marker {
+    position: relative;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 50% 0; /* 물방울 모양 */
+    transform: translate(-50%, -100%) rotate(-45deg);
+    transition: all 0.2s ease;
+}
+
+.user-location-marker::after,
+.mission-marker::after {
+    content: "";
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    /* 부모의 -45도 회전 보정 및 정중앙 배치 */
+    transform: translate(-50%, -50%) rotate(45deg); 
+}
+
+/* 사용자 위치 (파란색 + 펄스) */
+.user-location-marker {
+    background: #4DA6FF; 
+    z-index: 100;
+}
+
+.user-location-marker::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    animation: pulse-pin 2s infinite;
+}
+
+/* 미션 마커 - 색상은 JS(CATEGORY_COLORS)에서 inline style로 주입됨 */
+.mission-marker {
+    z-index: 50;
+    /* background 는 map_manager.js 의 CATEGORY_COLORS 에서 결정 */
+}
+
+.mission-marker:hover {
+    transform: translate(-50%, -100%) rotate(-45deg) scale(1.1);
+    z-index: 101;
+}
+
+/* 매칭 완료된 미션 마커는 약간 흐리게 처리 */
+.mission-marker.status-matched,
+.mission-marker.status-completed {
+    opacity: 0.5;
+}
+
+@keyframes pulse-pin {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* ==================== 4. 지도 범례 ==================== */
+.map-legend {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 10;
+    background: white;
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    color: #374151;
+    pointer-events: none; /* 지도 클릭 방해 안 하도록 */
+}
+
+.map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0;
+    line-height: 1;
+}
+
+.map-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ==================== 5. 헤더 & 필터 UI ==================== */
+.mission-header {
+    height: 70px;
+    max-width: 450px;
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-bottom: 1px solid #E5E7EB;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.header1 {
+    display: flex;
+    align-items: center;
+}
+
+.mission-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+
+
+.back-to-list-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #374151;
+    background-color: transparent;
+    margin-right: 12px;
+    padding: 8px;
+    transition: background 0.2s;
+}
+
+
+
+.back-to-list-btn:hover {
+    background: #E5E7EB;
+}
+
+
+/* 필터 버튼 활성화 상태 */
+.filter-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #E5E7EB;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: #4DA6FF !important;
+    border-color: #4DA6FF !important;
+    color: white !important;
+}
+
+.filter-btn svg {
+    color: #6B7280;
+    width: 20px;
+    height: 20px;
+}
+
+.filter-btn.active svg {
+    color: white; /* 활성화 시 아이콘도 흰색으로 */
+    stroke: white;
+}
+
+/* ==================== 6. 기타 UI 요소 (툴바, 패널 등) ==================== */
+.mission-toolbar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    padding-bottom: 18px;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+
+    width: 100%;
+}
+
+.view-toggle button {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    background: #F3F4F6;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #6B7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.view-toggle button.active {
+    color: white;
+    background-color: #4DA6FF;
+}
+
+/* 필터 패널 & 백드롭 */
+#filter-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#filter-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#filter-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-width: 450px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding-bottom:20px;
+    z-index: 1002;
+    overflow-y: auto;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#filter-panel.open {
+    transform: translateY(0);
+}
+
+.filter-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 0 20px;
+    position:sticky;
+    top:0;
+    background:white;
+    z-index: 1;
+}
+.filter-header h3{
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+.filter-close{
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #9ca3af;
+    padding:0;
+    width:32px; height:32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.filter-close:hover{
+    color: #6b7280;
+}
+.filter-content{
+    padding:20px;
+}
+.filter-section{
+    margin-bottom: 24px;
+}
+.filter-section:last-child{
+    margin-bottom: 0;
+}
+.filter-section h4{
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color:#374151;
+}
+.filter-options{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.filter-option{
+    display:flex; align-items: center;
+}
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"]{
+    display: none;
+}
+.filter-option input[type="checkbox"]:hover + span,
+.filter-option input[type="radio"]:hover + span {
+    background: #f3f4f6;
+}
+.filter-option input[type="checkbox"]:checked + span,
+.filter-option input[type="radio"]:checked + span {
+    background: #4da6ff;
+    color: white;
+    border-color: #4da6ff;
+}
+.filter-option span {
+    padding: 6px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #1F2937;
+    cursor: pointer;
+    transition: all 0.2s;
+    display:inline-block;
+}
+
+.filter-footer{
+    display:flex; 
+    gap:12px;
+    padding:16px 20px;
+    border-top: 1px solid #e5e7eb;
+    position:sticky;
+    bottom:0;
+    background: white;
+}
+.btn-reset,.btn-apply {
+    flex:1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight:600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+}
+
+.btn-reset {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.btn-reset:hover {
+    background: #e5e7eb;
+}
+.btn-apply {
+    background: #4da6ff;
+    color: white;
+}
+.btn-apply:hover {
+    background: #3b82f6;
+}
+
+
+/* 전체화면 지도 컨테이너 */
+#fullscreen-map-container {
+    position: fixed;
+    top: 70px;
+    left: 0; right: 0; bottom: 0;
+    max-width: 450px;
+    margin: 0 auto;
+    z-index: 999;
+    background: white;
+}
+
+#fullscreen-map {
+    width: 100%;
+    height: 100%;
+}

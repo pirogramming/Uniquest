@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Uniquest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/css/homepage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<header class="header">
+    <div class="header-top" id="header-top">
+        <div id="profile_photo">
+            <img src="" alt="profile_image" id="userprofile">
+        </div>
+        <div class="user-greeting">
+            <h1>안녕하세요</h1>
+            <p id="username"></p>
+        </div>
+        <div class="notification">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge"></span>
+        </div>
+    </div>
+
+    <section class="mission-status-card" id="mission-status-card">
+        <h3><i class="fa-solid fa-chart-line"></i> 내 미션 현황</h3>
+        <div class="status-grid">
+            <div class="status-item">
+                <span class="count highlight-yellow" id="waiting">0</span>
+                <span class="label">대기중</span>
+            </div>
+            <div class="status-item">
+                <span class="count highlight-blue" id="matched">0</span>
+                <span class="label">진행중</span>
+            </div>
+            <div class="status-item">
+                <span class="count" id="completed">0</span>
+                <span class="label">완료</span>
+            </div>
+    </div>
+</header>
+
+<section class="mission-list-section" id="mission-list-section">
+    <!-- 내가 등록한 미션 섹션 -->
+    <section class="mission-section">
+        <div class="section-header">
+            <h2 class="section-title">내가 등록한 미션</h2>
+            <a href="/api/users/my-missions/?tab=created" class="view-all">전체보기</a>
+        </div>
+        <div id="created-mission-container" class="mission-container">
+            <!-- 등록한 미션 1개 -->
+        </div>
+    </section>
+
+    <!-- 내가 참여한 미션 섹션 -->
+    <section class="mission-section">
+        <div class="section-header">
+            <h2 class="section-title">내가 참여한 미션</h2>
+            <a href="/api/users/my-missions/?tab=joined" class="view-all">전체보기</a>
+        </div>
+        <div id="joined-mission-container" class="mission-container">
+            <!-- 참여한 미션 1개 -->
+        </div>
+    </section>
+</section>
+{% endblock %}
+
+{% block bottom_nav %}
+{% include "_bottom-nav.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/shared/js/auth.js"></script>
+<script src="{% static 'shared/js/mission_renderer.js' %}"></script>
+<script src="{% static 'users/js/homepage.js' %}"></script>
+{% endblock %}

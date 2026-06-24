@@ -1,0 +1,20 @@
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}로그아웃{% endblock %}
+
+{%block extra_css %}
+    <link rel="stylesheet" href="{%static 'users/css/login.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="signup-wrapper">
+        <button type="button" onclick="logout()">로그아웃</button>
+    </div>
+{% endblock %}
+
+
+{%block extra_scripts %}
+    <script src="{%static 'users/js/logout.js'%}"></script>
+{% endblock %}

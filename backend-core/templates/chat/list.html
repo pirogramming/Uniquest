@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}채팅 목록 - Uniquest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'chat/css/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="has-nav">
+    <div class="chat-header-area">
+        <h1 class="page-title">채팅 목록</h1>
+    </div>
+
+    <section class="chat-section">
+        {% for group in grouped_list %}
+        <div class="chat-toggle-group">
+            <div class="chat-mission-header" onclick="toggleChat(this)">
+                <div class="header-left">
+                    <div class="mission-icon">{{ group.mission.category|slice:":1"|default:"미" }}</div>
+                    <div class="header-text">
+                        <strong class="mission-title">{{ group.mission.title }}</strong>
+                        <span class="participant-count">채팅 {{ group.rooms|length }}명</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                
+            </div>
+
+            <div class="chat-room-content">
+                {% for item in group.rooms %}
+                <a href="{% url 'missions:chat_room' group.mission.id item.room.id %}" class="individual-chat-link"
+                    data-room-id="{{ item.room.id }}">
+                    <div class="chat-user-avatar">
+                        {{ item.other_user.get_display_name|slice:":1" }}
+                    </div>
+                    <div class="chat-user-info">
+                        <div class="user-info-top">
+                            <span class="user-name">{{ item.other_user.get_display_name }}</span>
+                            <span class="chat-time">{% if item.last_message_created_at %}{{item.last_message_created_at|date:"A g:i" }}{% else %}{{ item.room.created_at|date:"A g:i"|default:"최근" }}{% endif %}</span>
+                        </div>
+                        <p class="last-preview">{{ item.last_message|default:"대화 내용이 없습니다." }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>참여 중인 채팅방이 없습니다.</p>
+            <a href="{% url 'missions:mission_list' %}">새로운 미션 찾기</a>
+        </div>
+        {% endfor %}
+    </section>
+
+    {% block bottom_nav_internal %}
+    {% include "_bottom-nav.html" %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function toggleChat(element) {
+        const group = element.parentElement;
+        group.classList.toggle('active');
+    }
+</script>
+{% endblock %}

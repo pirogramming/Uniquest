@@ -1,0 +1,171 @@
+@charset "UTF-8";
+
+/* 1. 기본 설정 및 변수 */
+:root {
+    --primary-blue: #4DA6FF;
+    --text-black: #1D2939;
+    --text-gray: #667085;
+    --border-color: #F2F4F7;
+    --white: #ffffff;
+}
+
+body {
+    background-color: var(--white);
+    margin: 0;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 2. 헤더 섹션 (상단 연한 블루 영역 수정) */
+.header {
+    background: #E6F1FF; /* 배경색 수정 */
+    padding: 60px 20px 80px;
+    text-align: center;
+}
+
+/* 실제 로고 이미지 스타일 */
+.login-logo {
+    width: 350px;        /* 로고 크기 */
+    height: auto;
+    display: block;
+    margin: 0 auto 12px; /* 가로 중앙 정렬 및 하단 여백 */
+}
+
+.brand-subtitle { 
+    width: 350px;        /* 로고 너비와 똑같이 맞춰서 기준점을 잡습니다 */
+    margin: 0 auto;       /* 로고와 동일하게 가로 중앙에 배치 */
+    text-align: center;   /* 350px라는 영역 안에서 글자를 중앙으로 정렬 */
+    font-size: 15px; 
+    font-weight: 500;
+    color: #4DA6FF; 
+    line-height: 2;     /* 글자가 너무 붙어 보이지 않게 약간의 높이 추가 */
+}
+
+/* 3. 미션 리스트 섹션 (문구 위치 및 굵기 설정) */
+.mission-list-section {
+    padding: 30px 25px 0;
+    background: var(--white);
+    margin-top: -30px !important;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 메인 타이틀: 굵기 700 적용 */
+.mission-list-section::before {
+    content: "캠퍼스 라이프를 더 쉽게";
+    order: -2;
+    display: block; font-size: 24px; font-weight: 700;
+    color: var(--text-black); margin-bottom: 8px;
+}
+
+/* 설명 문구 */
+.mission-list-section::after {
+    content: "작은 부탁부터 과제 도움까지,\A학생들이 서로 돕는 미션 플랫폼";
+    order: -1;
+    display: block; 
+    font-size: 16px; 
+    color: var(--text-gray); 
+    line-height: 1.6;
+    margin-bottom: 30px; 
+    white-space: pre-wrap;
+}
+
+.section-title {
+    order: 0;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+
+.section-title h2 {
+    font-size: 18px; font-weight: 700; color: var(--text-black);
+    display: flex; align-items: center; gap: 8px;
+}
+.section-title h2::after {
+    content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+    font-size: 14px; color: #D0D5DD;
+}
+
+/* 4. 미션 카드 디자인 */
+#mission_cards { order: 1; display: flex; flex-direction: column; gap: 12px; }
+
+.mission-card {
+    background: var(--white); border: 1px solid var(--border-color);
+    border-radius: 20px; padding: 20px; text-decoration: none; color: inherit;
+    display: block; cursor: pointer; transition: transform 0.2s;
+}
+
+.card-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+}
+
+.card-header .title {
+    font-size: 16px; font-weight: 700; color: #1D2939; margin: 0;
+}
+
+.tag-status {
+    font-size: 11px; font-weight: 600; padding: 4px 10px;
+    background: #EFF8FF; color: var(--primary-blue); border-radius: 12px;
+}
+
+.card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.info { display: flex; align-items: center; gap: 8px; }
+
+/* 카테고리별 태그 색상 */
+.tag-category {
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; color: white;
+}
+.category-errand { background-color: #3679E3 !important; }
+.category-study   { background-color: #27C27B !important; }
+.category-rent    { background-color: #FFB800 !important; }
+.category-job     { background-color: #8B5CF6 !important; }
+.category-life    { background-color: #FF6B9A !important; }
+.category-etc     { background-color: #94A3B8 !important; }
+
+.location { font-size: 12px; color: #98A2B3; }
+.price { font-size: 18px; font-weight: 700; color: var(--primary-blue); }
+
+/* 5. 하단 버튼 영역 (로그인/회원가입) */
+.guest-footer-area { 
+    padding: 30px 25px 100px; /* 양옆 여백을 20px에서 25px로 변경 */
+    background: var(--white); 
+}
+
+.guest-footer-text { 
+    text-align: center; 
+    font-size: 14px; 
+    color: #98A2B3; 
+    margin: 60px 0 20px; 
+}
+
+.guest-cta {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px;
+    
+    /* 핵심 수정 부분: 가로 크기를 100%로 하고 양옆 마진을 0으로 합니다 */
+    width: 100%;          
+    margin: 0 0 12px 0;  /* 위 0, 오른쪽 0, 아래 12px, 왼쪽 0 */
+    
+    height: 56px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* 첫 번째 버튼 (로그인): 배경색 적용 */
+.guest-cta:nth-of-type(1) { 
+    background: #4DA6FF; 
+    color: #ffffff; 
+}
+
+/* 두 번째 버튼 (회원가입): 테두리와 글자색 적용 */
+.guest-cta:nth-of-type(2) { 
+    background: #ffffff; 
+    color: #4DA6FF; 
+    border: 1px solid #4DA6FF; 
+}

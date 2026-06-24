@@ -1,0 +1,265 @@
+/* 기본 스타일 초기화 및 폰트 설정 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5; /* 배경색 (모바일 컨테이너 확인용) */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+/* 모바일 컨테이너 */
+.mobile-container {
+    width: 100%;
+    max-width: 430px; /* iPhone 14/15 Pro Max 사이즈 기준 */
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* 헤더 영역 */
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+}
+
+.back-arrow {
+    font-size: 26px;
+    font-weight: bold;
+    color: #344054;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1.2;
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* 메인 콘텐츠 래퍼 */
+.content-wrapper {
+    padding: 0 20px 100px; /* 푸터 버튼 공간 확보 */
+}
+
+/* 완료된 미션 카드 */
+.completed-mission-card {
+    background-color: #f1f6ff; /* 매우 연한 블루 */
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 40px;
+}
+
+.completed-mission-card .label {
+    font-size: 13px;
+    color: #8e94a0;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.mission-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 16px;
+}
+
+/* 유저 프로필 미니 */
+.user-profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    background-color: #6fa6ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-info .name {
+    display: block;
+    font-weight: 700;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-info .sub-text {
+    font-size: 13px;
+    color: #8e94a0;
+}
+
+/* 별점 섹션 */
+.rating-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.rating-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.rating-desc {
+    font-size: 13px;
+    color: #8e94a0;
+    margin-bottom: 24px;
+}
+
+.star-group {
+    font-size: 45px;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.star {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star:hover {
+    transform: scale(1.2);
+}
+
+.star.active {
+    color: #ffc107;        /* 고급스러운 골드 옐로우 */
+    text-shadow: 0 0 5px rgba(255, 193, 7, 0.5); /* 살짝 빛나는 효과 */
+}
+
+.star-guide {
+    font-size: 14px;
+    color: #8e94a0;
+}
+
+/* 코멘트 섹션 */
+.comment-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.comment-input {
+    width: 100%;
+    height: 120px;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    background-color: #fff;
+}
+
+.comment-input::placeholder {
+    color: #adb5bd;
+}
+
+/* 빠른 코멘트 섹션 */
+.quick-comment-section {
+    margin: 20px 0;
+}
+
+.section-title {
+    display: block;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chip {
+    padding: 10px 18px;
+    border-radius: 30px; /* 알약 모양 */
+    border: none;
+    background-color: #f1f3f5; /* 기본 연회색 */
+    color: #495057;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 마우스를 올렸을 때 살짝 어두워짐 */
+.chip:hover {
+    background-color: #e9ecef;
+}
+
+/* 선택되었을 때 (사진 속 파란색) */
+.chip.active {
+    background-color: #4DA6FF; /* 사진과 유사한 블루 */
+    color: white;
+    font-weight: 500;
+}
+
+/* 푸터 액션 버튼 */
+.footer-action {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, #fff 80%, transparent);
+}
+
+.submit-btn {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.submit-btn.disabled {
+    background-color: #d1d6db;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
+.submit-btn:not(.disabled) {
+    background-color: #4DA6FF;
+    color: white;
+}

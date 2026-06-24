@@ -1,0 +1,97 @@
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}회원가입{% endblock %}
+
+{%block extra_css %}
+    <link rel="stylesheet" href="{%static 'users/css/signup.css'%}">
+{% endblock %}
+{%block extra_js %}{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <div class="signup-header">
+        <button type="button" class="back-arrow" onclick="history.back()">←</button>
+        <h2>회원가입</h2>
+    </div>
+
+    <div class="profile-upload-group">
+        <div class="profile-image-container">
+            <img id="profile-preview" src="{% static 'users/images/plus.webp' %}" alt="프로필 이미지 추가">
+            
+            <input type="file" name="userphoto" id="userphoto" accept="image/*" onchange="previewImage(this)">
+            
+            <label for="userphoto" class="upload-label"></label>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label for="username"><i class="fa-solid fa-user label-icon" aria-hidden="true"></i> 이름</label>
+        <input type="text" name="username" id="username" placeholder="홍길동" required>
+    </div>
+
+    <div class="input-group">
+        <label for="password"><i class="fa-solid fa-lock label-icon" aria-hidden="true"></i> 비밀번호</label>
+        <input type="password" name="password" id="password" placeholder="8자 이상 입력" required>
+        <p id="password_condition">비밀번호는 영문자, 특수기호로 이루어진 8자 이상의 비밀번호여야 합니다.</p>
+    </div>
+
+    <div class="input-group">
+        <label for="password_check"><i class="fa-solid fa-lock label-icon" aria-hidden="true"></i> 비밀번호 확인</label>
+        <input type="password" name="password_check" id="password_check" placeholder="비밀번호 재입력" required>
+    </div>
+
+    <div class="input-group email-verify-box">
+        <label class="email-verify-title"><i class="fa-solid fa-envelope label-icon" aria-hidden="true"></i> 학교 이메일 인증</label>
+        <label for="email" class="email-verify-label">학교 이메일</label>
+        <div class="email-section">
+            <input type="email" name="email" id="email" placeholder="student@university.ac.kr" required>
+            <button type="button" class="btn-send" id="send-btn" onclick="send_number()" action="verify-email"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> 전송</button>
+            <div class="btn-send btn-send-state" id="transmitting" style="display:none;">
+                <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+            </div>
+            <div class="btn-send btn-send-state" id="complete" style="display:none;">완료</div>
+        </div>
+        <p class="email-verify-helper">학교 이메일 입력 후 '전송' 버튼을 클릭하세요</p>
+
+        <div id="check_number_box" style="display:none;">
+            <label for="number" style="display: block; margin-bottom: 5px;">인증번호 입력</label>
+            <div class="verify-group">
+                <input type="number" name="number" id="number" placeholder="6자리 숫자" required>
+                <button type="button" class="btn-sub" onclick="check_number()">확인</button>
+                <div id="timer-display" style="font-weight: bold; margin-top: 10px; color: blue;">
+                    남은 시간: 05:00
+                </div>
+            </div>
+        </div>
+        <div id="check_number_box_certified">
+            <div class="certified-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                </svg>
+                <span>이메일 인증 완료!</span>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn-main" onclick="handleSignup()"><i class="fa-solid fa-user" aria-hidden="true"></i> 회원가입</button>
+    <div class="footer">
+        <p>이미 계정이 있으신가요?</p>
+        <a href="{%url 'users:login'%}" id="signup">로그인</a>
+    </div>
+    <div id="announcement">
+        <p>
+            회원가입 시 Uniquest의 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.
+            <a href="{%url 'users:announcement'%}">상세보기</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{%block bottom_nav %}
+{% endblock %}
+
+{%block extra_scripts %}
+    <script src="{%static 'users/js/signup.js'%}"></script>
+{% endblock %}

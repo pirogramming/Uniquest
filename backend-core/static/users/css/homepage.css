@@ -1,0 +1,372 @@
+@charset "UTF-8";
+
+/* 1. 배경 설정 및 화면 중앙 배치 */
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+}
+
+/* 전체 모바일 컨테이너 구조 */
+.signup-wrapper {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    background-color: #ffffff;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: auto;
+    position: relative;
+}
+/* 2. 헤더 섹션 (겹침 현상 제거) */
+.header {
+background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+padding: 50px 20px 30px 25px; 
+border-radius: 0;
+color: white;
+margin-bottom: 20px;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+#profile_photo {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;           /* 원형 */
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#profile_photo img,
+#userprofile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.notification {
+    display: none;
+}
+
+.user-greeting {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-greeting h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.user-greeting p#username {
+    font-size: 18px;
+    margin: 4px 0 0 0;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+/* 퀵 메뉴 정렬 */
+.quick-menu {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2); 
+    padding: 25px 15px;
+    border-radius: 25px;
+}
+
+.quick-menu > * {
+    flex: 1; 
+    text-decoration: none;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; 
+}
+
+.menu-item span {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap; 
+    letter-spacing: -0.5px;
+}
+
+/* 3. 내 미션 현황 카드 */
+/* 3. 내 미션 현황 카드 - 불투명(유리창) 스타일 */
+.mission-status-card {
+    /* 배경색: 흰색 70~80% 투명도 */
+    background: rgba(255, 255, 255, 0.75); 
+    /* 뒤 배경 블러 처리 (불투명한 느낌의 핵심) */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    margin: 20px auto; 
+    padding: 20px;
+    border-radius: 20px;
+    
+    /* 테두리를 살짝 주면 투명한 느낌이 더 잘 살아요 */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    
+    /* 그림자는 조금 더 연하게 조정 */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.mission-status-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #101828;
+}
+
+.mission-status-card h3 i {
+    color: #4DA6FF;
+}
+
+.status-grid {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-item .count {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.status-item .label {
+    font-size: 13px;
+    color: #888;
+}
+
+.highlight-blue { color: #4DA6FF !important; }
+.highlight-yellow { color: #FFB800 !important; }
+
+/* 4. 미션 리스트 섹션 */
+.mission-list-section {
+    padding: 0 25px 100px 25px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-title h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #4DA6FF;
+    text-decoration: none;
+}
+
+/* 개별 미션 카드 */
+.mission-card {
+    background: #FFFFFF;
+    border: 1px solid #F2F4F7;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.card-header .title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    color: #1D2939;
+}
+
+/* 모든 상태 배지 컬러링 (대기중, 진행중, 완료 대소문자 완벽 대응) */
+.tag-status, .status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.tag-status.waiting, .tag-status.WAITING, 
+.status-badge.waiting, .status-badge.WAITING {
+    background-color: #FFF4ED !important;
+    color: #FB923C !important;
+}
+
+.tag-status.ongoing, .tag-status.ONGOING, 
+.status-badge.ongoing, .status-badge.ONGOING {
+    background-color: #EFF8FF !important;
+    color: #57A6FF !important;
+}
+
+.tag-status.completed, .tag-status.COMPLETED, 
+.status-badge.completed, .status-badge.COMPLETED {
+    background-color: #F2F4F7 !important;
+    color: #667085 !important;
+}
+
+.description {
+    font-size: 14px;
+    color: #667085;
+    line-height: 1.5;
+    margin: 0 0 15px 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tag-category {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    color: white;
+}
+
+/* 카테고리별 배경색 지정 */
+.category-errand { background-color: #3679E3 !important; } /* 심부름 - Blue */
+.category-study  { background-color: #27C27B !important; } /* 학업 - Green */
+.category-rent   { background-color: #FFB800 !important; } /* 대여 - Yellow */
+.category-job    { background-color: #8B5CF6 !important; } /* 구인 - Purple */
+.category-life   { background-color: #FF6B9A !important; } /* 생활 - Pink */
+.category-etc    { background-color: #94A3B8 !important; } /* 기타 - Gray */
+
+.location {
+    font-size: 12px;
+    color: #98A2B3;
+}
+
+.price {
+    font-size: 17px;
+    font-weight: 700;
+    color: #4DA6FF;
+}
+
+/* 하단 네비게이션 - 화면 바닥에 고정 */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #eee;
+    z-index: 1000;
+}
+
+.bottom-nav .badge, .bottom-nav .notification-dot {
+    display: none !important;
+}
+
+.nav-item.center-btn {
+    width: 50px;
+    height: 50px;
+    background-color: #4DA6FF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 10px rgba(77, 166, 255, 0.3);
+}
+
+/* 하단 네비 높이만큼 여백 (스크롤 시 콘텐츠가 가려지지 않도록) */
+.mission-list-section {
+    padding-bottom: 90px;
+}
+
+.mission-section {
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #101828;
+    margin: 0;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #98A2B3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+.loading, .empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #98A2B3;
+    font-size: 13px;
+    font-weight:500;
+}

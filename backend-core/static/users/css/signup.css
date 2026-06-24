@@ -1,0 +1,339 @@
+@charset "UTF-8";
+
+/* 1. 배경 설정 및 화면 중앙 배치 */
+body {
+    background-color: #f8f9fa; /* 화면 바깥쪽은 연회색 */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1D2939;
+}
+
+/* 2. 전체 모바일 화면 (박스 형태 제거, 전체 흰색) */
+.signup-wrapper {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh; 
+    background-color: #ffffff; /* 모바일 영역 전체 흰색 */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.signup-container {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 2. 헤더 레이아웃: 화살표 + 제목(1행) + 부제목(2행), 베이스라인 정렬 */
+.signup-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 15px;
+    align-items: baseline;
+    margin: 10px 0 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E4E7EC;
+}
+
+.signup-header .back-arrow {
+    line-height: 1;
+}
+
+.signup-container .signup-header h2 {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 15px;
+    align-items: start;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #101828;
+    text-align: left;
+}
+
+
+.signup-container h2::after {
+    content: "Uniquest와 함께 시작하세요.";
+    grid-row: 2;
+    grid-column: 1 / -1;  /* 전체 너비 사용 → 왼쪽부터 정렬 */
+    font-size: 14px;
+    font-weight: 400;
+    color: #667085;
+    margin-top: 4px;
+    text-align: left;
+    display: block;
+}
+
+/* 3. 입력 그룹 스타일 */
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475467;
+    margin-bottom: 8px;
+}
+
+.label-icon {
+    margin-right: 6px;
+    color: #667085;
+    font-size: 13px;
+}
+
+input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid #D0D5DD;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+#password_condition {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 8px;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* 1. 프로필 이미지 업로드 섹션 (새로 추가) */
+.profile-upload-group {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    margin-bottom: 30px;
+}
+
+/* 동그란 컨테이너 */
+.profile-image-container {
+    position: relative;
+    width: 100px;  /* 원하는 크기로 조절하세요 */
+    height: 100px; /* width와 같게 설정 */
+    border-radius: 50%; /* 완전한 원형 */
+    background-color: #F2F4F7; /* 회색 배경 */
+    overflow: hidden; /* 이미지가 원 밖으로 나가지 않게 자름 */
+    border: 2px solid #E4E7EC; /* 테두리 (선택사항) */
+    cursor: pointer;
+}
+
+/* 미리보기 이미지 스타일 */
+#profile-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 비율을 유지하며 컨테이너에 꽉 차게 */
+}
+
+/* 실제 파일 입력 창 숨기기 */
+#userphoto {
+    display: none;
+}
+
+/* 라벨을 컨테이너 전체로 확장하여 클릭 영역 확보 */
+.upload-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: transparent; /* 투명하게 */
+}
+
+/* 보내기 버튼 */
+#send-btn{
+    display: flex; align-items: center;
+}
+
+#transmitting{
+    display: flex; align-items: center;
+}
+
+/* 4. 학교 이메일 인증 섹션 (연한 파란 박스) */
+.email-verify-box {
+    background-color: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.email-verify-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #101828;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.email-verify-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475467;
+    margin-bottom: 8px;
+}
+
+.email-section {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.email-verify-box .email-section input {
+    flex: 1;
+}
+
+.btn-send {
+    height: 54px;
+    padding: 0 18px;
+    background-color: #F2F4F7;
+    color: #667085;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-send-state {
+    min-width: 80px;
+}
+
+.email-verify-helper {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+.btn-sub {
+    height: 54px;
+    padding: 0 18px;
+    background-color: #F2F4F7;
+    color: #667085;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 5. 인증번호 입력창 내부 타이머 배치 (동일 선상) */
+#check_number_box {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #F9FAFB;
+    border-radius: 12px;
+}
+
+.verify-group {
+    position: relative; /* 타이머 배치의 기준점 */
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#number {
+    flex: 1;
+    padding-right: 110px; /* 타이머 숫자가 들어갈 공간 확보 */
+}
+
+/* 타이머 스타일: 입력창 내부 우측 배치 */
+#timer-display {
+    position: absolute;
+    right: 85px; /* 확인 버튼 왼쪽, 입력창 안쪽 */
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 !important; /* HTML의 인라인 마진 무력화 */
+    font-size: 13px;
+    font-weight: 700;
+    color: #0000FF !important; /* 시안과 동일한 파란색 강조 */
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* 6. 인증 완료 배지 (이메일 인증 완료 시 표시) */
+#check_number_box_certified {
+    display: none; /* JS를 통해 인증 완료 시 'flex'로 변경 */
+    margin-top: 15px;
+}
+
+.certified-badge {
+    width: 100%;
+    height: 54px;
+    background-color: #57A6FF;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    gap: 8px;
+    font-weight: 700;
+}
+
+#complete{
+    align-items: center;
+}
+
+/* 7. 메인 버튼 및 하단 푸터 */
+.btn-main {
+    width: 100%;
+    height: 56px;
+    background-color: #57A6FF;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+#signup {
+    color: #57A6FF;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* 8. 이용약관: 하단으로 충분히 공간 띄움 */
+#announcement {
+    display: block;
+    margin-top: 30px;
+    padding: 16px;
+    background-color: #F9FAFB;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #667085;
+    line-height: 1.6;
+    text-align: left;
+}
+
+#announcement a{
+    text-decoration: underline;
+}

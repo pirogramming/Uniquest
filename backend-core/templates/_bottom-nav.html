@@ -1,0 +1,26 @@
+<nav class="bottom-nav">
+    <a href="{% url 'users:homepage' %}"
+        class="nav-item {% if request.resolver_match.url_name == 'homepage' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i>
+    </a>
+
+    <a href="{% url 'missions:mission_list' %}"
+        class="nav-item {% if request.resolver_match.url_name == 'mission_list' %}active{% endif %}">
+        <i class="fa-solid fa-list-ul"></i>
+    </a>
+
+    <a href="{% url 'missions:mission_create_view' %}" class="nav-fab">
+        <div class="fab-button"><i class="fa-solid fa-plus"></i></div>
+    </a>
+
+    <a href="{% url 'missions:chat_list' %}"
+        class="nav-item nav-item-chat {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}">
+        <i class="fa-solid fa-comment-dots"></i>
+        <span class="nav-badge" id="chatUnreadBadge" style="display:none">0</span>
+    </a>
+
+    <a href="{% url 'users:mypage_screen' %}"
+        class="nav-item {% if request.resolver_match.url_name == 'mypage_screen' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i>
+    </a>
+</nav>

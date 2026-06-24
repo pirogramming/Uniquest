@@ -1,0 +1,14 @@
+django>=4.2,<5.0
+djangorestframework
+psycopg2-binary
+redis
+django-cors-headers
+djangorestframework-simplejwt>=5.3.0
+PyJWT>=2.8.0
+Pillow==10.4.0
+requests
+django-environ
+django-redis
+python-dotenv
+drf-spectacular
+drf-yasg

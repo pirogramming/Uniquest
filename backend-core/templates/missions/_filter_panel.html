@@ -1,0 +1,86 @@
+<!-- 필터 백드롭 -->
+<div id="filter-backdrop" style="display:none;"></div>
+
+<!-- 필터 패널 -->
+<div id="filter-panel">
+    <div class="filter-header">
+        <h3>필터</h3>
+        <button type="button" class="filter-close" onclick="window.closeFilterPanel()">×</button>
+    </div>
+
+    <div class="filter-content">
+        <!-- 정렬 -->
+        <div class="filter-section">
+            <h4>정렬</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="latest" checked>
+                    <span>최신순</span>
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="distance">
+                    <span>거리순</span>
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="sort" value="reward">
+                    <span>높은 보상순</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 카테고리 -->
+        <div class="filter-section">
+            <h4>카테고리</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="ERRAND">
+                    <span>심부름</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="STUDY">
+                    <span>학업</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="RENTAL">
+                    <span>대여</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="RECRUIT">
+                    <span>구인</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="LIFE">
+                    <span>생활</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="OTHER">
+                    <span>기타</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 상태 섹션만 수정 -->
+        <div class="filter-section">
+            <h4>상태</h4>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" name="status" value="WAITING" checked>
+                    <span>대기중</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="status" value="MATCHED">
+                    <span>진행중</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="status" value="COMPLETED">
+                    <span>완료</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-footer">
+        <button type="button" class="btn-reset" onclick="window.resetFilters()">초기화</button>
+        <button type="button" class="btn-apply" onclick="window.applyFilters()">적용</button>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+{%extends "base.html"%}
+{%load static%}
+
+{% block title %}프로필 수정{% endblock %}
+
+{%block extra_css %}
+    <link rel="stylesheet" href="{%static 'users/css/mypage_modify.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+        <h2><button type="button" class="back-arrow" onclick="history.back()">←</button> 프로필 수정</h2>
+        
+        <div class="profile-upload-wrapper">
+            <label for="userphoto" class="profile-image-label">
+                <div class="profile-image-container">
+                    <img id="profile-preview" src="{% static 'users/images/plus.webp' %}" alt="프로필 이미지">
+                    <div class="image-overlay">
+                        <span class="camera-icon">📸</span>
+                    </div>
+                </div>
+            </label>
+            <input type="file" id="userphoto" accept="image/*" onchange="previewImage(this)">
+        </div>
+
+        <form id="profile-form">
+            <div class="input-group">
+                <label for="user-username">사용자명</label>
+                <input type="text" id="user-username" placeholder="사용자명을 입력하세요">
+            </div>
+
+            <div class="input-group readonly-group">
+                <p id="user-email"></p>
+                <p class="helper-text">이메일은 변경할 수 없습니다</p>
+            </div>
+
+            <div class="input-group readonly-group">
+                <p id="user-univ"></p>
+                <p class="helper-text">학교 정보는 변경할 수 없습니다</p>
+            </div>
+
+            <div class="info-banner">
+                ⓘ 학교 이메일과 학교 정보는 인증 완료 후 변경할 수 없습니다.
+            </div>
+        </form>
+
+        <button type="button" class="save-btn" onclick="patchProfile()">저장하기</button>
+    </div>
+{% endblock %}
+
+{%block extra_scripts %}
+    <script src="{% static 'shared/js/auth.js' %}"></script>
+    <script src="{% static 'users/js/mypage_modify.js' %}"></script>
+{% endblock %}

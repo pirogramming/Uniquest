@@ -1,0 +1,218 @@
+@charset "UTF-8";
+
+/* 1. 배경 설정 및 화면 중앙 배치 */
+body {
+    background-color: #f8f9fa; /* 화면 바깥쪽은 연회색 */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1D2939;
+}
+
+/* 2. 전체 모바일 화면 (박스 형태 제거, 전체 흰색) */
+.signup-wrapper {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh; 
+    background-color: #ffffff; /* 모바일 영역 전체 흰색 */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.signup-container {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 3. 헤더 레이아웃 수정 */
+.header {
+    display: grid;
+    grid-template-columns: auto 1fr; /* 화살표 / 나머지 영역 */
+    column-gap: 15px; 
+    align-items: start; /* 요소를 위쪽 정렬하여 텍스트 첫 줄에 맞춤 */
+    margin-bottom: 35px;
+    padding-top: 15px;
+}
+
+/* 텍스트 정렬 및 로고 배치를 위한 영역 */
+.header-text {
+    grid-column: 2;
+    text-align: left; /* 상단 텍스트는 화살표 옆 왼쪽 정렬 */
+}
+
+.header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #101828;
+    line-height: 1.2;
+}
+
+.header p {
+    font-size: 14px;
+    color: #667085;
+    margin: 4px 0 0 0;
+}
+
+/* 4. 로고 이미지 스타일 */
+.login-logo {
+    width: 370px;   
+    height: auto;
+    display: block;
+    margin: 50px 0 5px -25px; /* 왼쪽으로 25px 당김 */
+}
+
+/* 로고 밑에 '대학생 미션 중개 플랫폼' 문구 */
+.header-text::after {
+    content: "대학생 미션 중개 플랫폼";
+    display: block;
+    width: 370px;        
+    margin-left: -25px;  
+    text-align: center;
+    font-size: 15px;     
+    font-weight: 500;    
+    color: #667085;
+    margin-top: 20px;    
+    margin-bottom: 20px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* [순서 3] 입력창 영역 */
+.email-section, .input-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+/* 5. 입력창 및 버튼 디자인 */
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475467;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid #D0D5DD;
+    border-radius: 12px;
+    padding: 0 16px 0 48px;
+    font-size: 15px;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-position: 16px center;
+    background-size: 18px;
+}
+
+/* 아이콘 이미지 (Data URI 사용으로 별도 파일 없이 작동) */
+#email {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2398A2B3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /%3E%3C/svg%3E");
+}
+
+#password {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2398A2B3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' /%3E%3C/svg%3E");
+}
+
+.btn-main {
+    width: 100%;
+    height: 56px;
+    background-color: #4DA6FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+/* 로그인 없이 둘러보기 버튼 */
+.btn-guest {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 56px;
+    margin-top: 12px;
+    background-color: #F2F4F7;
+    color: #98A2B3;
+    border: 1px solid #D0D5DD;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-guest:hover {
+    background-color: #E4E7EC;
+    border-color: #98A2B3;
+    color: #667085;
+}
+
+/* 6. 하단 푸터 및 이용약관 */
+.footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+}
+
+/* 비밀번호 찾기 (회색 링크) */
+#search_key {
+    display: inline-block;
+    color: #98A2B3;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#search_key:hover {
+    color: #667085;
+}
+
+/* 회원가입 하기 (파란색 링크) */
+#signup {
+    color: #4DA6FF;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* 두 메뉴 사이의 구분선 */
+#search_key::after {
+    content: "|";
+    margin-left: 15px;
+}
+
+#announcement {
+    display: block;
+    margin-top: auto; 
+    margin-bottom: 20px;
+    padding: 16px;
+    background-color: #F9FAFB;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #667085;
+    line-height: 1.6;
+    text-align: left;
+}
+
+#announcement a{
+    text-decoration: underline;
+}

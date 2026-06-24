@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}마이페이지{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'users/css/mypage.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
+{% block content %}
+<div class="mobile-container has-nav">
+    
+    <header class="profile-card">
+        <div class="header-top">
+            <span>마이페이지</span>
+        </div>
+        
+        <div class="user-info-section">
+            <div class="profile-circle">
+                <img src="" alt="profile_image" id="userprofile">
+            </div>
+            <div class="text-info">
+                <h2 id="user-username"></h2>
+                <p id="user-univ"></p>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-header">
+                <span>유니퀘스트 점수</span>
+                <span id="user-score"></span>
+            </div>
+            <div class="score-bar-bg">
+                <div class="score-bar-fill" id="score_bar_fill"></div>
+            </div>
+            <p class="score-desc">유니퀘스트 점수는 미션 완료와 평가에 따라 변동됩니다</p>
+        </div>
+    </header>
+
+    <main class="menu-section">
+        <div class="menu-item" onclick="location.href='/api/users/mypage_modify/'">
+            <div class="menu-left">📝 프로필 수정</div>
+            <div class="menu-arrow">→</div>
+        </div>
+        <a href="/api/users/blocked_users/" class="menu-item">
+            <div class="menu-left">🛡️ 차단 관리</div>
+            <div class="menu-arrow">→</div>
+        </a>
+
+        <!-- 내 리뷰 보기 토글 -->
+        <div class="menu-item my-reviews-toggle" onclick="toggleReviews()" role="button" tabindex="0">
+            <div class="menu-left">
+                <span>⭐ 내 리뷰 보기</span>
+                <span class="review-count" id="review-count-badge">0</span>
+            </div>
+            <div class="menu-arrow">→</div>
+        </div>
+
+        <!-- 리뷰 리스트 (접었다 펼쳐지는 영역, 하드코딩) -->
+        <div class="reviews-container" id="reviewsContainer"></div>
+
+
+        <button class="logout-btn" onclick="logout()">
+            <p>로그아웃</p>
+        </button>
+        <a href="/api/users/signout/" class="signout-btn" role="button">
+            <p>회원탈퇴</p>
+        </a>
+    </main>
+
+    {% include "_bottom-nav.html" %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'shared/js/auth.js' %}"></script>
+    <script src="{% static 'users/js/mypage.js' %}"></script>
+{% endblock %}

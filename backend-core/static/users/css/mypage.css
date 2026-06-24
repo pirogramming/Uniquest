@@ -1,0 +1,340 @@
+@charset "UTF-8";
+
+/* 1. 기본 레이아웃 및 스크롤 설정 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 상단 정렬로 스크롤 확보 */
+    min-height: 100vh;
+}
+
+/* 모바일 규격 컨테이너 */
+.signup-wrapper, .mobile-container {
+    width: 100%;
+    max-width: 450px;
+    min-height: 100vh;
+    height: auto !important;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* 2. 상단 타이틀 영역 (흰색) - 스크롤해도 이 부분만 상단 고정 */
+.header-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 450px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background-color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1D2939;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.settings-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    /* 흰색 배경이므로 검은색 아이콘 유지 */
+}
+
+/* 3. 프로필 카드 (블루 그라데이션) - 일반 흐름, 스크롤됨 */
+.profile-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info-section {
+    background: linear-gradient(180deg, #4DA6FF 0%, #6BB6FF 100%);
+    padding: 30px 25px 20px 25px;
+    margin-top: 64px; /* 고정된 .header-top 높이만큼 띄움 */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-circle {
+    width: 75px;
+    height: 75px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #4DA6FF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;      /* 추가: 넘치는 부분 잘림 */
+    flex-shrink: 0;        /* 추가: flex 레이아웃에서 줄어들지 않게 */
+}
+
+.profile-circle img,
+#userprofile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.text-info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.text-info p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 4px;
+}
+
+/* 4. 유니퀘스트 점수 섹션 */
+.score-section {
+    background-color: #6BB6FF; /* 그라데이션 하단색과 통일 */
+    padding: 0 25px 35px 25px;
+    border-radius: 0 0 0 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.score-header span:first-child {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#user-score {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.score-bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.score-bar-fill {
+    height: 100%;
+    background-color: #ffffff; /* 흰색 바 적용 */
+    border-radius: 10px;
+}
+
+.score-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+}
+
+/* 5. 메뉴 및 리스트 영역 */
+.menu-section {
+    padding: 30px 25px 150px 25px;
+    background-color: #ffffff;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #F2F4F7;
+    padding: 18px 20px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: #1D2939;
+    font-weight: 600;
+}
+
+.mission-list-group {
+    margin-top: 30px;
+}
+
+.mission-list-group h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #1D2939;
+}
+
+.empty-box {
+    background-color: #F9FAFB;
+    color: #98A2B3;
+    padding: 40px;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+/* 6. 로그아웃 및 회원탈퇴 */
+.logout-btn {
+    width: 100%;
+    height: 54px;
+    background: none;
+    border: 1.5px solid #FF4757;
+    border-radius: 12px;
+    color: #FF4757;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 40px;
+    cursor: pointer;
+}
+
+.signout-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #98A2B3;
+    font-size: 12px;
+    margin-top: 20px;
+    text-decoration: underline;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+}
+
+/* ---------- 내 리뷰 보기 토글 (시안 스타일) ---------- */
+.menu-item.my-reviews-toggle {
+    cursor: pointer;
+    border-radius: 15px; /* 기존 메뉴 아이템 곡률 유지 */
+}
+
+.my-reviews-toggle .menu-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.review-count {
+    background: linear-gradient(135deg, #FFB800 0%, #FF9500 100%);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.my-reviews-toggle.active .menu-arrow {
+    transform: rotate(90deg);
+}
+
+.menu-arrow {
+    font-size: 18px;
+    color: #999;
+    transition: transform 0.3s ease;
+}
+
+/* 리뷰 리스트 컨테이너 (회색 배경 제거) */
+.reviews-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: transparent; /* 회색 배경 제거 및 투명화 */
+}
+
+.reviews-container.open {
+    max-height: 2000px; /* 리뷰가 많을 수 있으므로 충분히 확보 */
+}
+
+/* 리뷰 카드 (mission_card.css 기준 통일) */
+.review-card {
+    margin: 15px 5px; /* 양옆 여백 조정 */
+    padding: 20px;
+    background: #FFFFFF;
+    border: 1px solid #F2F4F7; /* mission_card 테두리 */
+    border-radius: 20px;        /* mission_card 곡률 20px */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); /* mission_card 스타일의 그림자 */
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* 별점 스타일 */
+.review-score {
+    display: flex;
+    gap: 4px;
+    font-size: 16px;
+}
+
+.review-score .star {
+    color: #FFB800;
+}
+
+.review-score .star.empty {
+    color: #E0E0E0;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #98A2B3; /* mission_card 보조 텍스트 색상 */
+}
+
+.review-comment {
+    font-size: 15px;
+    color: #333; /* mission-title 색상 참조 */
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* 태그 스타일 (mission_card 기반) */
+.quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.quick-tag {
+    padding: 4px 10px;
+    background: #F9FAFB;
+    border: 1px solid #F2F4F7;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #667085;
+    font-weight: 500;
+}
+
+.no-reviews {
+    padding: 40px 20px;
+    text-align: center;
+    color: #98A2B3;
+    font-size: 14px;
+    background-color: #F9FAFB;
+    border-radius: 20px;
+    margin: 15px 5px;
+}

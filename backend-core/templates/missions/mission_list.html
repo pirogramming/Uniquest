@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}미션 목록{% endblock %}
+
+{%block extra_css %}
+    <style>
+  .card { border:1px solid #eee; border-radius:12px; padding:12px; margin:10px 0; }
+  .muted { color:#666; font-size: 13px; }
+
+    .card { border: 1px solid #F2F4F7; border-radius: 12px; padding: 16px; margin: 12px 0; background: #fff; }
+    .muted { color: #667085; font-size: 13px; }
+    .mission-header { padding: 20px 0 10px; }
+    .mission-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .create-link { font-size: 14px; text-decoration: none; font-weight: 600; }
+    
+</style>
+<link rel="stylesheet" href="{% static 'shared/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'missions/css/mission_list.css' %}">
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/shared/js/auth.js"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_KEY }}&libraries=services&autoload=false"></script>
+<script src="{% static 'missions/js/map_manager.js' %}"></script>
+<script src="{% static 'shared/js/mission_renderer.js' %}" defer></script>
+<script src="{% static 'missions/js/mission_list.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="mobile-container has-nav">
+    <!-- 헤더 (고정, 항상 표시) -->
+    <div class="mission-header">
+        <div class="header1">
+            <button class="back-to-list-btn" id="back-to-list-btn" onclick="window.closeFullscreenMap()" style="display:none;">
+                ←
+            </button>
+            <h2>미션 목록</h2>
+        </div>
+        <button class="filter-btn" onclick="window.openFilterPanel()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+        </button>
+    </div>
+
+    <div class="content-container">
+        <!-- 툴바 -->
+        <div class="mission-toolbar">
+            <!-- 뷰 전환 -->
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="both" onclick="window.switchView('both')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    지도+미션
+                </button>
+                <button class="view-btn" data-view="list" onclick="window.switchView('list')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    리스트만
+                </button>
+            </div>
+        </div>
+
+        <!-- 지도 -->
+        <div class="map-wrapper" style="position: relative;"> 
+            <div id="map"></div>
+            <div class="map-controls">
+                <button class="floating-map-btn" onclick="window.openFullscreenMap()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
+                    </svg>
+                </button>
+                <button class="my-location-btn" onclick="window.moveToCurrentLocation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+                    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 미션 목록 -->
+        <div id="mission-list-container">
+            <p class="muted">미션을 불러오는 중...</p>
+        </div>
+    </div>
+
+    {% include "_bottom-nav.html" %}
+
+    {%include "missions/_filter_panel.html" %}
+
+    <!-- 전체화면 지도 -->
+    <div id="fullscreen-map-container" style="display:none;">
+        <div id="fullscreen-map"></div>
+        <div class="map-controls fullscreen-controls">
+                <button class="floating-map-btn" onclick="window.closeFullscreenMap()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-angle-contract" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707"/>
+                    </svg>
+                </button>
+                <button class="my-location-btn" onclick="window.moveToCurrentLocation(true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
+                    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52z"/>
+                    </svg>
+                </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+motor
+pydantic>=2.0
+pydantic-settings
+redis[asyncio]>=4.2.0  # ✨ 이렇게 수정
+PyJWT>=2.8.0
+httpx
